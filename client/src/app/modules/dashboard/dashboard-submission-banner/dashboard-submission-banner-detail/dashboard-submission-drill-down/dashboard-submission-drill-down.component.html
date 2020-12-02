@@ -1,0 +1,778 @@
+<div #middle class="p-col-12">
+    <p-table #dt [hidden]="displayType !== 2" [value]="submissions" dataKey="id" autoLayout="true" [paginator]="true"
+        [rows]="size" [loading]="loading" [scrollable]="true" [scrollHeight]="isLightVersion ? '360px' : '540px'">
+        <ng-template pTemplate="colgroup">
+            <colgroup>
+                <col [style.width]="'1%'" #status />
+                <col [style.width]="'2%'" #expand *ngIf="!isLightVersion" />
+                <col [style.width]="'2%'" #id />
+                <col [style.width]="'9%'" #process />
+                <col [style.width]="'9%'" #step />
+                <col [style.width]="'6%'" #elapsest />
+                <col [style.width]="'2.5%'" #avg *ngIf="!isLightVersion" />
+                <col [style.width]="'6%'" #start *ngIf="!isLightVersion" />
+                <col [style.width]="'4%'" #schend />
+                <col [style.width]="'5%'" #schdur *ngIf="!isLightVersion" />
+                <col [style.width]="'5%'" #elapse *ngIf="!isLightVersion" />
+                <col [style.width]="'2%'" #map *ngIf="!isLightVersion" />
+                <col [style.width]="'1%'" #isolate />
+            </colgroup>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th [pSortableColumn]="'status'" style="width: 3em">
+                    <p-sortIcon *ngIf="dt.sortField && dt.sortField === 'status'" [field]="'status'"></p-sortIcon>
+                </th>
+                <th style="width: 3em" *ngIf="!isLightVersion"></th>
+                <th [pSortableColumn]="'id'">
+                    ID<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'id'" [field]="'id'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'process_name'">
+                    Process<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'process_name'" [field]="'process_name'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'currentStep'">
+                    Current Step<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'Current_step'"
+                        [field]="'Current_step'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'records'" *ngIf="!isLightVersion" pTooltip="Records" tooltipPosition="bottom">
+                    Step Elapsed Time<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'records'" [field]="'records'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'warnings'" *ngIf="!isLightVersion" pTooltip="Warnings" tooltipPosition="bottom">
+                    Avg Step Duration<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'warnings'"
+                        [field]="'warnings'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'startTime'">
+                    Start Time<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'startTime'" [field]="'startTime'">
+                    </p-sortIcon>
+                </th>
+
+                <th [pSortableColumn]="'errors'" pTooltip="Errors" tooltipPosition="bottom">
+                    Scheduled End<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'errors'" [field]="'errors'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'period'" *ngIf="!isLightVersion">
+                    Scheduled Duration + Tolerance<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'period'"
+                        [field]="'period'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'adHoc'" *ngIf="!isLightVersion">
+                    Process Elapsed Time<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'adHoc'" [field]="'adHoc'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'parentId'" *ngIf="!isLightVersion">
+                    Process Map<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'parentId'" [field]="'parentId'">
+                    </p-sortIcon>
+                </th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-submission let-expanded="expanded" let-rowIndex="rowIndex">
+            <tr [ngClass]="{ 'fail-row': submission.status === 'failed' && !submission.acknowledgementFlag }"
+                (mouseenter)="showIcons = rowIndex" (mouseleave)="showIcons = -1">
+                <td>
+                    <div class="p-grid p-nogutter p-align-center">
+                        <div class="p-col-6" (mouseenter)="status.toggle($event)" (mouseleave)="status.hide()">
+                            <div (click)="openSubmissionDialog(submission)" class="circle" [ngStyle]="{
+                    'background-color': submissionStatusColor('in progress')
+                  }" [ngClass]="{
+                    'fail-circle': submission.status === 'failed' && !submission.acknowledgementFlag,
+                    'open-submission': submission.endTime === null
+                  }">
+                                <i *ngIf="submission.status === 'failed' && submission.acknowledgementFlag"
+                                    class="pi pi-check" style="font-size: 2em; color: lightgreen"></i>
+                            </div>
+                            <p-overlayPanel #status appendTo="body" [style]="{ 'background-color': '#fffffff5' }">
+                                <div style="color: #686868">
+                                    <p>
+                                        <span *ngIf="submission.endTime" class="pi pi-check-circle"
+                                            style="font-size: 150%; color: #97e5b7"><br /></span>
+                                    </p>
+                                    <p>
+                                        <b>Status: </b>
+                                        <span>In Progress</span>
+                                    </p>
+                                    <p *ngIf="submission.status === 'in progress'">
+                                        <b>Current Step: </b>{{ getLatestStepName(submission.steps) }}
+                                    </p>
+                                    <p><b>Elapsed Time: </b> {{ submission.elapsedTime }}</p>
+                                </div>
+                            </p-overlayPanel>
+                        </div>
+                        <div class="p-col-6" *ngIf="submission.notes && submission.notes !== 'null' && !isLightVersion"
+                            (click)="openNotesDialog(submission)">
+                            <i class="pi pi-file note-icon-sub"></i>
+                        </div>
+                    </div>
+                </td>
+                <td *ngIf="!isLightVersion">
+                    <i style="cursor:pointer" [pRowToggler]="submission"
+                        [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+                </td>
+                <td>{{ submission.id }}</td>
+                <td>
+                    <span>{{ submission.bu ? submission.bu + ' - ' : '' }}{{ submission.processname }}</span>
+                    <span *ngIf="submission.altId" class="altId">{{ submission.altId }}</span>
+                </td>
+                <td>{{submission.currentstep}} </td>
+                <td>{{submission.stepelapsetime}}</td>
+                <td *ngIf="!isLightVersion">{{ submission.avgstepduration }}m</td>
+                <td *ngIf="!isLightVersion">{{ submission.start }}</td>
+                <td>{{ submission.schend}}</td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.schdurationtolerance }}
+                </td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.elapsetime }}
+                    <!-- <span *ngIf="submission.adHoc" class="pi pi-calendar-times"
+                        style="font-size: 150%; color: grey; padding: none" pTooltip="AdHoc: true" showDelay="225"
+                        tooltipPosition="bottom"></span> -->
+                </td>
+                <td *ngIf="!isLightVersion">
+                    <button pButton *ngIf="submission.parentId" class="ui-button-secondary"
+                        (click)="changeView(submission)" label="{{ submission.parentId }}"
+                        style="font-size: 90%"></button>
+                </td>
+                <td>
+                    <span *ngIf="showIcons === rowIndex" class="pi pi-window-maximize" style="cursor: pointer"
+                        (click)="openIsolationMode(submission)"></span>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="rowexpansion" let-submission>
+            <tr style="background-color: white">
+                <td colspan="11">
+
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="paginatorleft" *ngIf="!isLightVersion">
+            <div class="footer" style="text-align: left">
+                <br />
+                <p style="margin-left: .2em">
+                    <span class="status-circle" style="background-color:#00bf6fa8"></span> Success
+                    <span class="status-circle" style="background-color:#0278d9b7"></span> Progress
+                    <span class="status-circle" style="background-color:#ffa500a8"></span> Warning
+                    <span class="status-circle" style="background-color:#f44336a8"></span> Failed
+                </p>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="paginatorright" *ngIf="!isLightVersion">
+        </ng-template>
+    </p-table>
+
+    <!-- Failed Submissions-->
+    <p-table #dt [hidden]="displayType !== 1" [value]="submissions" dataKey="id" autoLayout="true" [paginator]="true"
+        [rows]="size" [loading]="loading" [scrollable]="true" [scrollHeight]="isLightVersion ? '360px' : '540px'">
+        <ng-template pTemplate="colgroup">
+            <colgroup>
+                <col [style.width]="'1%'" #status />
+                <col [style.width]="'2%'" #expand *ngIf="!isLightVersion" />
+                <col [style.width]="'2%'" #id />
+                <col [style.width]="'9%'" #process />
+                <col [style.width]="'9%'" #firststep />
+                <col [style.width]="'6%'" #timefailed />
+                <col [style.width]="'2.5%'" #schend *ngIf="!isLightVersion" />
+                <col [style.width]="'6%'" #acknowledged *ngIf="!isLightVersion" />
+                <col [style.width]="'4%'" #escalated />
+                <col [style.width]="'5%'" #count *ngIf="!isLightVersion" />
+                <!-- <col [style.width]="'5%'" #elapse *ngIf="!isLightVersion" /> -->
+                <col [style.width]="'3%'" #map *ngIf="!isLightVersion" />
+            </colgroup>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th [pSortableColumn]="'status'" style="width: 3em">
+                    <p-sortIcon *ngIf="dt.sortField && dt.sortField === 'status'" [field]="'status'"></p-sortIcon>
+                </th>
+                <th style="width: 3em" *ngIf="!isLightVersion"></th>
+                <th [pSortableColumn]="'id'">
+                    ID<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'id'" [field]="'id'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'process_name'">
+                    Process<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'process_name'" [field]="'process_name'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'currentStep'">
+                    1st Step Failed<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'Current_step'"
+                        [field]="'Current_step'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'records'" *ngIf="!isLightVersion" pTooltip="Records" tooltipPosition="bottom">
+                    Time Failed<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'records'" [field]="'records'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'warnings'" *ngIf="!isLightVersion" pTooltip="Warnings" tooltipPosition="bottom">
+                    Schedule End<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'warnings'" [field]="'warnings'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'startTime'">
+                    Acknowledged<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'startTime'" [field]="'startTime'">
+                    </p-sortIcon>
+                </th>
+
+                <th [pSortableColumn]="'errors'" pTooltip="Errors" tooltipPosition="bottom">
+                    Escalated To<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'errors'" [field]="'errors'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'period'" *ngIf="!isLightVersion">
+                    Count<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'period'" [field]="'period'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'parentId'" *ngIf="!isLightVersion">
+                    Process Map<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'parentId'" [field]="'parentId'">
+                    </p-sortIcon>
+                </th>
+
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-submission let-expanded="expanded" let-rowIndex="rowIndex">
+            <tr [ngClass]="{ 'fail-row': submission.status === 'failed' && !submission.acknowledgementFlag }"
+                (mouseenter)="showIcons = rowIndex" (mouseleave)="showIcons = -1">
+                <td>
+                    <div class="p-grid p-nogutter p-align-center">
+                        <div class="p-col-6" (mouseenter)="status.toggle($event)" (mouseleave)="status.hide()">
+                            <div (click)="openSubmissionDialog(submission)" class="circle" [ngStyle]="{
+                            'background-color': submissionStatusColor(submission.status)
+                          }" [ngClass]="{
+                            'fail-circle': submission.status === 'failed' && !submission.acknowledgementFlag,
+                            'open-submission': submission.endTime === null
+                          }">
+                                <i *ngIf="submission.status === 'failed' && submission.acknowledgementFlag"
+                                    class="pi pi-check" style="font-size: 2em; color: lightgreen"></i>
+                            </div>
+                            <p-overlayPanel #status appendTo="body" [style]="{ 'background-color': '#fffffff5' }">
+                                <div style="color: #686868">
+                                    <p>
+                                        <span *ngIf="submission.endTime" class="pi pi-check-circle"
+                                            style="font-size: 150%; color: #97e5b7"><br /></span>
+                                    </p>
+                                    <p>
+                                        <b>Status: </b>
+                                        <span>{{ submission.status }}</span>
+                                    </p>
+                                    <p *ngIf="submission.status === 'in progress'">
+                                        <b>Current Step: </b>{{ getLatestStepName(submission.steps) }}
+                                    </p>
+                                    <p><b>Elapsed Time: </b> {{ submission.elapsedTime }}</p>
+                                </div>
+                            </p-overlayPanel>
+                        </div>
+                        <div class="p-col-6" *ngIf="submission.notes && submission.notes !== 'null' && !isLightVersion"
+                            (click)="openNotesDialog(submission)">
+                            <i class="pi pi-file note-icon-sub"></i>
+                        </div>
+                    </div>
+                </td>
+                <td *ngIf="!isLightVersion">
+                    <i style="cursor:pointer" [pRowToggler]="submission"
+                        [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+                </td>
+                <td>{{ submission.id }}</td>
+                <td>
+                    <span>{{ submission.bu ? submission.bu + ' - ' : '' }}{{ submission.processname }}</span>
+                    <span *ngIf="submission.altId" class="altId">{{ submission.altId }}</span>
+                </td>
+                <td>{{submission.firststep}} </td>
+                <td>{{submission.timefailed}}</td>
+                <td *ngIf="!isLightVersion">{{ submission.schend }}</td>
+                <td *ngIf="!isLightVersion">{{ submission.acknowledged }}</td>
+                <td>{{ submission.escalatedto}}</td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.count }}
+                </td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.elapsetime }}
+                    <!-- <span *ngIf="submission.adHoc" class="pi pi-calendar-times"
+                                style="font-size: 150%; color: grey; padding: none" pTooltip="AdHoc: true" showDelay="225"
+                                tooltipPosition="bottom"></span> -->
+                </td>
+                <!-- <td *ngIf="!isLightVersion">
+                    <button pButton *ngIf="submission.parentId" class="ui-button-secondary"
+                        (click)="changeView(submission)" label="{{ submission.parentId }}"
+                        style="font-size: 90%"></button>
+                </td> -->
+                <!-- <td>
+                    <span *ngIf="showIcons === rowIndex" class="pi pi-window-maximize" style="cursor: pointer"
+                        (click)="openIsolationMode(submission)"></span>
+                </td> -->
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="rowexpansion" let-submission>
+            <tr style="background-color: white">
+                <td colspan="11">
+
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="paginatorleft" *ngIf="!isLightVersion">
+            <div class="footer" style="text-align: left">
+                <br />
+                <p style="margin-left: .2em">
+                    <span class="status-circle" style="background-color:#00bf6fa8"></span> Success
+                    <span class="status-circle" style="background-color:#0278d9b7"></span> Progress
+                    <span class="status-circle" style="background-color:#ffa500a8"></span> Warning
+                    <span class="status-circle" style="background-color:#f44336a8"></span> Failed
+                </p>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="paginatorright" *ngIf="!isLightVersion">
+
+        </ng-template>
+    </p-table>
+    <!-- Delayed Submissions-->
+    <p-table #dt [hidden]="displayType !== 3" [value]="submissions" dataKey="id" autoLayout="true" [paginator]="true"
+        [rows]="size" [loading]="loading" [scrollable]="true" [scrollHeight]="isLightVersion ? '360px' : '540px'">
+        <ng-template pTemplate="colgroup">
+            <colgroup>
+                <col [style.width]="'1%'" #status />
+                <col [style.width]="'2%'" #expand *ngIf="!isLightVersion" />
+                <col [style.width]="'2%'" #id />
+                <col [style.width]="'9%'" #process />
+                <col [style.width]="'9%'" #step />
+                <col [style.width]="'6%'" #elapsest />
+                <col [style.width]="'2.5%'" #avg *ngIf="!isLightVersion" />
+                <col [style.width]="'6%'" #start *ngIf="!isLightVersion" />
+                <col [style.width]="'4%'" #schend />
+                <col [style.width]="'5%'" #schdur *ngIf="!isLightVersion" />
+                <col [style.width]="'5%'" #elapse *ngIf="!isLightVersion" />
+                <col [style.width]="'3%'" #map *ngIf="!isLightVersion" />
+            </colgroup>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th [pSortableColumn]="'status'" style="width: 3em">
+                    <p-sortIcon *ngIf="dt.sortField && dt.sortField === 'status'" [field]="'status'"></p-sortIcon>
+                </th>
+                <th style="width: 3em" *ngIf="!isLightVersion"></th>
+                <th [pSortableColumn]="'id'">
+                    ID<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'id'" [field]="'id'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'process_name'">
+                    Process<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'process_name'" [field]="'process_name'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'currentStep'">
+                    Scheduled Start<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'Current_step'"
+                        [field]="'Current_step'">
+                    </p-sortIcon>
+                </th>
+
+                <th [pSortableColumn]="'startTime'">
+                    Acknowledged<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'startTime'" [field]="'startTime'">
+                    </p-sortIcon>
+                </th>
+
+                <th [pSortableColumn]="'errors'" pTooltip="Errors" tooltipPosition="bottom">
+                    Escalated To<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'errors'" [field]="'errors'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'period'" *ngIf="!isLightVersion">
+                    Count<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'period'" [field]="'period'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'parentId'" *ngIf="!isLightVersion">
+                    Process Map<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'parentId'" [field]="'parentId'">
+                    </p-sortIcon>
+                </th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-submission let-expanded="expanded" let-rowIndex="rowIndex">
+            <tr [ngClass]="{ 'fail-row': submission.status === 'failed' && !submission.acknowledgementFlag }"
+                (mouseenter)="showIcons = rowIndex" (mouseleave)="showIcons = -1">
+                <td>
+                    <div class="p-grid p-nogutter p-align-center">
+                        <div class="p-col-6" (mouseenter)="status.toggle($event)" (mouseleave)="status.hide()">
+                            <div (click)="openSubmissionDialog(submission)" class="circle" [ngStyle]="{
+                                'background-color': submissionStatusColor(submission.status)
+                              }" [ngClass]="{
+                                'fail-circle': submission.status === 'failed' && !submission.acknowledgementFlag,
+                                'open-submission': submission.endTime === null
+                              }">
+                                <i *ngIf="submission.status === 'failed' && submission.acknowledgementFlag"
+                                    class="pi pi-check" style="font-size: 2em; color: lightgreen"></i>
+                            </div>
+                            <p-overlayPanel #status appendTo="body" [style]="{ 'background-color': '#fffffff5' }">
+                                <div style="color: #686868">
+                                    <p>
+                                        <span *ngIf="submission.endTime" class="pi pi-check-circle"
+                                            style="font-size: 150%; color: #97e5b7"><br /></span>
+                                    </p>
+                                    <p>
+                                        <b>Status: </b>
+                                        <span>{{ submission.status }}</span>
+                                    </p>
+                                    <p *ngIf="submission.status === 'in progress'">
+                                        <b>Current Step: </b>{{ getLatestStepName(submission.steps) }}
+                                    </p>
+                                    <p><b>Elapsed Time: </b> {{ submission.elapsedTime }}</p>
+                                </div>
+                            </p-overlayPanel>
+                        </div>
+                        <div class="p-col-6" *ngIf="submission.notes && submission.notes !== 'null' && !isLightVersion"
+                            (click)="openNotesDialog(submission)">
+                            <i class="pi pi-file note-icon-sub"></i>
+                        </div>
+                    </div>
+                </td>
+                <td *ngIf="!isLightVersion">
+                    <i style="cursor:pointer" [pRowToggler]="submission"
+                        [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+                </td>
+                <td>{{ submission.id }}</td>
+                <td>
+                    <span>{{ submission.bu ? submission.bu + ' - ' : '' }}{{ submission.processname }}</span>
+                    <span *ngIf="submission.altId" class="altId">{{ submission.altId }}</span>
+                </td>
+                <td>{{submission.schstart}} </td>
+                <td>{{submission.acknowledged}}</td>
+
+                <td>{{ submission.escalatedto}}</td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.count }}
+                </td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.elapsetime }}
+                </td>
+                <td *ngIf="!isLightVersion">
+                    <button pButton *ngIf="submission.parentId" class="ui-button-secondary"
+                        (click)="changeView(submission)" label="{{ submission.parentId }}"
+                        style="font-size: 90%"></button>
+                </td>
+
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="rowexpansion" let-submission>
+            <tr style="background-color: white">
+                <td colspan="11">
+                    <!-- <app-submissions-steps [autoRefreshOn]="autoRefreshOn" [processId]="submission.id"
+                        (stepsRefresh)="refreshStatus($event)"></app-submissions-steps> -->
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="paginatorleft" *ngIf="!isLightVersion">
+            <div class="footer" style="text-align: left">
+                <br />
+                <p style="margin-left: .2em">
+                    <span class="status-circle" style="background-color:#00bf6fa8"></span> Success
+                    <span class="status-circle" style="background-color:#0278d9b7"></span> Progress
+                    <span class="status-circle" style="background-color:#ffa500a8"></span> Warning
+                    <span class="status-circle" style="background-color:#f44336a8"></span> Failed
+                </p>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="paginatorright" *ngIf="!isLightVersion">
+        </ng-template>
+    </p-table>
+    <!-- Warning Submissions-->
+    <p-table #dt [hidden]="displayType !== 4" [value]="submissions" dataKey="id" autoLayout="true" [paginator]="true"
+        [rows]="size" [loading]="loading" [scrollable]="true" [scrollHeight]="isLightVersion ? '360px' : '540px'">
+        <ng-template pTemplate="colgroup">
+            <colgroup>
+                <col [style.width]="'1%'" #status />
+                <col [style.width]="'2%'" #expand *ngIf="!isLightVersion" />
+                <col [style.width]="'2%'" #id />
+                <col [style.width]="'9%'" #process />
+                <col [style.width]="'9%'" #altId />
+                <col [style.width]="'6%'" #step />
+                <col [style.width]="'2.5%'" #status *ngIf="!isLightVersion" />
+                <col [style.width]="'6%'" #start *ngIf="!isLightVersion" />
+                <col [style.width]="'4%'" #end />
+                <col [style.width]="'5%'" #duration *ngIf="!isLightVersion" />
+                <col [style.width]="'5%'" #adhoc *ngIf="!isLightVersion" />
+                <col [style.width]="'3%'" #map *ngIf="!isLightVersion" />
+            </colgroup>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th [pSortableColumn]="'status'" style="width: 3em">
+                    <p-sortIcon *ngIf="dt.sortField && dt.sortField === 'status'" [field]="'status'"></p-sortIcon>
+                </th>
+                <th style="width: 3em" *ngIf="!isLightVersion"></th>
+                <th [pSortableColumn]="'id'">
+                    ID<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'id'" [field]="'id'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'process_name'">
+                    Process<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'process_name'" [field]="'process_name'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'currentStep'">
+                    Alt ID<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'Current_step'" [field]="'Current_step'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'startTime'">
+                    Step<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'startTime'" [field]="'startTime'">
+                    </p-sortIcon>
+                </th>
+
+                <th [pSortableColumn]="'errors'" pTooltip="Errors" tooltipPosition="bottom">
+                    Step Status<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'errors'" [field]="'errors'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'period'" *ngIf="!isLightVersion">
+                    Start Time<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'period'" [field]="'period'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'parentId'" *ngIf="!isLightVersion">
+                    End Time<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'parentId'" [field]="'parentId'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'parentId'" *ngIf="!isLightVersion">
+                    Duration<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'parentId'" [field]="'parentId'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'parentId'" *ngIf="!isLightVersion">
+                    Ad Hoc<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'parentId'" [field]="'parentId'">
+                    </p-sortIcon>
+                </th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-submission let-expanded="expanded" let-rowIndex="rowIndex">
+            <tr [ngClass]="{ 'fail-row': submission.status === 'failed' && !submission.acknowledgementFlag }"
+                (mouseenter)="showIcons = rowIndex" (mouseleave)="showIcons = -1">
+                <td>
+                    <div class="p-grid p-nogutter p-align-center">
+                        <div class="p-col-6" (mouseenter)="status.toggle($event)" (mouseleave)="status.hide()">
+                            <div (click)="openSubmissionDialog(submission)" class="circle" [ngStyle]="{
+                                    'background-color': submissionStatusColor(submission.status)
+                                  }" [ngClass]="{
+                                    'fail-circle': submission.status === 'failed' && !submission.acknowledgementFlag,
+                                    'open-submission': submission.endTime === null
+                                  }">
+                                <i *ngIf="submission.status === 'failed' && submission.acknowledgementFlag"
+                                    class="pi pi-check" style="font-size: 2em; color: lightgreen"></i>
+                            </div>
+                            <p-overlayPanel #status appendTo="body" [style]="{ 'background-color': '#fffffff5' }">
+                                <div style="color: #686868">
+                                    <p>
+                                        <span *ngIf="submission.endTime" class="pi pi-check-circle"
+                                            style="font-size: 150%; color: #97e5b7"><br /></span>
+                                    </p>
+                                    <p>
+                                        <b>Status: </b>
+                                        <span>{{ submission.status }}</span>
+                                    </p>
+                                    <p *ngIf="submission.status === 'in progress'">
+                                        <b>Current Step: </b>{{ getLatestStepName(submission.steps) }}
+                                    </p>
+                                    <p><b>Elapsed Time: </b> {{ submission.elapsedTime }}</p>
+                                </div>
+                            </p-overlayPanel>
+                        </div>
+                        <div class="p-col-6" *ngIf="submission.notes && submission.notes !== 'null' && !isLightVersion"
+                            (click)="openNotesDialog(submission)">
+                            <i class="pi pi-file note-icon-sub"></i>
+                        </div>
+                    </div>
+                </td>
+                <td *ngIf="!isLightVersion">
+                    <i style="cursor:pointer" [pRowToggler]="submission"
+                        [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+                </td>
+                <td>{{ submission.id }}</td>
+                <td>
+                    <span>{{ submission.bu ? submission.bu + ' - ' : '' }}{{ submission.processname }}</span>
+                    <span *ngIf="submission.altId" class="altId">{{ submission.altId }}</span>
+                </td>
+                <td>{{submission.altId}} </td>
+                <td>{{ submission.step}}</td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.statusStep }}
+                </td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.start }}
+                </td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.end }}
+                </td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.duration }}
+                </td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.adhoc }}
+                </td>
+                <!-- <td *ngIf="!isLightVersion">
+
+                </td> -->
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="rowexpansion" let-submission>
+            <tr style="background-color: white">
+                <td colspan="11">
+                    <!-- <app-submissions-steps [autoRefreshOn]="autoRefreshOn" [processId]="submission.id"
+                            (stepsRefresh)="refreshStatus($event)"></app-submissions-steps> -->
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="paginatorleft" *ngIf="!isLightVersion">
+            <div class="footer" style="text-align: left">
+                <br />
+                <p style="margin-left: .2em">
+                    <span class="status-circle" style="background-color:#00bf6fa8"></span> Success
+                    <span class="status-circle" style="background-color:#0278d9b7"></span> Progress
+                    <span class="status-circle" style="background-color:#ffa500a8"></span> Warning
+                    <span class="status-circle" style="background-color:#f44336a8"></span> Failed
+                </p>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="paginatorright" *ngIf="!isLightVersion">
+
+        </ng-template>
+    </p-table>
+    <!-- Success Submissions-->
+    <p-table #dt [hidden]="displayType !== 5" [value]="submissions" dataKey="id" autoLayout="true" [paginator]="true"
+        [rows]="size" [loading]="loading" [scrollable]="true" [scrollHeight]="isLightVersion ? '360px' : '540px'">
+        <ng-template pTemplate="colgroup">
+            <colgroup>
+                <col [style.width]="'1%'" #status />
+                <col [style.width]="'2%'" #expand *ngIf="!isLightVersion" />
+                <col [style.width]="'2%'" #id />
+                <col [style.width]="'9%'" #process />
+                <col [style.width]="'9%'" #altId />
+                <!-- <col [style.width]="'6%'" #step />
+                <col [style.width]="'2.5%'" #status *ngIf="!isLightVersion" /> -->
+                <col [style.width]="'6%'" #start *ngIf="!isLightVersion" />
+                <col [style.width]="'4%'" #end />
+                <col [style.width]="'5%'" #duration *ngIf="!isLightVersion" />
+                <col [style.width]="'5%'" #adhoc *ngIf="!isLightVersion" />
+                <col [style.width]="'3%'" #map *ngIf="!isLightVersion" />
+            </colgroup>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th [pSortableColumn]="'status'" style="width: 3em">
+                    <p-sortIcon *ngIf="dt.sortField && dt.sortField === 'status'" [field]="'status'"></p-sortIcon>
+                </th>
+                <th style="width: 3em" *ngIf="!isLightVersion"></th>
+                <th [pSortableColumn]="'id'">
+                    ID<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'id'" [field]="'id'"></p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'process_name'">
+                    Process<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'process_name'" [field]="'process_name'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'currentStep'">
+                    Alt ID<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'Current_step'" [field]="'Current_step'">
+                    </p-sortIcon>
+                </th>
+
+                <th [pSortableColumn]="'period'" *ngIf="!isLightVersion">
+                    Start Time<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'period'" [field]="'period'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'parentId'" *ngIf="!isLightVersion">
+                    End Time<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'parentId'" [field]="'parentId'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'parentId'" *ngIf="!isLightVersion">
+                    Duration<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'parentId'" [field]="'parentId'">
+                    </p-sortIcon>
+                </th>
+                <th [pSortableColumn]="'parentId'" *ngIf="!isLightVersion">
+                    Ad Hoc<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'parentId'" [field]="'parentId'">
+                    </p-sortIcon>
+                </th>
+                <th></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-submission let-expanded="expanded" let-rowIndex="rowIndex">
+            <tr [ngClass]="{ 'fail-row': submission.status === 'failed' && !submission.acknowledgementFlag }"
+                (mouseenter)="showIcons = rowIndex" (mouseleave)="showIcons = -1">
+                <td>
+                    <div class="p-grid p-nogutter p-align-center">
+                        <div class="p-col-6" (mouseenter)="status.toggle($event)" (mouseleave)="status.hide()">
+                            <div (click)="openSubmissionDialog(submission)" class="circle" [ngStyle]="{
+                                        'background-color': submissionStatusColor(submission.status)
+                                      }" [ngClass]="{
+                                        'fail-circle': submission.status === 'failed' && !submission.acknowledgementFlag,
+                                        'open-submission': submission.endTime === null
+                                      }">
+                                <i *ngIf="submission.status === 'failed' && submission.acknowledgementFlag"
+                                    class="pi pi-check" style="font-size: 2em; color: lightgreen"></i>
+                            </div>
+                            <p-overlayPanel #status appendTo="body" [style]="{ 'background-color': '#fffffff5' }">
+                                <div style="color: #686868">
+                                    <p>
+                                        <span *ngIf="submission.endTime" class="pi pi-check-circle"
+                                            style="font-size: 150%; color: #97e5b7"><br /></span>
+                                    </p>
+                                    <p>
+                                        <b>Status: </b>
+                                        <span>{{ submission.status }}</span>
+                                    </p>
+                                    <p *ngIf="submission.status === 'in progress'">
+                                        <b>Current Step: </b>{{ getLatestStepName(submission.steps) }}
+                                    </p>
+                                    <p><b>Elapsed Time: </b> {{ submission.elapsedTime }}</p>
+                                </div>
+                            </p-overlayPanel>
+                        </div>
+                        <div class="p-col-6" *ngIf="submission.notes && submission.notes !== 'null' && !isLightVersion"
+                            (click)="openNotesDialog(submission)">
+                            <i class="pi pi-file note-icon-sub"></i>
+                        </div>
+                    </div>
+                </td>
+                <td *ngIf="!isLightVersion">
+                    <i style="cursor:pointer" [pRowToggler]="submission"
+                        [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+                </td>
+                <td>{{ submission.id }}</td>
+                <td>
+                    <span>{{ submission.bu ? submission.bu + ' - ' : '' }}{{ submission.processname }}</span>
+                    <span *ngIf="submission.altId" class="altId">{{ submission.altId }}</span>
+                </td>
+                <td>{{submission.altId}} </td>
+                <!-- <td>{{ submission.step}}</td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.status }}
+                </td> -->
+                <td *ngIf="!isLightVersion">
+                    {{ submission.start }}
+                </td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.end }}
+                </td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.duration }}
+                </td>
+                <td *ngIf="!isLightVersion">
+                    {{ submission.adhoc }}
+                </td>
+                <!-- <td *ngIf="!isLightVersion">
+    
+                    </td> -->
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="rowexpansion" let-submission>
+            <tr style="background-color: white">
+                <td colspan="11">
+                    <!-- <app-submissions-steps [autoRefreshOn]="autoRefreshOn" [processId]="submission.id"
+                                (stepsRefresh)="refreshStatus($event)"></app-submissions-steps> -->
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="paginatorleft" *ngIf="!isLightVersion">
+            <div class="footer" style="text-align: left">
+                <br />
+                <p style="margin-left: .2em">
+                    <span class="status-circle" style="background-color:#00bf6fa8"></span> Success
+                    <span class="status-circle" style="background-color:#0278d9b7"></span> Progress
+                    <span class="status-circle" style="background-color:#ffa500a8"></span> Warning
+                    <span class="status-circle" style="background-color:#f44336a8"></span> Failed
+                </p>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="paginatorright" *ngIf="!isLightVersion">
+
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [modal]="false" [(visible)]="displayAcknowledgmentDialog" *ngIf="acknowledgementData"
+    (onHide)="acknowledgementData = null" [style]="{ 'min-width': '500px', 'max-width': '800px' }" [maximizable]="true">
+    <p-header> Acknowledgment Note </p-header>
+    <app-ge-notes-dialog [noteData]="acknowledgementData" (submitNote)="setAcknowledgementFlag($event)">
+    </app-ge-notes-dialog>
+</p-dialog>

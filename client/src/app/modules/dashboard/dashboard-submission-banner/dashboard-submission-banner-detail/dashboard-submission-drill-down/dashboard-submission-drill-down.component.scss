@@ -1,0 +1,117 @@
+@import '~src/styles-variables.scss';
+
+.input {
+  margin-left: 0.5em;
+  vertical-align: middle;
+}
+
+.status-circle {
+  margin-left: 0.5em;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.circle {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.fail-row {
+  background-color: #f080805c !important;
+}
+
+.fail-circle {
+  animation: fail-circle-animation 2s infinite;
+  cursor: pointer;
+}
+
+@keyframes fail-circle-animation {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+}
+
+i {
+  font-size: 1.8em;
+  cursor: pointer;
+  color: $gray;
+  &:hover {
+    color: $blue;
+  }
+}
+
+.active-filters {
+  color: orange;
+}
+
+.note-icon-sub {
+  font-size: 1.6em;
+  color: #afafaf;
+  vertical-align: middle;
+  padding-left: 0.2em;
+  cursor: pointer;
+  &:hover {
+    color: #3a3a3a;
+  }
+}
+
+.note {
+  color: #4e4e4e;
+  padding: 0.5em;
+  word-break: break-all;
+}
+
+.altId {
+  display: block;
+  color: #808080;
+  font-style: italic;
+  font-size: 95%;
+  padding: 0.3em;
+  padding-left: 0.7em;
+  word-wrap: break-word;
+}
+
+.footer {
+  color: #686868;
+  font-style: italic;
+  font-size: 80%;
+}
+
+.isolation-logo {
+  height: 25px;
+  width: 25px;
+  vertical-align: top;
+  bottom: 15px;
+  position: absolute;
+}
+
+.open-submission {
+  cursor: pointer;
+  animation: open-submission-animation 5s infinite;
+  animation-fill-mode: forwards;
+}
+
+@keyframes open-submission-animation {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  7% {
+    transform: translate(0, -10px);
+  }
+
+  14% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
