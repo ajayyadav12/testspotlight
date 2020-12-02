@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group 'com.ge.finance.spotlight'
+version '2.2.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: "org.mockito", module: "mockito-core"
+    }
+    testCompile("org.mockito:mockito-core:2.23.4")
+    testCompile('org.springframework.security:spring-security-test')
+}

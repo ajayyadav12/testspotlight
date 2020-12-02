@@ -1,0 +1,14 @@
+<p-organizationChart [value]="process" styleClass="process" *ngIf="ready">
+  <ng-template let-node pTemplate="process">
+    <div [ngClass]="incomingProcess ? 'export' : ''">
+      <div [ngClass]="node.children ? 'header-parent' : node.data.current ? 'current-child' : 'header-child'">
+        {{ node.label }}
+      </div>
+      <div class="content-parent" *ngIf="!incomingProcess && node.data.pType">{{ node.data.pType.name }} Process</div>
+      <div class="content-child" *ngIf="!incomingProcess && (node.data.sender || node.data.receiver)">
+        <span *ngIf="node.data.sender">From {{ node.data.sender.name }}</span>
+        <span *ngIf="node.data.receiver"> to {{ node.data.receiver.name }}</span>
+      </div>
+    </div>
+  </ng-template>
+</p-organizationChart>

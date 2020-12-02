@@ -1,0 +1,69 @@
+<p-table
+  #dt
+  [value]="value"
+  [columns]="columns"
+  [paginator]="true"
+  autoLayout="true"
+  [rows]="rows"
+  [scrollable]="isLightVersion"
+  [scrollHeight]="isLightVersion ? '360px' : ''"
+  [loading]="loading"
+>
+  <ng-template pTemplate="colgroup" let-columns *ngIf="isLightVersion">
+    <colgroup>
+      <col *ngFor="let col of columns" [style.width]="col.width" />
+    </colgroup>
+  </ng-template>
+  <ng-template pTemplate="header" let-columns>
+    <tr>
+      <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+        {{ col.header }}
+        <p-sortIcon *ngIf="dt.sortField && dt.sortField === col.field" [field]="col.field"></p-sortIcon>
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-rowData let-columns="columns" let-rowIndex="rowIndex">
+    <tr
+      (mouseenter)="showIcons = rowIndex"
+      (mouseleave)="showIcons = -1"
+      [ngStyle]="{ 'background-color': rowData.backgroundColor, cursor: rowData.cursor, color: rowData.color }"
+      (click)="clickItem(rowData)"
+      pTooltip="{{ rowData.tooltipValue }}"
+      tooltipPosition="left"
+    >
+      <td *ngFor="let col of columns" (click)="menu.toggle($event); recordSelected = rowData">
+        {{ rowData[col.field] }}
+        <i
+          *ngIf="col.field === iconColumn"
+          class="{{ rowData.iconClass }}"
+          [ngStyle]="{ color: rowData.iconColor }"
+        ></i>
+      </td>
+      <div
+        [ngClass]="{
+          'row-even': rowIndex % 2 > 0,
+          'row-odd': rowIndex % 2 === 0
+        }"
+        class="floating-icons"
+        *ngIf="showEditDelete && showIcons === rowIndex"
+      >
+        <span>
+          <i
+            class="pi pi-pencil table-icon"
+            (click)="editItem(rowData['id'])"
+            pTooltip="Edit"
+            tooltipPosition="bottom"
+          ></i>
+          <i
+            class="pi pi-trash table-icon"
+            style="margin-right: 5px"
+            (click)="deleteItem(rowData['id'])"
+            pTooltip="Delete"
+            tooltipPosition="bottom"
+          ></i
+        ></span>
+      </div>
+    </tr>
+  </ng-template>
+</p-table>
+<p-menu #menu [popup]="true" [model]="_menuItems"></p-menu>

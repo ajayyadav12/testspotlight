@@ -1,0 +1,100 @@
+<h4 style="color: gray">{{ feedDate | date: 'MMMM d, y' }} feed</h4>
+<div [hidden]="true">
+  <mat-form-field class="example-full-width">
+    <input
+      (dateChange)="onClickManualRefresh()"
+      [(ngModel)]="feedDate"
+      matInput
+      [matDatepicker]="picker"
+      placeholder="Choose a date"
+    />
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+</div>
+<div style="right: 0px; position: absolute; top: 10px;">
+  <button mat-icon-button (click)="picker.open()">
+    <mat-icon>date_range</mat-icon>
+  </button>
+  <button mat-icon-button (click)="openSubmissionsFilters()">
+    <mat-icon>filter_list</mat-icon>
+  </button>
+  <button mat-icon-button (click)="onClickManualRefresh()">
+    <mat-icon>refresh</mat-icon>
+  </button>
+</div>
+<div
+  style="height: 45rem; overflow: scroll;"
+  infiniteScroll
+  [infiniteScrollDistance]="2"
+  [infiniteScrollThrottle]="50"
+  (scrolled)="onScroll()"
+  [scrollWindow]="false"
+>
+  <mat-chip-list aria-label="Fish selection" style="padding: 5px">
+    <mat-chip *ngFor="let param of chipParams" [removable]="true" (removed)="removeFilter(param)"
+      >{{ param.label }}<mat-icon matChipRemove>cancel</mat-icon></mat-chip
+    >
+  </mat-chip-list>
+  <div *ngFor="let submission of submissions">
+    <mat-grid-list cols="38" rowHeight="30px">
+      <mat-grid-tile colspan="1" rowspan="4" [style.background]="submissionStatusColor(submission.status.name)">
+      </mat-grid-tile>
+      <mat-grid-tile colspan="1" rowspan="4"> </mat-grid-tile>
+      <mat-grid-tile colspan="30" rowspan="1">
+        <div style="width: 100%">
+          <b>{{ submission.process.name }}</b>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="6" rowspan="2">
+        <button mat-icon-button (click)="openSubmissionMenu(submission)">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="30" rowspan="1">
+        <div style="width: 100%">
+          ID {{ submission.id }}
+          <div
+            (click)="tooltip.show()"
+            matTooltipClass="tooltip-altid"
+            #tooltip="matTooltip"
+            [matTooltip]="submission.altId"
+            class="submission-altid"
+          >
+            {{ submission.altId ? submission.altId : '' }}
+          </div>
+        </div>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="18" rowspan="1">
+        <div style="width: 100%">Started at {{ submission.startTime | date: 'shortTime' }}</div>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="6" rowspan="1">
+        <div style="color: lightskyblue">#</div>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="6" rowspan="1">
+        <div style="color: orange">W</div>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="6" rowspan="1">
+        <div style="color: tomato">E</div>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="18" rowspan="1">
+        <div style="width: 100%">{{ submission.elapsedTime }}</div>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="6" rowspan="1">
+        <div>{{ submission.records }}</div>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="6" rowspan="1">
+        <div>{{ submission.warnings }}</div>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="6" rowspan="1">
+        <div>{{ submission.errors }}</div>
+      </mat-grid-tile>
+    </mat-grid-list>
+    <mat-divider></mat-divider>
+  </div>
+  <div style="margin: 10px 0px;" class="center-content" *ngIf="showNoMoreSubmissions">
+    <i>That's all folks!</i>
+  </div>
+  <div class="center-content">
+    <mat-spinner *ngIf="showSpinner"></mat-spinner>
+  </div>
+</div>

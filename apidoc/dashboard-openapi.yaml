@@ -1,0 +1,2091 @@
+openapi: 3.0.0
+info:
+  title: Spotlight Dashboard REST API
+  version: 1.0.0-20190117
+servers:
+- url: http://localhost:9000/dashapi/v1
+tags:
+- name: Processes
+- name: Process Steps
+- name: Receivers
+- name: Senders
+- name: Submissions
+- name: Users
+- name: Status
+- name: Security
+- name: Distribution Lists
+- name: Notifications
+- name: Schedules
+security:
+- bearer: []
+paths:
+  /process-types/:
+    get:
+      summary: Returns a catalog of process types
+      description: Returns a catalog of process types sort by process type id. It can be also sorted by process type name.
+      tags:
+      - Processes
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessType'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+  /processes/:
+    get:
+      summary: Returns a list of all processes
+      description: Returns a list of all processes sorted by process id. If the process belongs to a parent process, the processParent property will be populated, or it will be null otherwise. Admin roles can see all processes, and any other role can only see the processes it belongs to.
+      tags:
+      - Processes
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Process'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+    post:
+      summary: Creates and returns a new process
+      description: Creates and returns a new process. Only admin roles can create a new process.
+      tags:
+      - Processes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Process 1"
+                senderId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                receiverId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                processTypeId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                parentProcessId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                technicalOwnerUserId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                functionalOwnerUserId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                critical:
+                  type: boolean
+                supersession:
+                  type: boolean
+              required:
+              - name
+              - senderId
+              - receiverId
+              - processTypeId
+      responses:
+        201:
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Process'
+  /processes/{processId}:
+    get:
+      summary: Returns the process with processId.
+      tags:
+      - Processes
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Process'
+    put:
+      summary: Updates the process with processId.
+      tags:
+      - Processes
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Process 1"
+                senderId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                receiverId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                processTypeId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                parentProcessId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                technicalOwnerUserId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                functionalOwnerUserId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                critical:
+                  type: boolean
+                supersession:
+                  type: boolean
+              required:
+              - name
+              - senderId
+              - receiverId
+              - processTypeId
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Process'
+    delete:
+      summary: Deletes the process with processId.
+      description: Deletes the process with processId. It cannot be deleted if it still has process steps or children process attached to it, in that case it will return a Conflict exception.
+      tags:
+      - Processes
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Process'
+  /receivers/:
+    get:
+      summary: Returns a list of receivers
+      tags:
+      - Receivers
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Receiver'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+    post:
+      summary: Creates and returns a new receiver
+      tags:
+      - Receivers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Receiver 1"
+              required:
+              - name
+      responses:
+        201:
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receiver'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+  /receivers/{receiverId}:
+    get:
+      summary: Returns the receiver with receiverId.
+      tags:
+      - Receivers
+      parameters:
+      - name: receiverId
+        in: path
+        description: Receiver id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receiver'
+    put:
+      summary: Updates the receiver with receiverId.
+      tags:
+      - Receivers
+      parameters:
+      - name: receiverId
+        in: path
+        description: Receiver id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Receiver 1"
+              required:
+              - name
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receiver'
+    delete:
+      summary: Deletes the receiver with receiverId.
+      description: Deletes the receiver with senderId. There should not be any process with the receiver to be deleted, otherwise it will return a Conflict error.
+      tags:
+      - Receivers
+      parameters:
+      - name: receiverId
+        in: path
+        description: Receiver id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Receiver'
+  /roles/:
+    get:
+      summary: Returns catalog of roles
+      tags:
+      - Users
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+  /senders/:
+    get:
+      summary: Returns list of senders
+      tags:
+      - Senders
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sender'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+    post:
+      summary: Creates and returns a new sender
+      tags:
+      - Senders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Sender 1"
+              required:
+              - name
+      responses:
+        201:
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+  /senders/{senderId}:
+    get:
+      summary: Returns the sender with senderId.
+      tags:
+      - Senders
+      parameters:
+      - name: senderId
+        in: path
+        description: Sender id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+    put:
+      summary: Updates the sender with senderId.
+      tags:
+      - Senders
+      parameters:
+      - name: senderId
+        in: path
+        description: Sender id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Sender 1"
+              required:
+              - name
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+    delete:
+      summary: Deletes the sender with senderId.
+      description: Deletes the sender with senderId. There should not be any process with the sender to be deleted, otherwise it will return a Conflict error.
+      tags:
+      - Senders
+      parameters:
+      - name: senderId
+        in: path
+        description: Sender id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+  /users/:
+    get:
+      summary: Returns list of users
+      tags:
+      - Users
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Creates and returns a new user
+      tags:
+      - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "User 1"
+                sso:
+                  type: integer
+                  example: 999999999
+                roles:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+      responses:
+        201:
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/{userId}:
+    get:
+      summary: Returns the user with userId
+      tags:
+      - Users
+      parameters:
+      - name: userId
+        in: path
+        description: User id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    patch:
+      summary: Updates the user name for the user with userId.
+      tags:
+      - Users
+      parameters:
+      - name: userId
+        in: path
+        description: User id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: 'User 1'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      summary: Deletes the user with userId.
+      description: Deletes the user with userId. It won't delete the user if the user is added to at least one process.
+      tags:
+      - Users
+      parameters:
+      - name: userId
+        in: path
+        description: User id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/{userId}/roles:
+    patch:
+      summary: Adds a role to the user with userId.
+      tags:
+      - Users
+      parameters:
+      - name: userId
+        in: path
+        description: User id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/{userId}/roles/{roleId}:
+    delete:
+      summary: Removes the role with roleId from the user with userId.
+      tags:
+      - Users
+      parameters:
+      - name: userId
+        in: path
+        description: User id
+        required: true
+        schema:
+          type: integer
+      - name: roleId
+        in: path
+        description: Role id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /processes/{processId}/steps:
+    get:
+      summary: Returns a list of steps registered for the process with processId.
+      tags: 
+      - Process Steps
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessStep'
+    post:
+      summary: Creates and returns a new process step for the given process.
+      tags:
+      - Process Steps
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Process Step 1"
+      responses:
+        201:
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessStep'
+  /processes/{processId}/steps/{processStepId}:
+    get:
+      summary: Returns the process step with processStepId 
+      description: Returns the process step with processStepId that belongs to the process with processId.
+      tags:
+      - Process Steps
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      - name: processStepId
+        in: path
+        description: Process step id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessStep'
+    put:
+      summary: Returns the process step with processStepId 
+      description: Returns the process step with processStepId that belongs to the process with processId.
+      tags:
+      - Process Steps
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      - name: processStepId
+        in: path
+        description: Process step id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Process Step 1"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessStep'
+    delete:
+      summary: Deletes the process step with processStepId 
+      description: Deletes the process step with processStepId that belongs to the process with processId.
+      tags:
+      - Process Steps
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      - name: processStepId
+        in: path
+        description: Process step id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessStep'
+  /submissions/:
+    get:
+      summary: Returns a list of submissions.
+      tags:
+      - Submissions
+      parameters:
+      - name: sender
+        in: query
+        description: list of sender ids to filter for
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: false
+      - name: receiver
+        in: query
+        description: list of receiver ids to filter for
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: false
+      - name: processType
+        in: query
+        description: list of process type ids to filter for
+        schema:
+          type: array
+          items:
+            type: integer
+        explode: false
+      - name: from
+        in: query
+        description: only submissions with startTime after the beginning of this date will be returned
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        description: only submissions with startTime before the beginning of this date will be returned
+        schema:
+          type: string
+          format: date
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Submission'
+  /submissions/{submissionId}/steps:
+    get:
+      summary: Returns a list of submission steps added to the submission with submissionId.
+      tags:
+      - Submissions
+      parameters:
+      - name: submissionId
+        in: path
+        description: Submission id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SubmissionStep'
+  /status/:
+    get:
+      summary: Returns a catalog of status
+      tags:
+      - Status
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Status'
+  /security/token:
+    post:
+      summary: Generates a Json Web Token to be used as authentication in the dashboard.
+      tags:
+      - Security
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sso:
+                  type: integer
+                  example: 999999999
+                password:
+                  type: string
+                  example: "My1SecurePassword"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "0123456789abcdefghijklmnopqrstuvwxyz"
+                  roles:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Role'
+                  name:
+                    type: string
+                    example: 'User 1'
+                  sso:
+                    type: integer
+                    example: 999999999
+  /processes/{processId}/token:
+    post:
+      summary: Generates a token to be used by the applications as authentication into the application api.
+      tags:
+      - Security
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "0123456789abcdefghijklmnopqrstuvwxyz"
+  /processes/{processId}/users:
+    get:
+      summary: Returns all the users added to the process with processId.
+      tags:
+      - Processes
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessUser'
+    post:
+      summary: Add a new user to the process with processId.
+      tags:
+      - Processes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessUser'
+  /processes/{processId}/users/{userId}:
+    delete:
+      summary: Removes a user from the process with processId.
+      tags:
+      - Processes
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      - name: userId
+        in: path
+        description: User id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessUser'
+  /distribution-lists/:
+    get:
+      summary: Returns all the distribution lists.
+      tags:
+      - Distribution Lists
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DistributionList'
+    post:
+      summary: Creates a new distribution list.
+      tags:
+      - Distribution Lists
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Distribution List 1"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionList'
+  /distribution-lists/{distributionListId}:
+    get:
+      summary: Returns the distribution list with distributionListId.
+      tags:
+      - Distribution Lists
+      parameters:
+      - name: distributionListId
+        in: path
+        description: Distribution list id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionList'
+    put:
+      summary: Updates the distribution list with distributionListId.
+      tags:
+      - Distribution Lists
+      parameters:
+      - name: distributionListId
+        in: path
+        description: Distribution list id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Distribution List 1"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionList'
+    delete:
+      summary: Deletes the distribution list with distributionListId.
+      description: Deletes the distribution list with distributionListId. The distribution list should be empty before deletion, otherwise it will rise a Conflict exception.
+      tags:
+      - Distribution Lists
+      parameters:
+      - name: distributionListId
+        in: path
+        description: Distribution list id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionList'
+  /distribution-lists/{distributionListId}/members:
+    get:
+      summary: Returns all the emails associated to the distribution list with distributionListId.
+      tags:
+      - Distribution Lists
+      parameters:
+      - name: distributionListId
+        in: path
+        description: Distribution list id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DistributionListMember'
+    post:
+      summary: Adds a new email to the distribution list with distributionListId.
+      tags:
+      - Distribution Lists
+      parameters:
+      - name: distributionListId
+        in: path
+        description: Distribution list id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: 'Member 1'
+                email:
+                  type: string
+                  example: 'member@email.com'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionListMember'
+  /distribution-lists/{distributionListId}/members/{distributionListMemberId}:
+    get:
+      summary: Returns the member with distributionListMemberId that belongs to distribution list with distributionListId.
+      tags:
+      - Distribution Lists
+      parameters:
+      - name: distributionListId
+        in: path
+        description: Distribution list id
+        required: true
+        schema:
+          type: integer
+      - name: distributionListMemberId
+        in: path
+        description: Distribution list member id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionListMember'
+    put:
+      summary: Updates the member with distributionListMemberId that belongs to distribution list with distributionListId.
+      tags:
+      - Distribution Lists
+      parameters:
+      - name: distributionListId
+        in: path
+        description: Distribution list id
+        required: true
+        schema:
+          type: integer
+      - name: distributionListMemberId
+        in: path
+        description: Distribution list member id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: 'Member 1'
+                email:
+                  type: string
+                  example: 'member@email.com'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionListMember'
+    delete:
+      summary: Deletes the member with distributionListMemberId that belongs to distribution list with distributionListId.
+      tags:
+      - Distribution Lists
+      parameters:
+      - name: distributionListId
+        in: path
+        description: Distribution list id
+        required: true
+        schema:
+          type: integer
+      - name: distributionListMemberId
+        in: path
+        description: Distribution list member id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DistributionListMember'
+  /notification-templates/:
+    get:
+      summary: Returns a list of all notification templates.
+      tags:
+      - Notifications
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationTemplate'
+    post:
+      summary: Creates a new notification template.
+      description: Creates a new notification template. The template should be in Freemarker syntax.
+      tags:
+      - Notifications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: 'Template 1'
+                subject:
+                  type: string
+                  example: 'Email Subject Example'
+                body:
+                  type: string
+                  example: 'Hello World! I am an email template'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTemplate'
+  /notification-templates/{notificationTemplateId}:
+    get:
+      summary: Returns the notification template with notificationTemplateId.
+      tags:
+      - Notifications
+      parameters:
+      - name: notificationTemplateId
+        in: path
+        description: Notification Template id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: 'Template 1'
+                subject:
+                  type: string
+                  example: 'Email Subject Example'
+                body:
+                  type: string
+                  example: 'Hello World! I am an email template'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTemplate'
+    put:
+      summary: Updates the notification template with notificationTemplateId.
+      tags:
+      - Notifications
+      parameters:
+      - name: notificationTemplateId
+        in: path
+        description: Notification Template id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTemplate'
+    delete:
+      summary: Deletes the notification template with notificationTemplateId.
+      description: Deletes the notification template with notificationTemplateId. There should be no notification attached to the template to be deleted.
+      tags:
+      - Notifications
+      parameters:
+      - name: notificationTemplateId
+        in: path
+        description: Notification Template id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationTemplate'
+  /processes/{processId}/notifications:
+    get:
+      summary: Returns all notifications associated with the process with processId.
+      tags:
+      - Process Notifications
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+    post:
+      summary: Adds a new notification to the process with processId.
+      description: >
+        Adds a new notification to the process with processId, for a combination of process step and status. 
+        When a submission step associated to the process step is created/updated with the associated status, the system will send an email to the distribution list 
+        using the specified template. Only users with application role added to the process can create notifications. If processStepId and statusId are null, the notification
+        will be added at submission status (delayed submission, etc).
+      tags:
+      - Process Notifications
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                processStep:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                  nullable: true
+                status:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                  nullable: true
+                distributionList:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                notificationTemplate:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+  /processes/{processId}/notifications/{notificationId}:
+    get:
+      summary: Returns the notification with notificationId attached to the process with processId.
+      tags:
+      - Process Notifications
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      - name: notificationId
+        in: path
+        description: Notification id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+    put:
+      summary: Updates the notification with notificationId attached to the process with processId.
+      tags:
+      - Process Notifications
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      - name: notificationId
+        in: path
+        description: Notification id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                processStep:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                  nullable: true
+                status:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                  nullable: true
+                distributionList:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                notificationTemplate:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+    delete:
+      summary: Deletes the notification with notificationId attached to the process with processId.
+      tags:
+      - Process Notifications
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      - name: notificationId
+        in: path
+        description: Notification id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+  /processes/{processId}/schedule-definitions:
+    get:
+      summary: Returns all the schedule definitions.
+      tags:
+      - Schedules
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleDefinition'
+    post:
+      summary: Creates and returns a new schedule definition.
+      tags:
+      - Schedules
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                settings:
+                  type: string
+                  example: '{"dates": ["2019-02-28"]}'
+                tolerance:
+                  type: integer
+                  example: 5
+                scheduleChangeFlag:
+                  type: boolean
+                criticalDate:
+                  type: string
+                  format: date-time
+                startTime:
+                  type: string
+                  format: date-time
+                endTime:
+                  type: string
+                  format: date-time
+                scheduleStartDate:
+                  type: string
+                  format: date-time
+                scheduleEndDate:
+                  type: string
+                  format: date-time
+                recurrencePattern:
+                  type: string
+                  example: 'C'
+                recurrenceTime:
+                  type: integer
+                  example: 5
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleDefinition'
+  /processes/{processId}/schedule-definitions/{scheduleDefinitionId}:
+    get:
+      summary: Returns the schedule definition with scheduleDefinitionId that belongs to process with processId.
+      tags:
+      - Schedules
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      - name: scheduleDefinitionId
+        in: path
+        description: Schedule Definition id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleDefinition'
+    delete:
+      summary: Deletes the schedule definition with scheduleDefinitionId that belongs to process with processId.
+      description: Deletes the schedule definition with scheduleDefinitionId that belongs to process with processId. It also deletes all the scheduled submissions attached to the schedule definition that it is being deleted.
+      tags:
+      - Schedules
+      parameters:
+      - name: processId
+        in: path
+        description: Process id
+        required: true
+        schema:
+          type: integer
+      - name: scheduleDefinitionId
+        in: path
+        description: Schedule Definition id
+        required: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+    post:
+      summary: Adds a new notification to the process with processId.
+      description: >
+        Adds a new notification to the process with processId, for a combination of process step and status. 
+        When a submission step associated to the process step is created/updated with the associated status, the system will send an email to the distribution list 
+        using the specified template. Only users with application role added to the process can create notifications. If processStepId and statusId are null, the notification
+        will be added at submission status (delayed submission, etc).
+      tags:
+      - Schedules
+      parameters:
+      - name: from
+        in: query
+        description: from date
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        description: to date
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                processStepId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                statusId:
+                  type: integer
+                  example: 1
+                  nullable: true
+                distributionListId:
+                  type: integer
+                  example: 1
+                notificationTemplateId:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+  /schedules/:
+    get:
+      summary: Returns all the schedule definitions.
+      tags:
+      - Schedules
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleDefinition'
+    post:
+      summary: Creates and returns a new schedule definition.
+      tags:
+      - Schedules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                processId:
+                  type: integer
+                  example: 1
+                settings:
+                  type: string
+                  example: '{"dates": ["2019-02-28"]}'
+                tolerance:
+                  type: integer
+                  example: 5
+                scheduleChangeFlag:
+                  type: boolean
+                criticalDate:
+                  type: string
+                  format: date-time
+                startTime:
+                  type: string
+                  format: date-time
+                endTime:
+                  type: string
+                  format: date-time
+                scheduleStartDate:
+                  type: string
+                  format: date-time
+                scheduleEndDate:
+                  type: string
+                  format: date-time
+                recurrencePattern:
+                  type: string
+                  example: 'C'
+                recurrenceTime:
+                  type: integer
+                  example: 5
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleDefinition'
+  /scheduled-submissions/:
+    get:
+      summary: Returns all the scheduled submissions from a date to a date.
+      tags:
+      - Schedules
+      parameters:
+      - name: from
+        in: query
+        description: from date
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        description: to date
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledSubmission'
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+  schemas:
+    ScheduledSubmission:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        scheduleDefId:
+          type: integer
+          example: 1
+        submission:
+          $ref: '#/components/schemas/Submission'
+          nullable: true
+        processId:
+          type: integer
+          example: 1
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        tolerance:
+          type: integer
+          example: 15
+        notifications:
+          type: integer
+          example: 0
+    ScheduleDefinition:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        process:
+          $ref: '#/components/schemas/Process'
+        processWorkflowId:
+          type: integer
+          example: 1
+        settings:
+          type: string
+          example: '{"dates": ["2019-02-28"]}'
+        tolerance:
+          type: integer
+          example: 5
+        scheduleChangeFlag:
+          type: boolean
+        criticalDate:
+          type: string
+          format: date-time
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        scheduleStartDate:
+          type: string
+          format: date-time
+        scheduleEndDate:
+          type: string
+          format: date-time
+        recurrencePattern:
+          type: string
+          example: 'C'
+        recurrenceTime:
+          type: integer
+          example: 5
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        processId:
+          type: integer
+          example: 1
+        processStepId:
+          type: integer
+          example: 1
+        statusId:
+          type: integer
+          example: 1
+        distributionListId:
+          type: integer
+          example: 1
+        templateId:
+          type: integer
+          example: 1
+    NotificationTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Template 1'
+        subject:
+          type: string
+          example: 'Email Subject Example'
+        body:
+          type: string
+          example: 'Hello World! I am an email template'
+    DistributionListMember:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        distributionListId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Member 1'
+        email:
+          type: string
+          example: 'member@email.com'
+    DistributionList:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Distribution List 1"
+    ProcessUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user:
+          $ref: '#/components/schemas/User'
+        processId:
+          type: integer
+          example: 1
+    SubmissionStep:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        submissionId:
+          type: integer
+          example: 1
+        processStep:
+          $ref: '#/components/schemas/ProcessStep'
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        systemStartTime:
+          type: string
+          format: date-time
+        systemEndTime:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/Status'
+    Status:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Status 1"
+    Submission:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        process:
+          $ref: '#/components/schemas/Process'
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+          nullable: true
+        updateTime:
+          type: string
+          format: date-time
+        systemStartTime:
+          type: string
+          format: date-time
+        systemEndTime:
+          type: string
+          format: date-time
+          nullable: true
+        systemUpdateTime:
+          type: string
+          format: date-time
+        records:
+          type: integer
+          example: 10
+        warnings:
+          type: integer
+          example: 10
+        errors:
+          type: integer
+          example: 10
+    ProcessStep:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        processId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Process Step 1"
+    ProcessType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    Receiver:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    Sender:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "User 1"
+        sso:
+          type: integer
+          example: 999999999
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+    Process:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "Process 1"
+        sender:
+          $ref: '#/components/schemas/Sender'
+        receiver:
+          $ref: '#/components/schemas/Receiver'
+        processType:
+          $ref: '#/components/schemas/ProcessType'
+        critical:
+          type: boolean
+        supersession:
+          type: boolean
+        processParent:
+          type: object
+          nullable: true
+        processLevel:
+          type: integer
+        isParent:
+          type: boolean
+        functionalOwner:
+          $ref: '#/components/schemas/User'
+        technicalOwner:
+          $ref: '#/components/schemas/User'

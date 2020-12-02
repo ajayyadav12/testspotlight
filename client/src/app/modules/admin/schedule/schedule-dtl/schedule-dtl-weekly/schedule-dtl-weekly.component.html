@@ -1,0 +1,17 @@
+<div *ngIf="scheduleForm" [formGroup]="scheduleForm" class="p-grid">
+  <div formGroupName="weeklyRecurrence" class="p-grid">
+    <div class="p-md-12">
+      <span class="ui-float-label">
+        <input formControlName="recurEvery" id="float-input" type="number" size="30" pInputText min="1" max="6" />
+        <label for="float-input"
+          >Recur every
+          {{ scheduleForm.value.weeklyRecurrence.recurEvery ? scheduleForm.value.weeklyRecurrence.recurEvery : 0 }}
+          weeks(s)</label
+        >
+      </span>
+    </div>
+    <div formArrayName="days" class="p-md-3" *ngFor="let day of days; let i = index">
+      <p-checkbox formControlName="{{ i }}" binary="true" name="weekGroup" label="{{ day }}"></p-checkbox>
+    </div>
+  </div>
+</div>

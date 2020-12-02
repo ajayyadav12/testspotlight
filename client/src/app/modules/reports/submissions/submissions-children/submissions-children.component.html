@@ -1,0 +1,257 @@
+<p-carousel
+  [headerText]="customGroup ? 'Group of ' + customGroup[0].process.name : 'Children'"
+  [value]="customGroup ? customGroup : showGrouped ? processes : children"
+  numVisible="4"
+  pageLinks="5"
+  [style]="{ margin: '30px', 'max-width': '920px' }"
+>
+  <ng-template let-child pTemplate="child">
+    <div class="p-grid" style="margin: 1px" [ngClass]="{ adhoc: parent.adHoc }">
+      <div class="p-md-12" style="margin: none">
+        <div class="p-grid p-justify-between">
+          <div
+            class="p-md-3 status"
+            (mouseenter)="detail.toggle($event)"
+            (mouseleave)="detail.hide()"
+            (click)="popup(child)"
+          >
+            <div
+              class="bubble"
+              [ngStyle]="{
+                'background-color': showGrouped
+                  ? child.info.stats.count > 1
+                    ? 'gray'
+                    : child.info.stats.data[0].color
+                  : child.color,
+                'border-color': showGrouped
+                  ? child.info.stats.count > 1
+                    ? 'gray'
+                    : child.info.stats.data[0].color
+                  : child.color
+              }"
+            >
+              <span *ngIf="showGrouped && child.info.stats.count > 1" class="pi pi-tags"></span>
+              <span *ngIf="!showGrouped || child.info.stats.count === 1">{{
+                showGrouped ? child.info.stats.data[0].id : child.id
+              }}</span>
+            </div>
+            <p-overlayPanel #detail appendTo="body" [style]="{ 'background-color': '#fffffff5', top: '-20px' }">
+              <div style="color: #686868">
+                <p>
+                  <span *ngIf="parent.adHoc" class="pi pi-calendar-times" style="font-size: 150%; margin-top: 5px;"
+                    ><br
+                  /></span>
+                </p>
+                <p style="height: 7px" *ngIf="parent.adHoc"></p>
+                <p *ngIf="showGrouped && child.info.stats.count > 1">
+                  <b>Total Count: </b> {{ child.info.stats.count }}
+                </p>
+                <p *ngIf="showGrouped && child.info.stats.count > 1">
+                  <b>Total Records: </b> {{ child.info.stats.totalRecords }}
+                </p>
+                <p *ngIf="!showGrouped || child.info.stats.count === 1">
+                  <b>Status: </b>{{ showGrouped ? child.info.stats.data[0].status : child.status }}
+                </p>
+                <p style="height: 7px"></p>
+                <p>
+                  <b><span *ngIf="showGrouped && child.info.stats.count > 1">Earliest </span> Start: </b
+                  >{{ showGrouped ? (child.info.stats.time.start | date: 'short') : (child.startTime | date: 'short') }}
+                </p>
+                <p>
+                  <b> <span *ngIf="showGrouped && child.info.stats.count > 1">Latest </span> End: </b
+                  >{{ showGrouped ? (child.info.stats.time.end | date: 'short') : (child.endTime | date: 'short') }}
+                </p>
+                <p>
+                  <b *ngIf="!showGrouped || child.info.stats.count === 1">Elapsed Time: </b>
+                  <b *ngIf="showGrouped && child.info.stats.count > 1">Window: </b>
+                  <span>{{ showGrouped ? child.info.labels.elapsedTime : child.elapsedTime }}</span>
+                  <span
+                    *ngIf="showGrouped && child.info.stats.count > 1"
+                    style="vertical-align: middle; margin: none; margin-bottom: 3px; padding-left: 3px"
+                  >
+                    <span
+                      *ngIf="child.info.stats.time.complete"
+                      class="pi pi-check-circle"
+                      style="color: #7fc59c"
+                    ></span>
+                    <span
+                      *ngIf="!child.info.stats.time.complete"
+                      style="color: #acacac"
+                      class="pi pi-times-circle"
+                    ></span>
+                  </span>
+                </p>
+              </div>
+            </p-overlayPanel>
+          </div>
+          <div class="p-md-8 info">
+            <span class="date">
+              {{ showGrouped ? (child.info.stats.time.start | date: 'M') : (child.startTime | date: 'M') }}/{{
+                showGrouped ? (child.info.stats.time.start | date: 'd') : (child.startTime | date: 'd')
+              }},
+              {{
+                showGrouped ? (child.info.stats.time.start | date: 'shortTime') : (child.startTime | date: 'shortTime')
+              }}
+            </span>
+            <span
+              *ngIf="child.endTime || (showGrouped && child.info.stats.time.complete)"
+              class="pi pi-check-circle complete"
+            ></span>
+            <span> {{ showGrouped ? child.info.labels.elapsedTime : child.elapsedTime }}</span>
+            <span
+              class="pi pi-file note-icon-child"
+              style="font-size: 1.7em;"
+              *ngIf="
+                (child.notes && child.notes !== 'null') ||
+                (showGrouped && child.info.stats.count === 1 && child.info.stats.data[0].notes)
+              "
+              (click)="openNotesDialog(child)"
+            ></span>
+          </div>
+        </div>
+      </div>
+      <div class="p-md-12" style="margin-left: 10px; margin-right: 10px; margin: 10px">
+        <div style="min-height: 62px">
+          <b style="color: #4d4d4d; font-size: 160%">{{ showGrouped ? child.info.labels.name : child.title }}</b>
+          <span
+            *ngIf="child.altId || (showGrouped && child.info.stats.count === 1 && child.info.stats.data[0].altId)"
+            class="altId"
+          >
+            {{ showGrouped ? child.info.stats.data[0].altId : child.altId }}
+          </span>
+        </div>
+      </div>
+      <div class="p-md-12" style="padding: none" *ngIf="!showGrouped || child.info.stats.count === 1">
+        <div class="p-grid p-justify-center">
+          <div
+            class="p-md-12"
+            *ngIf="showGrouped && child.info.stats.count === 1"
+            [ngStyle]="{ height: child.info.stats.data[0].altId ? '17px' : '38px' }"
+          ></div>
+          <div class="p-md-10" style="padding: inherit">
+            <div class="p-grid" style="text-align: center; color:#808080">
+              <div class="p-md-4">
+                <div class="p-grid">
+                  <div class="p-col-2 p-md-12" style="font-size: 65%">RECORDS</div>
+                  <div class="p-col-10 p-md-12 data" style="background-color:#e0eaf1">
+                    <b>{{ showGrouped ? child.info.stats.data[0].records : child.records }}</b>
+                  </div>
+                </div>
+              </div>
+              <div class="p-md-4" style="border-radius: 4px">
+                <div class="p-grid">
+                  <div class="p-col-2 p-md-12" style="font-size: 65%">WARNINGS</div>
+                  <div class="p-col-10 p-md-12 data" style="background-color:#f7f2e4">
+                    <b>{{ showGrouped ? child.info.stats.data[0].warnings : child.warnings }}</b>
+                  </div>
+                </div>
+              </div>
+              <div class="p-md-4" style="border-radius: 4px">
+                <div class="p-grid">
+                  <div class="p-col-2 p-md-12" style="font-size: 65%">ERRORS</div>
+                  <div class="p-col-10 p-md-12 data" style="background-color:#e6e6e6">
+                    <b>{{ showGrouped ? child.info.stats.data[0].errors : child.errors }}</b>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-md-12" style="padding: none" *ngIf="showGrouped && child.info.stats.count > 1">
+        <div class="p-grid p-justify-center">
+          <div class="p-md-10" style="padding: inherit">
+            <div class="p-grid" style="text-align: center; color:#808080">
+              <div class="p-md-5">
+                <div class="p-grid">
+                  <div class="p-col-2 p-md-12" style="font-size: 65%; padding-top: inherit">SUCCESS</div>
+                  <div
+                    class="p-col-10 p-md-12"
+                    style="background-color:#cbe6d6; font-size: 120%; border-radius: 4px; height: 100%; overflow: scroll"
+                  >
+                    <div class="p-grid">
+                      <div class="p-md-12 count" style="padding: .3em">
+                        <p class="stat">{{ child.success.data.length }}</p>
+                        <p class="label">TOTAL</p>
+                      </div>
+                      <div class="p-md-12 records" style="padding-top: .3em; padding-bottom: inherit">
+                        <p class="stat">{{ child.success.records }}</p>
+                        <p class="label">RECORDS</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="p-md-7">
+                <div class="p-grid p-justify-center">
+                  <div class="p-col-4 p-md-11" style="padding: .49em" pTooltip="Progress" tooltipPosition="right">
+                    <div class="p-grid p-justify-between stack" style="background-color:#d7e7f5">
+                      <div class="p-col count">
+                        <p class="stat">{{ child.progress.data.length }}<span class="label-mini"> T</span></p>
+                      </div>
+                      <div class="p-col records">
+                        <p class="stat-mini">{{ child.progress.records }}<span class="label-mini"> R</span></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="p-col-4 p-md-11" style="padding: .49em" pTooltip="Warning" tooltipPosition="right">
+                    <div class="p-grid p-justify-between stack" style="background-color:#ebe2d0">
+                      <div class="p-col count">
+                        <p class="stat">{{ child.warning.data.length }}<span class="label-mini"> T</span></p>
+                      </div>
+                      <div class="p-col records">
+                        <p class="stat-mini">{{ child.warning.records }}<span class="label-mini"> R</span></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    class="p-col-4 p-md-11"
+                    style="padding: .49em; padding-bottom: inherit"
+                    pTooltip="Failed"
+                    tooltipPosition="right"
+                  >
+                    <div class="p-grid p-justify-between stack" style="background-color:#ecd7d6">
+                      <div class="p-col count">
+                        <p class="stat">{{ child.failed.data.length }}<span class="label-mini"> T</span></p>
+                      </div>
+                      <div class="p-col records">
+                        <p class="stat-mini">{{ child.failed.records }}<span class="label-mini"> R</span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-carousel>
+
+<p-dialog
+  [modal]="true"
+  *ngIf="displayNotesDialog"
+  [(visible)]="displayNotesDialog"
+  [dismissableMask]="true"
+  [style]="{ 'min-width': '500px', 'max-width': '800px' }"
+  [maximizable]="true"
+>
+  <p-header> Submission Notes </p-header>
+  <div [innerHTML]="notesData" class="note"></div>
+</p-dialog>
+
+<p-dialog
+  [modal]="true"
+  *ngIf="displayCustomCarousel"
+  [(visible)]="displayCustomCarousel"
+  [dismissableMask]="true"
+  [maximizable]="true"
+>
+  <p-header> Submission Group </p-header>
+  <app-submissions-children
+    [parent]="parent"
+    [customGroup]="dataGroup"
+    [isLightVersion]="true"
+  ></app-submissions-children>
+</p-dialog>

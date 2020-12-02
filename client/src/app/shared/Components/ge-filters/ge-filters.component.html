@@ -1,0 +1,118 @@
+<p-sidebar
+  [modal]="true"
+  [(visible)]="displayFilters"
+  position="right"
+  dismissible="false"
+  (onHide)="onHideSidebar($event)"
+  (onShow)="onShowSidebar($event)"
+>
+  <h3><b>Filters</b></h3>
+  <form [formGroup]="submissionFilterForm">
+    <div class="p-grid">
+      <div class="p-md-12"></div>
+      <div class="p-md-6" [hidden]="!showFilter('from')">
+        <p class="field" *ngIf="input.from">From</p>
+        <p-calendar placeholder="From" formControlName="from" showButtonBar="true"></p-calendar>
+      </div>
+      <div class="p-md-6" [hidden]="!showFilter('to')">
+        <p class="field" *ngIf="input.to">To</p>
+        <p-calendar placeholder="To" formControlName="to" showButtonBar="true"></p-calendar>
+      </div>
+      <div class="p-md-12 divide"></div>
+      <div class="p-md-2" [hidden]="!showFilter('processes')">
+        <p-radioButton name="levels" value="PR" label=" " formControlName="level" inputId="opt1"></p-radioButton>
+      </div>
+      <div class="p-md-10" [hidden]="!showFilter('processes')">
+        <p class="field" *ngIf="input.processes.length">Processes</p>
+        <p-multiSelect
+          dataKey="id"
+          optionLabel="name"
+          filterPlaceHolder="Search"
+          defaultLabel="Processes"
+          [options]="processes"
+          formControlName="processes"
+          [panelStyle]="{ minWidth: '12em' }"
+        ></p-multiSelect>
+      </div>
+      <div class="p-md-12 divide"></div>
+      <div class="p-md-2" [hidden]="!showFilter('processes')">
+        <p-radioButton name="levels" value="PA" label=" " formControlName="level" inputId="opt2"></p-radioButton>
+      </div>
+      <div class="p-md-10" [hidden]="!showFilter('processes')">
+        <p class="field" *ngIf="input.parents.length">Parents</p>
+        <p-multiSelect
+          dataKey="id"
+          optionLabel="name"
+          filterPlaceHolder="Search"
+          defaultLabel="Parents"
+          [options]="parentProcesses"
+          formControlName="parents"
+          [panelStyle]="{ minWidth: '12em' }"
+        ></p-multiSelect>
+      </div>
+      <div class="p-md-12 divide"></div>
+      <div class="p-md-2" [hidden]="!showFilter('processes')">
+        <p-radioButton name="levels" value="SR" label=" " formControlName="level" inputId="opt3"></p-radioButton>
+      </div>
+      <div class="p-md-10" [hidden]="!showFilter('processes')">
+        <p class="field" *ngIf="input.senders.length">Senders</p>
+        <p-multiSelect
+          filterPlaceHolder="Search"
+          dataKey="id"
+          optionLabel="name"
+          defaultLabel="Senders"
+          [options]="senders"
+          formControlName="senders"
+          [panelStyle]="{ minWidth: '12em' }"
+        ></p-multiSelect>
+      </div>
+      <div class="p-md-10 p-offset-2" [hidden]="!showFilter('processes')">
+        <p class="field" *ngIf="input.receivers.length">Receivers</p>
+        <p-multiSelect
+          filterPlaceHolder="Search"
+          dataKey="id"
+          optionLabel="name"
+          defaultLabel="Receivers"
+          [options]="receivers"
+          formControlName="receivers"
+          [panelStyle]="{ minWidth: '12em' }"
+        ></p-multiSelect>
+      </div>
+      <div class="p-md-12 divide"></div>
+      <div class="p-md-12" [hidden]="!showFilter('status')">
+        <p class="field" *ngIf="input.status.length">Status</p>
+        <p-multiSelect
+          filterPlaceHolder="Search"
+          defaultLabel="Status"
+          [options]="status"
+          formControlName="status"
+          [panelStyle]="{ minWidth: '12em' }"
+        ></p-multiSelect>
+      </div>
+      <div class="p-md-12" [hidden]="!showFilter('bu')">
+        <p class="field" *ngIf="input.bu">Business</p>
+        <p-dropdown placeholder="Business" [options]="businesses" formControlName="bu" [showClear]="true"></p-dropdown>
+      </div>
+      <div class="p-md-12" [hidden]="!showFilter('adHoc')">
+        <p class="field">Adhoc</p>
+        <p-dropdown [options]="adHoc" formControlName="adHoc" [showClear]="true"></p-dropdown>
+      </div>
+      <div class="p-md-12" [hidden]="!showFilter('altId')">
+        <span class="ui-float-label">
+          <input formControlName="altId" pInputText type="text" name="altId" id="altId" />
+          <label for="float-input">Alt ID</label>
+        </span>
+      </div>
+      <div class="p-md-12 divide"></div>
+      <div class="p-md-12">
+        <p-button label="Filter" (onClick)="filter()"></p-button>
+        <p-button
+          label="Clear"
+          style="float: right"
+          styleClass="ui-button-secondary"
+          (onClick)="onClickClear()"
+        ></p-button>
+      </div>
+    </div>
+  </form>
+</p-sidebar>

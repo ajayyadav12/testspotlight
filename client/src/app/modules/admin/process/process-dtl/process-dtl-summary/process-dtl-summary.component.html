@@ -1,0 +1,234 @@
+<form [formGroup]="processForm">
+  <div class="p-grid">
+    <div class="p-md-6">
+      <div class="p-grid">
+        <div class="p-md-2">
+          <span class="ui-float-label">
+            <input formControlName="id" pInputText type="number" name="id" id="id" />
+            <label for="float-input">ID</label>
+          </span>
+        </div>
+        <div class="p-md-9">
+          <span class="ui-float-label">
+            <input
+              formControlName="name"
+              pInputText
+              type="text"
+              name="name"
+              id="name"
+              *ngIf="isVisible"
+              maxlength="25"
+              [autofocus]="isVisible"
+            />
+            <label for="float-input">*Name</label>
+          </span>
+        </div>
+        <div class="p-md-1"></div>
+        <div class="p-md-1">
+          <i class="pi pi-ellipsis-h" title="Select Feed Type"></i>
+        </div>
+        <div class="p-md-11">
+          <p-dropdown
+            optionLabel="name"
+            formControlName="feedType"
+            [options]="feedTypes"
+            placeholder="*Select Feed Type"
+            showClear="true"
+          ></p-dropdown>
+        </div>
+        <div class="p-md-1">
+          <i class="pi pi-angle-double-right" title="Select Sender"></i>
+        </div>
+        <div class="p-md-11">
+          <p-dropdown
+            optionLabel="name"
+            name="sender"
+            showClear="true"
+            inputId="sender"
+            formControlName="sender"
+            [options]="senders"
+            placeholder="*Select Sender"
+            showClear="true"
+          ></p-dropdown>
+        </div>
+        <div class="p-md-1">
+          <i class="pi pi-angle-double-left" title="Select Receiver"></i>
+        </div>
+        <div class="p-md-11">
+          <p-dropdown
+            optionLabel="name"
+            name="receiver"
+            showClear="true"
+            inputId="receiver"
+            formControlName="receiver"
+            [options]="receivers"
+            placeholder="*Select Receiver"
+            showClear="true"
+          ></p-dropdown>
+        </div>
+        <div class="p-md-1">
+          <i class="pi pi-user" title="Select App Owner"></i>
+        </div>
+        <div class="p-md-11">
+          <p-dropdown
+            optionLabel="name"
+            formControlName="appOwner"
+            filter="true"
+            optionLabel="name"
+            [options]="users"
+            placeholder="Select an App Owner"
+            showClear="true"
+          ></p-dropdown>
+        </div>
+        <div class="p-md-1">
+          <i class="pi pi-users" title="Select Suppor Team Email"></i>
+        </div>
+        <div class="p-md-11">
+          <span class="ui-float-label">
+            <input
+              formControlName="supportTeamEmail"
+              pInputText
+              type="text"
+              name="supportTeamEmail"
+              id="supportTeamEmail"
+            />
+            <label for="float-input">* Support Team Email</label>
+          </span>
+        </div>
+        <div class="p-md-12"></div>
+        <div class="p-md-3 p-offset-1">
+          <p-checkbox formControlName="critical" binary="true" name="critical" label="Critical"></p-checkbox>
+        </div>
+      </div>
+    </div>
+    <div class="p-md-6">
+      <div class="p-grid">
+        <div class="p-md-1">
+          <i class="pi pi-sitemap" title="Select Process Type"></i>
+        </div>
+        <div class="p-md-11">
+          <p-dropdown
+            optionLabel="name"
+            formControlName="processType"
+            [options]="processTypes"
+            placeholder="*Select Process Type"
+            showClear="true"
+          ></p-dropdown>
+        </div>
+        <div class="p-md-1">
+          <i class="pi pi-home" style="font-size: 1em" title="Select Parent"></i>
+        </div>
+        <div class="p-md-7">
+          <p-dropdown
+            formControlName="processParent"
+            showClear="true"
+            [options]="parents"
+            optionLabel="name"
+            placeholder="Select Parent"
+            (onChange)="onChangeProcessParent($event)"
+            dataKey="id"
+          ></p-dropdown>
+        </div>
+        <div class="p-md-4">
+          <p-checkbox
+            formControlName="isParent"
+            binary="true"
+            name="isParent"
+            label="Is Parent"
+            (onChange)="onChangeIsParent($event)"
+          ></p-checkbox>
+        </div>
+        <div class="p-md-1" *ngIf="processForm.getRawValue().processParent">
+          <i class="pi pi-sign-in" title="Select Predecessor"></i>
+        </div>
+        <div class="p-md-5" *ngIf="processForm.getRawValue().processParent">
+          <p-dropdown
+            optionLabel="name"
+            formControlName="predecessor"
+            [options]="siblings"
+            placeholder="Select Predecessor"
+            showClear="true"
+            dataKey="id"
+          ></p-dropdown>
+        </div>
+        <div class="p-md-1" *ngIf="processForm.getRawValue().processParent">
+          <i class="pi pi-sign-out" title="Select Successor"></i>
+        </div>
+        <div class="p-md-5" *ngIf="processForm.getRawValue().processParent">
+          <p-dropdown
+            optionLabel="name"
+            formControlName="successor"
+            [options]="siblings"
+            placeholder="Select successor"
+            showClear="true"
+            dataKey="id"
+          >
+          </p-dropdown>
+        </div>
+        <div class="p-md-12">
+          <b>Max Run Time</b>
+        </div>
+        <div class="p-md-1">
+          <i class="pi pi-clock" style="font-size: 1em" title="Select Max Run Time"></i>
+        </div>
+        <div class="p-md-1">
+          <label for="maxRunTimeHours">Hours</label>
+        </div>
+        <div class="p-md-3">
+          <input
+            min="0"
+            id="maxRunTimeHours"
+            name="maxRunTimeHours"
+            type="number"
+            pInputText
+            formControlName="maxRunTimeHours"
+          />
+        </div>
+        <div class="p-md-1">
+          <label for="maxRunTimeMinutes">Mins</label>
+        </div>
+        <div class="p-md-3">
+          <input
+            min="0"
+            max="59"
+            id="maxRunTimeMinutes"
+            name="maxRunTimeMinutes"
+            type="number"
+            pInputText
+            formControlName="maxRunTimeMinutes"
+          />
+        </div>
+        <div class="p-md-12"></div>
+        <div
+          class="p-md-11 p-offset-1"
+          *ngIf="
+            processForm.getRawValue().processParent ||
+            (!processForm.getRawValue().isParent && !processForm.getRawValue().processParent)
+          "
+        >
+          <button
+            (click)="getProcessToken()"
+            pButton
+            type="button"
+            label="Show Token"
+            class="ui-button-secondary"
+            [disabled]="processForm.disabled"
+          ></button>
+          <div
+            class="token"
+            (click)="copyToken()"
+            *ngIf="
+              processForm.getRawValue().processParent ||
+              (!processForm.getRawValue().isParent && !processForm.getRawValue().processParent)
+            "
+          >
+            {{ processToken }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="p-md-12">
+      <p-button [disabled]="!processForm.valid" [label]="submitButtonLabel" (onClick)="save()"></p-button>
+    </div>
+  </div>
+</form>

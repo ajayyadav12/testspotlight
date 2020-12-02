@@ -1,0 +1,36 @@
+<p-table
+  #dt
+  [value]="schedules"
+  [columns]="columns"
+  [paginator]="true"
+  autoLayout="true"
+  [rows]="10"
+  [loading]="loading"
+>
+  <ng-template pTemplate="header" let-columns>
+    <tr>
+      <th *ngFor="let col of columns" [pSortableColumn]="col.field">
+        {{ col.header }}
+        <p-sortIcon *ngIf="dt.sortField && dt.sortField === col.field" [field]="col.field"></p-sortIcon>
+      </th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-sch let-columns="columns" let-rowIndex="rowIndex">
+    <tr (mouseenter)="showIcons = rowIndex" (mouseleave)="showIcons = -1">
+      <td *ngFor="let col of columns">
+        {{ sch[col.field] }}
+      </td>
+      <div style="background-color: transparent" class="floating-icons" *ngIf="showIcons === rowIndex">
+        <span>
+          <i
+            class="pi pi-trash table-icon"
+            style="margin-right: 5px"
+            (click)="deleteSchedule(sch)"
+            pTooltip="Delete"
+            tooltipPosition="bottom"
+          ></i
+        ></span>
+      </div>
+    </tr>
+  </ng-template>
+</p-table>

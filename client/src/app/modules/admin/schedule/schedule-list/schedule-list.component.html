@@ -1,0 +1,26 @@
+<div *ngIf="hasProcesses">
+  <div style="display: inline-block">
+    <p-button label="New Schedule" routerLink="/schedule/0"></p-button>
+  </div>
+  <div style="float:right">
+    <span class="ui-float-label">
+      <p-dropdown
+        id="processId"
+        [(ngModel)]="processId"
+        [options]="processes"
+        placeholder="Select Process"
+        (onChange)="onChangeProcess($event)"
+        (deleteRecord)="onDeleteRecord($event)"
+      ></p-dropdown>
+      <label for="scheduleEndDate">Process</label>
+    </span>
+  </div>
+</div>
+<p></p>
+<app-ge-table
+  [value]="schedules"
+  [columns]="columns"
+  routerLink="/schedule/"
+  [loading]="loading"
+  (deleteRecord)="onDeleteRecord($event)"
+></app-ge-table>

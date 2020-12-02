@@ -1,0 +1,30 @@
+<div class="container" [class.is-mobile]="mobileQuery.matches">
+  <mat-toolbar color="primary">
+    <button mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <h1>Spotlight - {{ sessionSvc.title }}</h1>
+  </mat-toolbar>
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav
+      #sidenav
+      [mode]="mobileQuery.matches ? 'over' : 'side'"
+      [fixedInViewport]="mobileQuery.matches"
+      fixedTopGap="56"
+      style="width: 200px"
+    >
+      <mat-nav-list>
+        <a mat-list-item (click)="sidenav.toggle()" [routerLink]="nav.router" *ngFor="let nav of navMenu">{{
+          nav.title
+        }}</a>
+        <a mat-list-item (click)="sidenav.toggle(); onClickLogOut()">Log Out</a>
+      </mat-nav-list>
+    </mat-sidenav>
+
+    <mat-sidenav-content>
+      <div style="margin: 0 16px 0 16px">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

@@ -1,0 +1,160 @@
+@import '~src/styles-variables.scss';
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: calc(100%);
+  background-color: #eeefef;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  color: $gray;
+}
+
+.sidebar-content {
+  margin: 5px;
+}
+
+.vr {
+  margin-left: 8px;
+  border-left: solid 1px #bebebe2d;
+  padding-right: 20px;
+  border-right: solid 1px #bebebe2d;
+  margin-right: 6px;
+}
+
+.hr {
+  margin: 1em;
+  height: 0px;
+  margin-left: inherit;
+  border-top: solid 1.5px #bebebe67;
+}
+
+.hamburger-icon {
+  font-size: 1.2em;
+  cursor: pointer;
+  vertical-align: middle;
+  color: #414141;
+
+  &:hover {
+    color: $blue !important;
+  }
+}
+
+.site-title {
+  font-size: 1.5em;
+  vertical-align: super;
+  color: #373737;
+  font-style: bold;
+  text-shadow: 1px 1px 1px #37373746;
+}
+
+.build-version {
+  margin-top: none;
+  font-size: 0.6em;
+  color: gray;
+  text-align: right;
+  font-style: italic;
+}
+
+.logo {
+  height: 25px;
+  width: 25px;
+  vertical-align: top;
+  margin-top: 0.2em;
+
+  &.closed {
+    height: 20px;
+    width: 20px;
+    vertical-align: middle;
+  }
+}
+
+.menu-header {
+  font-size: 0.7em;
+  padding-left: 12px;
+}
+
+.menu-item {
+  padding-bottom: 5px;
+  font-size: 1.1em;
+
+  .icon {
+    vertical-align: bottom;
+    font-style: bold;
+
+    &:hover {
+      color: $blue;
+    }
+  }
+
+  .text {
+    padding-left: 20px;
+    vertical-align: middle;
+
+    &:hover {
+      color: $blue;
+    }
+  }
+
+  .active-link {
+    color: $blue !important;
+    pointer-events: none;
+    .icon {
+      padding-bottom: 1px;
+      border-bottom: solid 1.5px #005fb8b9;
+      border-radius: 1.5px;
+    }
+  }
+}
+
+.account {
+  position: absolute;
+  bottom: 0;
+
+  .icon {
+    font-size: 1.3em;
+    cursor: pointer;
+    text-align: center;
+
+    &:hover {
+      color: $blue;
+    }
+  }
+
+  .profile-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 40px;
+    display: inline-block;
+
+    &.closed {
+      width: 25px;
+      height: 25px;
+      border-radius: 25px;
+      text-align: center;
+    }
+  }
+
+  .profile-user {
+    width: 70px;
+    display: inline-block;
+    float: right;
+
+    .name {
+      font-size: 0.8em;
+      text-align: right;
+    }
+
+    .role {
+      margin-top: 0.2em;
+      font-size: 0.7em;
+      text-transform: capitalize;
+      color: #808080a6;
+      font-style: italic;
+      text-align: right;
+    }
+  }
+}

@@ -1,0 +1,13 @@
+<div id="gant_chart"></div>
+<label for="float-input"><i>* Click to see Submission Notes</i></label>
+<p-dialog
+  [modal]="true"
+  *ngIf="displayNotesDialog"
+  [(visible)]="displayNotesDialog"
+  [dismissableMask]="true"
+  [style]="{ 'min-width': '500px', 'max-width': '800px', 'z-index': '10000 !important' }"
+  [maximizable]="true"
+>
+  <p-header> Submission Notes </p-header>
+  <div [innerHTML]="notesData" class="note"></div>
+</p-dialog>

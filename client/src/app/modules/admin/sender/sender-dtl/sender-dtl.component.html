@@ -1,0 +1,38 @@
+<form [formGroup]="senderForm">
+  <div class="p-grid">
+    <div class="p-md-12">
+      <span class="ui-float-label">
+        <input formControlName="id" pInputText type="number" name="id" id="id" /> <label for="float-input">ID</label>
+      </span>
+    </div>
+    <div class="p-md-12">
+      <span class="ui-float-label">
+        <input formControlName="name" pInputText type="text" name="name" id="name" [autofocus] />
+        <label for="float-input">Name</label>
+      </span>
+    </div>
+    <div class="p-md-12">
+      <p-dropdown
+        formControlName="closePhase"
+        filter="true"
+        optionLabel="name"
+        [options]="closePhases"
+        placeholder="Select a Close Phase"
+        showClear="true"
+      ></p-dropdown>
+    </div>
+    <div class="p-md-12">
+      <p-dropdown
+        formControlName="appOwner"
+        filter="true"
+        optionLabel="name"
+        [options]="users"
+        placeholder="Select an App Owner"
+        showClear="true"
+      ></p-dropdown>
+    </div>
+    <div class="p-md-12">
+      <p-button [disabled]="!senderForm.valid || senderForm.pristine" label="Save" (onClick)="save()"></p-button>
+    </div>
+  </div>
+</form>

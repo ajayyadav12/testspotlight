@@ -1,0 +1,32 @@
+<form [formGroup]="manualCloseForm">
+  <div class="p-grid">
+    <div class="p-md-12">
+      <div class="p-grid">
+        <div class="p-md-6">
+          <p-radioButton
+            name="status"
+            value="warning"
+            label="Warning"
+            formControlName="status"
+            inputId="warning"
+          ></p-radioButton>
+        </div>
+        <div class="p-md-6">
+          <p-radioButton
+            name="status"
+            value="failed"
+            label="Failed"
+            formControlName="status"
+            inputId="failed"
+          ></p-radioButton>
+        </div>
+      </div>
+    </div>
+    <div class="p-md-12">
+      <textarea pInputTextarea formControlName="notes" autofocus [autofocus]></textarea>
+    </div>
+    <div class="p-md-12">
+      <p-button [disabled]="!manualCloseForm.valid" label="Submit" (onClick)="submit()"></p-button>
+    </div>
+  </div>
+</form>

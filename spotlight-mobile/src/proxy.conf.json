@@ -1,0 +1,7 @@
+{
+  "/dashapi/v1/": {
+    "target": "http://localhost:9002",
+    "secure": false
+  },
+  "logLevel": "debug"
+}

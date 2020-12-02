@@ -1,0 +1,138 @@
+<div class="p-grid">
+  <div class="p-md-8">
+    <h3>User Defined Notifications</h3>
+    <app-ge-table [value]="processNotifications" [columns]="columns" (deleteRecord)="onDeleteRecord($event)">
+    </app-ge-table>
+    <div class="p-md-8">
+      <h3>Automated Notifications</h3>
+      <div class="p-md-10" style="color: #525252; font-size: 87%">
+        <p-checkbox
+          [(ngModel)]="escalatedEmails"
+          binary="true"
+          id="escalatedEmails"
+          name="escalatedEmails"
+          label="Failed Submissions - Escalation"
+        >
+        </p-checkbox>
+      </div>
+      <div class="p-md-10" style="color: #525252; font-size: 87%">
+        <p-checkbox
+          [(ngModel)]="longRunningSub"
+          binary="true"
+          id="longRunningSub"
+          name="longRunningSub"
+          label="Long Running Submissions"
+        >
+        </p-checkbox>
+      </div>
+      <div class="p-md-10" style="color: #525252; font-size: 87%">
+        <p-checkbox
+          [(ngModel)]="longRunningStep"
+          binary="true"
+          id="longRunningStep"
+          name="longRunningStep"
+          label="Long Running Steps"
+        >
+        </p-checkbox>
+      </div>
+      <div class="p-md-8">
+        <p-button label="Update Alerts" (onClick)="updateAlerts()"></p-button>
+      </div>
+    </div>
+  </div>
+  <div class="p-md-1 vr"></div>
+  <div class="p-md-3">
+    <h3>Create New</h3>
+    <form [formGroup]="processNotificationForm">
+      <div class="p-grid" style="color: #525252; font-size: 87%">
+        <div class="p-md-11 p-offset-1 section">Level</div>
+        <div class="p-md-10 p-offset-2">
+          <p-radioButton
+            name="levels"
+            value="delayed"
+            label="Delayed Submission"
+            formControlName="level"
+            inputId="opt1"
+          ></p-radioButton>
+        </div>
+        <div class="p-md-10 p-offset-2">
+          <p-radioButton
+            name="levels"
+            value="statusProcess"
+            label="Submission Status"
+            formControlName="level"
+            inputId="opt2"
+          ></p-radioButton>
+        </div>
+        <div class="p-md-10 p-offset-2">
+          <p-radioButton name="levels" value="statusStep" label="Step Status" formControlName="level" inputId="opt3">
+          </p-radioButton>
+        </div>
+        <div class="p-md-12"></div>
+        <div class="p-md-11 p-offset-1 section">Details</div>
+        <div class="p-md-10 p-offset-2">
+          <div class="p-grid">
+            <div class="p-md-12">
+              <p class="field" *ngIf="input.processSteps">Steps</p>
+              <p-multiSelect
+                formControlName="processSteps"
+                defaultLabel="Steps"
+                [options]="steps"
+                optionLabel="name"
+                filterPlaceHolder="Search"
+                [panelStyle]="{ minWidth: '12em' }"
+                (onFocus)="onFocusProcessStep($event)"
+              >
+              </p-multiSelect>
+            </div>
+            <div class="p-md-12">
+              <p class="field" *ngIf="input.status">Status</p>
+              <p-dropdown
+                formControlName="status"
+                placeholder="Status"
+                [options]="status"
+                optionLabel="name"
+                showClear="true"
+              ></p-dropdown>
+            </div>
+            <div class="p-md-12">
+              <span class="ui-float-label">
+                <input
+                  formControlName="additionalEmails"
+                  pInputText
+                  type="text"
+                  name="additionalEmails"
+                  id="additionalEmails"
+                />
+                <label for="float-input">Additional Emails (Optional)</label>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="p-md-11 p-offset-1 section">Text Messaging</div>
+        <div class="p-md-10 p-offset-2">
+          <div class="p-grid">
+            <div class="p-md-12">
+              <p-checkbox label="Enabled" formControlName="enableTextMessaging" binary="true"></p-checkbox>
+            </div>
+            <div class="p-md-12">
+              <p-dropdown
+                formControlName="createdFor"
+                placeholder="Select User"
+                [options]="users"
+                optionLabel="name"
+                showClear="true"
+                (onShow)="onShowCreatedFor($event)"
+              >
+              </p-dropdown>
+            </div>
+          </div>
+        </div>
+        <div class="p-md-12"></div>
+        <div class="p-md-11 p-offset-1">
+          <p-button [disabled]="!processNotificationForm.valid" label="Save" (onClick)="addNotification()"></p-button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

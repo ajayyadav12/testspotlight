@@ -1,0 +1,125 @@
+@import '~src/styles-variables.scss';
+
+.step-title {
+  color: $blue;
+  vertical-align: middle;
+}
+
+.steps-custom .ui-steps {
+  .success {
+    .ui-menuitem-link {
+      .ui-steps-title {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ui-steps-number {
+        background-color: #b1e0c4;
+        border: none;
+      }
+    }
+    &.ui-steps-item.ui-state-highlight {
+      .ui-steps-title {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ui-steps-number {
+        background-color: #00bf6f;
+        font-weight: bold;
+      }
+    }
+  }
+  .inprogress {
+    .ui-menuitem-link {
+      .ui-steps-title {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ui-steps-number {
+        background-color: #c6def2;
+        border: none;
+      }
+    }
+    &.ui-steps-item.ui-state-highlight {
+      .ui-steps-title {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ui-steps-number {
+        background-color: #027ad9;
+        font-weight: bold;
+      }
+    }
+  }
+  .warning {
+    .ui-menuitem-link {
+      .ui-steps-title {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ui-steps-number {
+        background-color: #efdaae;
+        border: none;
+      }
+    }
+    &.ui-steps-item.ui-state-highlight {
+      .ui-steps-title {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ui-steps-number {
+        background-color: #ffa600;
+        font-weight: bold;
+      }
+    }
+  }
+  .failed {
+    .ui-menuitem-link {
+      .ui-steps-title {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ui-steps-number {
+        background-color: #edbbb8;
+        border: none;
+      }
+    }
+    &.ui-steps-item.ui-state-highlight {
+      .ui-steps-title {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: hidden;
+      }
+      .ui-steps-number {
+        background-color: #f44336;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.note-icon-step {
+  vertical-align: bottom;
+  color: #afafaf;
+  padding-left: 0.3em;
+  cursor: pointer;
+  &:hover {
+    color: #3a3a3a;
+  }
+}
+
+.note {
+  color: #4e4e4e;
+  padding: 0.5em;
+  word-break: break-all;
+}
+
+.ui-dialog {
+  z-index: 10000 !important;
+}

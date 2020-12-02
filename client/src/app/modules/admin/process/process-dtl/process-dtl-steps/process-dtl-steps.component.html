@@ -1,0 +1,24 @@
+<div class="p-grid">
+  <div class="p-md-5">
+    <span class="ui-float-label">
+      <input [(ngModel)]="stepName" pInputText type="text" name="stepname" id="stepname" *ngIf="isVisible"
+        [autofocus]="isVisible" (keyup.enter)="addStep()" />
+      <label for="float-input">Step Name</label>
+    </span>
+  </div>
+  <div class="p-md-4">
+    <div class="p-md-4">
+      <p-checkbox [(ngModel)]="required" binary="true" id="required" name="required" label="Required"></p-checkbox>
+    </div>
+    <div class="p-md-4">
+      <p-checkbox [(ngModel)]="parallel" binary="true" id="parallel" name="parallel" label="Parallel"></p-checkbox>
+    </div>
+  </div>
+  <div class="p-md-1">
+    <p-button [disabled]="!stepName" label="Add" (onClick)="addStep()"></p-button>
+  </div>
+  <div class="p-md-6">
+    <h3>List</h3>
+    <app-ge-table [value]="processSteps" [columns]="columns" (deleteRecord)="onDeleteRecord($event)"></app-ge-table>
+  </div>
+</div>

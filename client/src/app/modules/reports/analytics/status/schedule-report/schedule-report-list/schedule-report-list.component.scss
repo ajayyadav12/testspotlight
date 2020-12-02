@@ -1,0 +1,16 @@
+.floating-icons {
+  float: right;
+  position: absolute;
+  width: 70px;
+  right: 0px;
+}
+
+.table-icon {
+  font-size: 1.8em;
+  padding: 2px;
+  cursor: pointer;
+  &:hover {
+    background-color: lightgray;
+    border-radius: 50%;
+  }
+}

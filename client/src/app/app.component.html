@@ -1,0 +1,18 @@
+<app-sidebar></app-sidebar>
+<div [ngStyle]="{ 'margin-left': sidebarSvc.sidebarOpen ? '250px' : '50px' }">
+  <div style="margin:0px 30px 0px 30px">
+    <p-toast
+      [style]="{ marginTop: '80px' }"
+      [ngStyle]="{ marginLeft: sidebarSvc.sidebarOpen ? '300px' : '60px' }"
+    ></p-toast>
+    <p class="page-title">
+      <a routerLink="{{ listPage }}">
+        <i *ngIf="isDtlPage" class="pi pi-arrow-left" style="padding-right: 15px; vertical-align: bottom;"></i>
+      </a>
+      {{ sidebarSvc.title }}
+    </p>
+    <p-messages key="persist" [(value)]="msgs"></p-messages>
+    <div style="height: 5px"></div>
+    <router-outlet></router-outlet>
+  </div>
+</div>

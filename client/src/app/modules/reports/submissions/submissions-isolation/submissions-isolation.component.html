@@ -1,0 +1,173 @@
+<div class="p-grid p-justify-between" *ngIf="submission">
+  <div class="p-md-12" style="height: 40px"></div>
+  <div class="p-md-12" style="text-align: right">
+    <i
+      (click)="getSingleSubmission()"
+      class="pi pi-refresh refresh"
+      pTooltip="Last Updated: {{ lastUpdatedTime | date: 'medium' }}"
+      tooltipPosition="bottom"
+    ></i>
+    <p-toggleButton
+      [(ngModel)]="autoRefreshOn"
+      onLabel="Auto"
+      offLabel="Auto"
+      onIcon="pi pi-refresh"
+      offIcon="pi pi-refresh"
+      class="input"
+      iconPos="right"
+      pTooltip="Every 20s"
+      showDelay="400"
+      tooltipPosition="bottom"
+    ></p-toggleButton>
+  </div>
+  <div class="p-md-12" style="height: 50px"></div>
+  <div class="p-md-5" style="max-height: 65vh; overflow-y: auto">
+    <p-card [style]="{ 'background-color': '#f5f5f5' }">
+      <p-header>
+        <div
+          style="height: 20px"
+          [ngStyle]="{ 'background-color': submissionStatusColor(submission.status) }"
+          [ngClass]="{ 'fail-row': submission.status === 'failed' && !submission.acknowledgementFlag }"
+          pTooltip="Status: {{
+            submission.status +
+              (submission.status === 'failed' && !submission.acknowledgementFlag ? '; not acknowledged' : '')
+          }}"
+          tooltipPosition="top"
+          showDelay="225"
+        ></div>
+        <div class="p-grid">
+          <div class="p-md-6" style="padding: 2em">
+            <div style="font-size: 1.7em; margin-bottom: .5em">
+              <b>{{ submission.process.name }}</b>
+            </div>
+            <div style="opacity: .7">
+              <p>
+                <span
+                  ><b>#{{ submission.id }}</b></span
+                >
+                <span *ngIf="submission.altId"> - {{ submission.altId }}</span>
+              </p>
+              <p *ngIf="submission.parent" style="font-style: italic">
+                From {{ submission.parent.process.name }} (#{{ submission.parent.id }})
+              </p>
+            </div>
+          </div>
+          <div class="p-md-6" style="color: grey; text-align: right; padding: 2em">
+            <p>
+              <span style="font-style: italic">{{ submission.startTime | date: 'fullDate' }}</span>
+            </p>
+            <p>
+              <b>{{ submission.elapsedTime }}</b>
+            </p>
+            <p>
+              <span
+                *ngIf="submission.adHoc"
+                class="pi pi-calendar-times"
+                style="font-size: 160%; vertical-align: middle"
+                pTooltip="AdHoc: true"
+                showDelay="225"
+                tooltipPosition="bottom"
+              ></span>
+            </p>
+          </div>
+        </div>
+        <div *ngIf="submission.notes.length" style="padding-left: 2em; padding-right: 2em">
+          <div class="hr"></div>
+          <div [innerHTML]="submission.notes" class="note"></div>
+          <div class="hr"></div>
+        </div>
+      </p-header>
+      <p-footer>
+        <div class="p-grid p-justify-center">
+          <div class="p-md-10" style="padding: inherit">
+            <div class="p-grid" style="text-align: center; color:#808080">
+              <div class="p-md-4">
+                <div class="p-grid">
+                  <div class="p-col-2 p-md-12" style="font-size: 80%">RECORDS</div>
+                  <div class="p-col-10 p-md-12 data" style="background-color:#e0eaf1">
+                    <b>{{ submission.records }}</b>
+                  </div>
+                </div>
+              </div>
+              <div class="p-md-4">
+                <div class="p-grid">
+                  <div class="p-col-2 p-md-12" style="font-size: 80%">WARNINGS</div>
+                  <div class="p-col-10 p-md-12 data" style="background-color:#f7f2e4">
+                    <b>{{ submission.warnings }}</b>
+                  </div>
+                </div>
+              </div>
+              <div class="p-md-4">
+                <div class="p-grid">
+                  <div class="p-col-2 p-md-12" style="font-size: 80%">ERRORS</div>
+                  <div class="p-col-10 p-md-12 data" style="background-color:#e6e6e6">
+                    <b>{{ submission.errors }}</b>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-footer>
+    </p-card>
+  </div>
+  <div class="p-md-1 vr"></div>
+  <div class="p-md-6" style="max-height: 65vh; overflow-y: auto">
+    <div class="p-grid">
+      <div class="p-md-12" *ngFor="let step of submission.steps">
+        <div class="p-grid p-align-center">
+          <div class="p-col-3" style="width: 70px">
+            <div
+              class="status-circle"
+              [ngClass]="step.styleClass"
+              pTooltip="Status: {{ step.status.name }}"
+              tooltipPosition="bottom"
+              showDelay="225"
+            >
+              <b style="vertical-align: bottom; font-size: 130%">{{ step.order }}</b>
+            </div>
+          </div>
+          <div class="p-col-9">
+            <p-card
+              header="{{
+                (step.parentChildProcessName ? step.parentChildProcessName : '') +
+                  step.processStep.name +
+                  (step.processStep.name === 'start' || step.processStep.name === 'end' ? ': ' + step.displayTime : '')
+              }}"
+              subheader="{{
+                !(step.processStep.name === 'start' || step.processStep.name === 'end') ? step.displayTime : ''
+              }}"
+              [style]="{
+                'background-color':
+                  step.processStep.name === 'start' || step.processStep.name === 'end' ? '#eeefef' : '#fafafa',
+                'box-shadow': step.processStep.name === 'start' || step.processStep.name === 'end' ? 'none' : ''
+              }"
+            >
+              <div>
+                <div *ngIf="step.notes.length" class="hr"></div>
+                <div [innerHTML]="step.notes" class="note"></div>
+                <div
+                  *ngIf="!(step.processStep.name === 'start' || step.processStep.name === 'end')"
+                  class="pi pi-info-circle info"
+                  (mouseenter)="detail.toggle($event)"
+                  (mouseleave)="detail.hide()"
+                >
+                  <p-overlayPanel #detail appendTo="body" [style]="{ 'background-color': '#fffffff5' }">
+                    <div style="color: #686868">
+                      <p><b>Start Time</b>: {{ step.startTime | date: 'mediumTime' }}</p>
+                      <p>
+                        <b>End Time</b>:
+                        <span *ngIf="step.endTime">{{ step.endTime | date: 'mediumTime' }}</span>
+                        <span *ngIf="!step.endTime" class="pi pi-times-circle" style="vertical-align: middle"></span>
+                      </p>
+                    </div>
+                  </p-overlayPanel>
+                </div>
+              </div>
+            </p-card>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

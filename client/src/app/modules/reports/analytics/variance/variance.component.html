@@ -1,0 +1,125 @@
+<div class="p-grid">
+  <div class="p-col-12"></div>
+  <div class="p-col">
+    <form [formGroup]="reportForm" *ngIf="!exportData">
+      <div class="p-grid">
+        <div class="p-md-12">
+          <p-dropdown
+            formControlName="process"
+            [options]="processes"
+            placeholder="Process"
+            filter="true"
+            filterPlaceholder="Search"
+            [autofocus]="true"
+            (onClick)="resetForm()"
+          ></p-dropdown>
+        </div>
+        <div class="p-md-7">
+          <p-calendar
+            formControlName="period"
+            id="period"
+            selectionMode="range"
+            [maxDate]="today"
+            placeholder="Time Period"
+            (onChange)="togglePeriod()"
+            showButtonBar="true"
+          ></p-calendar>
+        </div>
+        <div class="p-md-5">
+          <p-checkbox
+            formControlName="defaultPeriod"
+            binary="true"
+            name="defaultPeriod"
+            label="Last 30 days"
+            (onChange)="togglePeriod()"
+          ></p-checkbox>
+        </div>
+        <div class="p-md-12">
+          <p-button
+            [disabled]="!reportForm.valid || loading.report || loading.complete"
+            label="Generate"
+            (onClick)="prepareReport()"
+          ></p-button>
+          <p-button
+            [disabled]="!stats.count"
+            label="Preview Export"
+            styleClass="ui-button-secondary"
+            style="float: right"
+            (onClick)="loading.export = true"
+          ></p-button>
+          <p-dialog
+            *ngIf="loading.export"
+            [visible]="loading.export"
+            modal="true"
+            [closable]="false"
+            [contentStyle]="{ height: '300px' }"
+            [maximizable]="true"
+          >
+            <app-variance-export [deviationMap]="deviationMap" (loading)="closePreview($event)"></app-variance-export>
+          </p-dialog>
+        </div>
+      </div>
+    </form>
+    <div *ngIf="exportData" class="report-info">
+      <p>
+        <b>
+          Variance Report Summary
+        </b>
+      </p>
+      <p>{{ info.report.rangeStart | date: 'longDate' }} - {{ info.report.rangeEnd | date: 'longDate' }}</p>
+    </div>
+    <div class="p-md-12"></div>
+    <div class="p-md-12" *ngIf="!exportData"></div>
+    <div class="p-md-12" *ngIf="stats.count">
+      <div class="p-grid">
+        <div class="p-col-10 p-md-12">
+          <div class="p-grid">
+            <div class="p-col-4 p-md-4 stat-number">{{ info.labels.avgHist }}</div>
+            <div
+              class="p-col-4 p-md-4 stat-number"
+              [style.background-color]="stats.avg.success ? '#c9e2d6' : '#ecd7d6'"
+            >
+              {{ info.labels.avgPeriod }}
+            </div>
+            <div class="p-col-4 p-md-4 stat-number">{{ info.labels.median }}</div>
+          </div>
+        </div>
+        <div class="p-col-2 p-md-12">
+          <div class="p-grid">
+            <div class="p-col-4 p-md-4 stat-title"><b>Historical</b> Average</div>
+            <div class="p-col-4 p-md-4 stat-title"><b>Period</b> Average</div>
+            <div class="p-col-4 p-md-4 stat-title"><b>Median</b> Duration</div>
+          </div>
+        </div>
+        <div class="p-col-12 p-md-12" *ngIf="!exportData"></div>
+        <div class="p-col-10 p-md-12">
+          <div class="p-grid">
+            <div class="p-col-4 p-md-4 stat-number">
+              <span *ngIf="stats.empty.length"> {{ stats.count }} / {{ stats.count + stats.empty.length }} </span>
+              <span *ngIf="!stats.empty.length">{{ stats.count }}</span>
+            </div>
+            <div class="p-col-4 p-md-4 stat-number">{{ info.labels.schedule }}</div>
+            <div class="p-col-4 p-md-4 stat-number">
+              <span *ngIf="stats.schedule.tolerance">+ </span>{{ info.labels.tolerance }}
+            </div>
+          </div>
+        </div>
+        <div class="p-col-2 p-md-12">
+          <div class="p-grid">
+            <div class="p-col-4 p-md-4 stat-title"><b>Total</b> Submissions</div>
+            <div class="p-col-4 p-md-4 stat-title"><b>Scheduled</b> Duration</div>
+            <div class="p-col-4 p-md-4 stat-title"><b>Tolerance</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="p-col-8" *ngIf="!exportData">
+    <div *ngIf="loading.report" class="p-grid p-justify-center">
+      <div class="p-col-2">
+        <i class="pi pi-spin pi-spinner loading"></i>
+      </div>
+    </div>
+    <app-variance-chart *ngIf="loading.chart" [deviationMap]="deviationMap"></app-variance-chart>
+  </div>
+</div>

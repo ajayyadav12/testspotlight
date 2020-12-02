@@ -1,0 +1,51 @@
+.process.ui-organizationchart .ui-organizationchart-node-content {
+  padding: 0;
+  border: 0 none;
+}
+
+.header-parent {
+  background-color: #5a5a5a;
+  color: #ffffff;
+  font-weight: bold;
+  padding: 0.5em 0.7em;
+  border-radius: 3px;
+}
+
+.content-parent {
+  text-align: center;
+  background-color: #f3f3f3;
+  border: 1px solid grey;
+  padding: 0.5em 0.7em;
+  font-style: italic;
+  border-radius: 3px;
+}
+
+.header-child {
+  background-color: #c7c7c7;
+  color: #5a5a5a;
+  border: 1px solid grey;
+  font-weight: bold;
+  padding: 0.5em 0.7em;
+  border-radius: 3px;
+}
+
+.current-child {
+  background-color: #768cbb;
+  color: white;
+  border: 1px solid grey;
+  font-weight: bold;
+  padding: 0.5em 0.7em;
+  border-radius: 3px;
+}
+
+.content-child {
+  text-align: center;
+  border: 1px solid grey;
+  padding: 0.5em 0.7em;
+  font-style: italic;
+  border-radius: 3px;
+}
+
+.export {
+  font-size: 65%;
+}

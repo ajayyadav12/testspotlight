@@ -1,0 +1,53 @@
+<app-ge-table
+  [value]="upcomingSubmissions"
+  [columns]="columns"
+  [showEditDelete]="false"
+  [loading]="loading"
+  [menuItems]="menuItems"
+  (clickMenuOption)="onClickMenuOption($event)"
+></app-ge-table>
+<p-dialog
+  [modal]="true"
+  [(visible)]="displayDisabledDialog"
+  *ngIf="disableNoteData"
+  (onHide)="disableNoteData = null"
+  [style]="{ 'min-width': '500px', 'max-width': '800px' }"
+  [maximizable]="true"
+>
+  <p-header> Disabled Note </p-header>
+  <app-ge-notes-dialog [noteData]="disableNoteData" (submitNote)="onSubmitDisabledNote($event)"></app-ge-notes-dialog>
+</p-dialog>
+<p-dialog
+  [modal]="true"
+  [(visible)]="displayEditDialog"
+  [style]="{ 'min-width': '500px', 'max-width': '800px' }"
+  [maximizable]="true"
+>
+  <p-header
+    >Edit Schedule Submission <b>#{{ editScheduleId }}</b></p-header
+  >
+  <p>Time is set on EST</p>
+  <form [formGroup]="upcomingSubmissionForm">
+    <div class="p-grid" style="margin: 20px 50px 400px 50px">
+      <div class="p-md-6">
+        <span class="ui-float-label">
+          <p-calendar formControlName="startTime" [showTime]="true"> </p-calendar>
+          <label for="startTime">Start Date</label>
+        </span>
+      </div>
+      <div class="p-md-6">
+        <span class="ui-float-label">
+          <p-calendar formControlName="endTime" [showTime]="true"> </p-calendar>
+          <label for="endTime">End Date</label>
+        </span>
+      </div>
+      <div class="p-md-12">
+        <p-button
+          [disabled]="!upcomingSubmissionForm.valid"
+          label="Update"
+          (onClick)="updateUpcomingSubmission()"
+        ></p-button>
+      </div>
+    </div>
+  </form>
+</p-dialog>

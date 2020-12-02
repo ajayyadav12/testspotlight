@@ -1,0 +1,124 @@
+.adhoc {
+  background: repeating-linear-gradient(45deg, white, white 10px, #f7f7f7 10px, #f7f7f7 20px);
+}
+
+.status {
+  padding: inherit;
+  text-align: center;
+  font-weight: bold;
+  color: #ffffff;
+  cursor: pointer;
+  margin: -5px;
+  height: 100%;
+
+  .bubble {
+    border: 2px solid;
+    border-radius: 4px;
+    min-height: 50px;
+    padding-top: 20%;
+  }
+}
+
+.info {
+  text-align: right;
+  font-size: 90%;
+  font-style: italic;
+  color: #999999;
+  display: block;
+  min-height: 65px;
+
+  .date {
+    font-weight: bold;
+    display: block;
+  }
+
+  .complete {
+    color: #97e5b7;
+    vertical-align: middle;
+    margin: none;
+    margin-bottom: 5px;
+  }
+}
+
+.note-icon-child {
+  vertical-align: middle;
+  font-size: 1.6em;
+  color: #afafaf;
+  margin-bottom: 5px;
+  cursor: pointer;
+  &:hover {
+    color: #3a3a3a;
+  }
+}
+
+.note {
+  color: #4e4e4e;
+  padding: 0.5em;
+  word-break: break-all;
+}
+
+.altId {
+  display: block;
+  padding-top: 0.8em;
+  font-style: italic;
+  font-size: 70%;
+  color: #808080;
+  word-wrap: break-word;
+}
+
+.data {
+  font-size: 120%;
+  border-radius: 4px;
+  overflow: auto;
+}
+
+.count {
+  text-align: center;
+
+  .stat {
+    font-weight: bold;
+    color: #4d4d4d;
+  }
+
+  .label {
+    font-size: 40%;
+    font-style: italic;
+    color: #4d4d4d;
+  }
+
+  .label-mini {
+    font-size: 60%;
+    font-style: italic;
+    vertical-align: sub;
+  }
+}
+
+.records {
+  text-align: center;
+  font-style: italic;
+
+  .stat {
+    font-size: 60%;
+  }
+
+  .stat-mini {
+    vertical-align: middle;
+  }
+
+  .label {
+    font-size: 40%;
+  }
+
+  .label-mini {
+    font-size: 60%;
+    font-style: italic;
+    vertical-align: sub;
+  }
+}
+
+.stack {
+  font-size: 90%;
+  border-radius: 4px;
+  text-align: center;
+  overflow: auto;
+}

@@ -1,0 +1,16 @@
+<br />
+<button mat-raised-button (click)="onClickBackBtn()"><mat-icon>arrow_back</mat-icon></button>
+<mat-grid-list *ngFor="let step of steps" cols="7" rowHeight="15px">
+  <mat-grid-tile colspan="1" rowspan="3">
+    <div class="step-circle" [style.background]="stepStatusColor(step.status.name)"></div>
+  </mat-grid-tile>
+  <mat-grid-tile colspan="3" rowspan="3">
+    <div class="step-name">{{ step.processStep.name }}</div>
+  </mat-grid-tile>
+  <mat-grid-tile colspan="3" rowspan="3">
+    <div class="step-time">From {{ step.startTime | date: 'shortTime' }} To {{ step.endTime | date: 'shortTime' }}</div>
+  </mat-grid-tile>
+  <mat-grid-tile colspan="1" rowspan="1">
+    <div *ngIf="step.processStep.name != 'start'" class="step-line"></div>
+  </mat-grid-tile>
+</mat-grid-list>

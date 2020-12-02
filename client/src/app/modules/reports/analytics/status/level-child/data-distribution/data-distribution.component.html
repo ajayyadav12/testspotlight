@@ -1,0 +1,8 @@
+<div>
+  <p class="title">Record Distribution</p>
+</div>
+<br />
+<div id="chartStatus2" [ngStyle]="{ display: deviationMap.totalSum ? 'visible' : 'none' }"></div>
+<div *ngIf="!deviationMap.totalSum" style="height: 350px">
+  <div class="empty">no records to show</div>
+</div>

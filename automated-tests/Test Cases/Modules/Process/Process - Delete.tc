@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>Process - Delete</name>
+   <tag></tag>
+   <comment>Delete Steps
+Delete Users</comment>
+   <testCaseGuid>66b4c390-2a6c-45bd-8734-abbdf9739eda</testCaseGuid>
+</TestCaseEntity>

@@ -1,0 +1,12 @@
+<div>
+  <p class="title">Step Status</p>
+</div>
+<br />
+<div id="chartStatus3" [ngStyle]="{ display: stepMap.length ? 'visible' : 'none' }"></div>
+<br />
+<div *ngIf="stepMap.length" style="text-align: center">
+  <p-button label="Export" styleClass="ui-button-secondary" (onClick)="exportReport()"></p-button>
+</div>
+<div *ngIf="!stepMap.length" style="height: 350px">
+  <div class="empty">no steps to show</div>
+</div>

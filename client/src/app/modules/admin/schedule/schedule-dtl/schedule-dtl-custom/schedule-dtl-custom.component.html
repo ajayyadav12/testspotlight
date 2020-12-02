@@ -1,0 +1,68 @@
+<section *ngIf="scheduleForm" [formGroup]="scheduleForm">
+  <div class="p-grid">
+    <div class="p-md-12">
+      <div style="text-align: right">
+        <input type="file" (change)="onFileSelect($event.target)" name="myfile" />
+        <button
+          (click)="onClickImport($event)"
+          icon="pi pi-file"
+          pButton
+          type="button"
+          label="Import Dates"
+          class="ui-button-success"
+          [disabled]="!dates"
+        ></button>
+      </div>
+    </div>
+    <div class="p-md-12">
+      <p-button label="Add" (onClick)="addDate()"></p-button>
+      <span
+        style="color: red; margin-left: 5px"
+        *ngIf="
+          scheduleForm.get('customRecurrence').errors &&
+          scheduleForm.get('customRecurrence').errors.minLengthArray &&
+          !scheduleForm.get('customRecurrence').pristine
+        "
+        >Should Have at Least One Entry</span
+      >
+      <span
+        style="color: red; margin-left: 5px"
+        *ngIf="
+          scheduleForm.get('customRecurrence').errors &&
+          scheduleForm.get('customRecurrence').errors.noDuplicatesArray &&
+          !scheduleForm.get('customRecurrence').pristine
+        "
+        >No Duplicates Allowed</span
+      >
+    </div>
+    <div class="p-md-12">
+      <div class="p-grid" style="font-weight: 600">
+        <div class="p-md-2">ID</div>
+        <div class="p-md-4">Start Time</div>
+        <div class="p-md-4">End Time</div>
+        <div class="p-md-2"></div>
+      </div>
+      <hr />
+    </div>
+    <div
+      class="p-md-12"
+      formArrayName="customRecurrence"
+      *ngFor="let dates of datesArray.controls; let rowIndex = index"
+    >
+      <div class="p-grid" [formGroupName]="rowIndex">
+        <div class="p-md-2">{{ rowIndex }}</div>
+        <div class="p-md-4"><p-calendar formControlName="startTime" [showTime]="true"></p-calendar></div>
+        <div class="p-md-4"><p-calendar formControlName="endTime" [showTime]="true"></p-calendar></div>
+        <div class="p-md-2">
+          <button
+            (click)="onClickDeleteDate(rowIndex)"
+            pButton
+            type="button"
+            icon="pi pi-times"
+            class="ui-button-rounded ui-button-danger"
+          ></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

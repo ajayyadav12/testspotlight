@@ -1,0 +1,3 @@
+<p-button icon="pi pi-arrow-left" (onClick)="getSubmissionCount(params)" *ngIf="!isShowingLineChart"></p-button>
+<span *ngIf="!dataFound"> No data found in the last {{ days }} days.</span>
+<div [hidden]="!dataFound" id="{{ 'line_chart' + uniqueId }}"></div>

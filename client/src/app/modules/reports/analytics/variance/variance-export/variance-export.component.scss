@@ -1,0 +1,183 @@
+.report {
+  width: 750px; // 8.5 in
+  max-height: 800px; // 11 in
+  color: #585757;
+
+  .info {
+    margin: 10px;
+    padding: 10px;
+    padding-top: inherit;
+    background-color: white;
+    border-radius: 4px;
+    text-align: center;
+
+    .button {
+      margin: inherit;
+    }
+
+    .title {
+      margin-top: 5px;
+      font-size: 130%;
+      font-weight: bold;
+    }
+
+    .subtitle {
+      font-size: 80%;
+      font-style: italic;
+      color: #7a7a7a;
+    }
+
+    .hr {
+      margin: 1.2em;
+      height: 0px;
+      border-top: solid 4px #bebebe33;
+    }
+  }
+}
+
+.page {
+  padding: 12px;
+  font-size: 90%;
+}
+
+.section {
+  margin: inherit;
+  background-color: #51689b;
+  padding: 0.9em;
+  font-size: 85%;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 4px;
+  color: white;
+}
+
+.banner {
+  margin: none;
+  padding: 0.9em;
+  font-size: 90%;
+  text-transform: uppercase;
+  text-align: center;
+  min-height: 30px;
+
+  .title {
+    font-size: 70%;
+    font-style: italic;
+    text-align: center;
+  }
+
+  .info {
+    font-weight: bold;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+
+    i {
+      font-size: 97%;
+    }
+  }
+}
+
+.id {
+  font-weight: bold;
+  background-color: #eeeeee;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 110%;
+  margin-right: 20px;
+
+  .critical-state {
+    color: #e8a325;
+  }
+  .critical-icon {
+    top: 5px;
+  }
+}
+
+.name {
+  font-size: 200%;
+  text-transform: uppercase;
+  font-weight: bold;
+  padding: 0em;
+}
+
+.type {
+  font-style: italic;
+  color: #7a7a7a;
+  margin-bottom: 0.5em;
+}
+
+.chart {
+  padding: none;
+}
+
+.title {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 110%;
+}
+
+.stat {
+  text-transform: uppercase;
+  font-size: 110%;
+  text-align: center;
+  font-weight: bold;
+}
+
+.submissions {
+  color: #7a7a7a;
+
+  .title {
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 130%;
+    margin: none;
+  }
+
+  .stats {
+    margin: inherit;
+  }
+
+  .deviation {
+    padding-left: 1.5em;
+
+    .range {
+      color: #8d8d8d;
+      font-style: italic;
+      font-size: 90%;
+      padding-left: 8px;
+    }
+
+    .count {
+      font-size: 90%;
+      padding-left: 8px;
+    }
+
+    .hr {
+      margin: 1.5em;
+      margin-top: 0.8em;
+      height: 0px;
+      border-top: solid 1px #bebebe33;
+    }
+  }
+}
+
+.hr {
+  margin: 0.2em;
+  margin-top: 0.5em;
+  height: 0px;
+  border-top: solid 1px #bebebe33;
+}
+
+.vr {
+  padding: none;
+  margin: 0.2em;
+  width: 0px;
+  border-right: solid 1px #bebebe33;
+}
+
+.footer {
+  padding: 2em;
+  font-size: 85%;
+  font-style: italic;
+  color: #7a7a7a;
+}

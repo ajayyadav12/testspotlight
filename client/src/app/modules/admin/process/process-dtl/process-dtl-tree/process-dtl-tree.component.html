@@ -1,0 +1,33 @@
+<div class="p-grid">
+  <div class="p-md-2">
+    <p-listbox
+      [options]="processes"
+      [(ngModel)]="selectedProcess"
+      filter="filter"
+      optionLabel="name"
+      [listStyle]="{ 'max-height': '400px' }"
+    >
+      <p-header>
+        <i class="pi pi-sitemap"></i>
+        Processes
+      </p-header>
+    </p-listbox>
+  </div>
+  <div class="p-md-10">
+    <p-menu #menu [popup]="true" [model]="items"></p-menu>
+    <p-organizationChart
+      [value]="processTree"
+      selectionMode="single"
+      [(selection)]="selectedNode"
+      (onNodeSelect)="onNodeSelect($event)"
+      *ngIf="isLoaded"
+    >
+      <ng-template let-node pTemplate="default">
+        <div [ngStyle]="{ color: currentProcessColor(node.label), 'font-weight': 600 }">{{ node.label }}</div>
+        <div [ngStyle]="{ color: currentProcessColor(node.label) }">
+          From {{ node.senderName }} to {{ node.receiverName }}
+        </div>
+      </ng-template>
+    </p-organizationChart>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+@import '~src/styles-variables.scss';
+
+.table-icon {
+  font-size: 1.8em;
+  padding: 2px;
+  cursor: pointer;
+  &:hover {
+    background-color: lightgray;
+    border-radius: 50%;
+  }
+}
+
+.floating-icons {
+  float: right;
+  position: absolute;
+  width: 70px;
+  right: 0px;
+}
+
+.row-even {
+  background-color: #f9f9f9;
+}
+
+.row-odd {
+  background-color: white;
+}

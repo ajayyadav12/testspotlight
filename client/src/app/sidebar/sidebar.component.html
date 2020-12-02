@@ -1,0 +1,128 @@
+<div @sidebarAnimation class="sidebar" [ngStyle]="{ width: sidebarSvc.sidebarOpen ? '250px' : '50px' }">
+  <div class="sidebar-content">
+    <div class="p-grid p-nogutter">
+      <div class="p-col-12" style="height: 10px"></div>
+      <div class="p-col p-md-12">
+        <div class="p-grid p-nogutter" [ngStyle]="{ 'text-align': sidebarSvc.sidebarOpen ? 'left' : 'center' }">
+          <div [ngClass]="sidebarSvc.sidebarOpen ? 'p-md-2' : 'p-md-12'">
+            <i
+              (click)="sidebarSvc.sidebarOpen = !sidebarSvc.sidebarOpen"
+              class="pi pi-bars hamburger-icon"
+              [ngClass]="sidebarSvc.sidebarOpen ? '' : 'closed'"
+              pTooltip="Open Menu"
+              tooltipPosition="right"
+              [tooltipDisabled]="sidebarSvc.sidebarOpen"
+            ></i>
+          </div>
+          <div
+            [ngClass]="sidebarSvc.sidebarOpen ? 'p-md-7 vr' : 'p-md-12'"
+            [ngStyle]="{ padding: sidebarSvc.sidebarOpen ? '.7em' : '.3em' }"
+          >
+            <div [ngStyle]="{ 'text-align': sidebarSvc.sidebarOpen ? 'right' : 'center' }">
+              <span class="site-title start" *ngIf="sidebarSvc.sidebarOpen">Sp</span>
+              <img
+                src="../../assets/spotlight-logo-gray.png"
+                alt=""
+                [ngClass]="sidebarSvc.sidebarOpen ? 'logo' : 'logo closed'"
+                pTooltip="Spotlight {{ version }}"
+                tooltipPosition="right"
+                [tooltipDisabled]="sidebarSvc.sidebarOpen"
+              />
+              <span class="site-title" *ngIf="sidebarSvc.sidebarOpen">tlight</span>
+            </div>
+            <div title="{{ buildDate }}" class="build-version" *ngIf="sidebarSvc.sidebarOpen">v{{ version }}</div>
+          </div>
+          <div
+            [ngClass]="sidebarSvc.sidebarOpen ? 'p-md-2' : 'p-md-12'"
+            [ngStyle]="{ padding: sidebarSvc.sidebarOpen ? '.7em' : '.3em' }"
+          >
+            <img
+              src="../../assets/ge-logo.svg"
+              alt=""
+              [ngClass]="sidebarSvc.sidebarOpen ? 'logo' : 'logo closed'"
+              pTooltip="GE Corporate"
+              tooltipPosition="right"
+              [tooltipDisabled]="sidebarSvc.sidebarOpen"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="p-col p-md-12 hr" [ngStyle]="{ width: sidebarSvc.sidebarOpen ? '240px' : '40px' }"></div>
+      <div class="p-col p-md-12 p-col-align-stretch" *ngIf="isLoggedIn && sso !== ''">
+        <div *ngIf="isLoggedIn" [ngStyle]="{ 'text-align': sidebarSvc.sidebarOpen ? 'left' : 'center' }">
+          <div *ngFor="let menuItem of sidebarSvc.menuItems">
+            <p class="menu-header" *ngIf="sidebarSvc.sidebarOpen && menuItem.items.length">
+              {{ menuItem.label | uppercase }}
+            </p>
+
+            <div
+              *ngFor="let nestedMenuItem of menuItem.items"
+              class="menu-item"
+              [ngStyle]="{ 'padding-left': sidebarSvc.sidebarOpen ? '20px' : 'initial' }"
+            >
+              <a
+                [routerLink]="nestedMenuItem.routerLink"
+                style="font-size: .8em; color: rgb(65, 65, 65)"
+                routerLinkActive="active-link"
+                (click)="this.msgSvc.clear('persist')"
+                pTooltip="{{ nestedMenuItem.label }}"
+                tooltipPosition="right"
+                [tooltipDisabled]="sidebarSvc.sidebarOpen"
+              >
+                <span class="icon {{ nestedMenuItem.icon }}"></span>
+                <span class="text" *ngIf="sidebarSvc.sidebarOpen">{{ nestedMenuItem.label }}</span>
+              </a>
+            </div>
+            <br *ngIf="!sidebarSvc.sidebarOpen" />
+          </div>
+        </div>
+      </div>
+      <div class="p-col p-md-12 account" *ngIf="isLoggedIn && sso !== ''">
+        <div class="p-grid p-nogutter p-align-center">
+          <div class="p-col p-md-12 hr" [ngStyle]="{ width: sidebarSvc.sidebarOpen ? '240px' : '40px' }"></div>
+          <div
+            [ngClass]="sidebarSvc.sidebarOpen ? 'p-md-2' : 'p-md-12'"
+            [ngStyle]="{ padding: sidebarSvc.sidebarOpen ? '.7em' : '.5em' }"
+          >
+            <span
+              class="pi pi-info-circle icon"
+              (click)="menu.toggle($event)"
+              pTooltip="Resources"
+              tooltipPosition="right"
+            ></span>
+            <p-menu #menu [popup]="true" appendTo="body" [model]="help" [style]="{ width: '100px' }"></p-menu>
+          </div>
+          <div
+            [ngClass]="sidebarSvc.sidebarOpen ? 'p-md-7 vr' : 'p-md-12'"
+            [ngStyle]="{ padding: sidebarSvc.sidebarOpen ? '1em' : '.5em' }"
+          >
+            <img
+              [ngClass]="sidebarSvc.sidebarOpen ? 'profile-img' : 'profile-img closed'"
+              onerror="this.src='../assets/user.png'"
+              src="https://supportcentral.ge.com/images/person/temp/{{ sso }}.jpg"
+              pTooltip="{{ name }}"
+              tooltipPosition="right"
+              [tooltipDisabled]="sidebarSvc.sidebarOpen"
+            />
+            <div class="profile-user" *ngIf="sidebarSvc.sidebarOpen">
+              <div class="name">{{ name }}</div>
+              <div class="role">{{ role }}</div>
+            </div>
+          </div>
+          <div
+            [ngClass]="sidebarSvc.sidebarOpen ? 'p-md-2' : 'p-md-12'"
+            [ngStyle]="{ padding: sidebarSvc.sidebarOpen ? '.7em' : '.5em' }"
+          >
+            <span
+              class="pi pi-sign-out icon"
+              (click)="sessionSvc.logout()"
+              pTooltip="Log Out"
+              tooltipPosition="right"
+            ></span>
+          </div>
+          <div class="p-col-12" style="height: 10px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

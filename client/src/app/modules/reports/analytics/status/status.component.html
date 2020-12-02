@@ -1,0 +1,137 @@
+<div class="p-grid">
+  <div class="p-md-11" *ngIf="!displayAllSchedules">
+    <div class="p-grid">
+      <div class="p-md-5">
+        <form [formGroup]="reportForm">
+          <div class="p-grid">
+            <div class="p-md-6">
+              <p-dropdown
+                formControlName="level"
+                [options]="levels"
+                placeholder="Level"
+                (onChange)="getProcesses()"
+                autofocus
+              ></p-dropdown>
+            </div>
+            <div class="p-md-6">
+              <p-dropdown
+                formControlName="process"
+                [options]="processesToLoad"
+                placeholder="Process"
+                filter="true"
+                filterPlaceholder="Search"
+                [disabled]="!processesToLoad.length || isScheduleActive"
+                (onClick)="resetForm()"
+              ></p-dropdown>
+            </div>
+            <div class="p-md-7">
+              <p-calendar
+                formControlName="period"
+                id="period"
+                selectionMode="range"
+                [maxDate]="today"
+                placeholder="Time Period"
+                (onChange)="togglePeriod()"
+                showButtonBar="true"
+              ></p-calendar>
+            </div>
+            <div class="p-md-5">
+              <p-checkbox
+                formControlName="defaultPeriod"
+                binary="true"
+                name="defaultPeriod"
+                label="Last 30 days"
+                (onChange)="togglePeriod()"
+              ></p-checkbox>
+            </div>
+            <div class="p-md-12">
+              <p-button
+                [disabled]="!reportForm.valid || loading.report || loading.complete"
+                label="Generate"
+                (onClick)="prepareReport()"
+              ></p-button>
+              <p-button
+                *ngIf="!(reportScheduled || isScheduleActive)"
+                [disabled]="!(stats.count && hasProcessAccess)"
+                label="Schedule Report"
+                styleClass="ui-button-secondary"
+                style="float: right"
+                (onClick)="displayScheduleDialog = true"
+              ></p-button>
+              <p-button
+                *ngIf="isScheduleActive || reportScheduled"
+                [disabled]="true"
+                label="Scheduled"
+                icon="pi pi-clock"
+                styleClass="ui-button-success"
+                style="float: right"
+              ></p-button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="p-md-6 p-offset-1">
+        <div *ngIf="loading.report" class="p-grid p-justify-center">
+          <i class="pi pi-spin pi-spinner loading"></i>
+        </div>
+        <div *ngIf="stats.count">
+          <div class="p-grid">
+            <div class="p-md-12"></div>
+            <div class="p-md-3 stat-number">
+              <span *ngIf="stats.empty.length"> {{ stats.count }} / {{ stats.count + stats.empty.length }} </span>
+              <span *ngIf="!stats.empty.length">{{ stats.count }}</span>
+            </div>
+            <div class="p-md-3 stat-number">{{ info.labels.avgPeriod }}</div>
+            <div class="p-md-3 stat-number">{{ info.labels.avgHist }}</div>
+            <div class="p-md-3"></div>
+            <div class="p-md-3 stat-title"><b>Total</b> Submissions</div>
+            <div class="p-md-3 stat-title"><b>Period</b> Average</div>
+            <div class="p-md-3 stat-title"><b>Historical</b> Average</div>
+          </div>
+        </div>
+      </div>
+      <div class="p-md-12"></div>
+      <div class="p-md-12">
+        <div class="p-grid" *ngIf="loading.chart">
+          <div [ngClass]="isParent ? 'p-col-6' : 'p-col-4'">
+            <app-status-steps *ngIf="!isParent" [dataToLoad]="dataToLoad" [reportInfo]="info"></app-status-steps>
+            <app-status-children *ngIf="isParent" [dataToLoad]="dataToLoad" [reportInfo]="info"></app-status-children>
+          </div>
+          <div class="p-col-4" *ngIf="!isParent">
+            <app-status-submission [dataToLoad]="dataToLoad" [reportInfo]="info"></app-status-submission>
+          </div>
+          <div [ngClass]="isParent ? 'p-col-6' : 'p-col-4'">
+            <app-data-distribution
+              *ngIf="!isParent"
+              [dataToLoad]="dataToLoad"
+              [reportInfo]="info"
+            ></app-data-distribution>
+            <app-status-parent *ngIf="isParent" [dataToLoad]="dataToLoad" [reportInfo]="info"></app-status-parent>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="p-md-11" *ngIf="displayAllSchedules">
+    <app-schedule-report-list></app-schedule-report-list>
+  </div>
+  <div class="p-md-1" style="padding: none">
+    <p-menu #menu [popup]="true" [model]="scheduleMenu" [style]="{ 'text-align': 'right', width: '120px' }"></p-menu>
+    <button type="button" pButton icon="pi pi-bars" style="float: right" (click)="menu.toggle($event)"></button>
+  </div>
+</div>
+
+<p-dialog
+  *ngIf="displayScheduleDialog"
+  header="Schedule Report"
+  [(visible)]="displayScheduleDialog"
+  [modal]="true"
+  [style]="{ width: '800px' }"
+  [contentStyle]="{ height: '300px' }"
+  [maximizable]="true"
+>
+  <app-schedule-report
+    [reportInfo]="info"
+    (exit)="displayScheduleDialog = !$event; reportScheduled = $event"
+  ></app-schedule-report>
+</p-dialog>

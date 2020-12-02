@@ -1,0 +1,6 @@
+rootProject.name = 'spotlight'
+include 'common'
+include 'dashboard'
+include 'applications'
+include 'cronjobs'
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TestCaseEntity>
+   <description></description>
+   <name>Process - Create</name>
+   <tag></tag>
+   <comment></comment>
+   <testCaseGuid>c9fea9a5-10be-4fcf-bcb2-ec46b009f8b3</testCaseGuid>
+   <variable>
+      <defaultValue>'000-step'</defaultValue>
+      <description></description>
+      <id>4a2f6303-98d0-4dc1-95f0-230ef53ee7ed</id>
+      <masked>false</masked>
+      <name>stepname</name>
+   </variable>
+</TestCaseEntity>

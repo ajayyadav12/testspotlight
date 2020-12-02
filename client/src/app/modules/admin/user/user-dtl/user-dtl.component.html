@@ -1,0 +1,50 @@
+<form [formGroup]="userForm">
+  <div class="p-grid">
+    <div class="p-md-12">
+      <h3>Summary</h3>
+      <span class="ui-float-label">
+        <input formControlName="id" pInputText type="number" name="id" id="id" /> <label for="float-input">ID</label>
+      </span>
+    </div>
+    <div class="p-md-12">
+      <span class="ui-float-label">
+        <input formControlName="name" pInputText type="text" name="name" id="name" [autofocus] />
+        <label for="float-input">Name</label>
+      </span>
+    </div>
+    <div class="p-md-12">
+      <span class="ui-float-label">
+        <input formControlName="sso" pInputText type="number" name="sso" id="sso" />
+        <label for="float-input">SSO</label>
+      </span>
+    </div>
+    <div class="p-md-12">
+      <p-dropdown
+        filterPlaceHolder="Select Role"
+        defaultLabel="Select Role"
+        [options]="roles"
+        formControlName="role"
+        placeholder="Role"
+        [panelStyle]="{ minWidth: '12em' }"
+      ></p-dropdown>
+    </div>
+    <div class="p-md-12">
+      <h3>Text Messaging</h3>
+      <p-dropdown
+        [options]="carriers"
+        formControlName="carrier"
+        placeholder="Carrier"
+        optionLabel="carrier"
+        [panelStyle]="{ minWidth: '12em' }"
+        (onShow)="onShowCarriers($event)"
+      ></p-dropdown>
+    </div>
+    <div class="p-md-12">
+      <span class="ui-float-label">
+        <input formControlName="phoneNumber" pInputText type="number" name="phoneNumber" id="phoneNumber" />
+        <label for="float-input">Phone Number</label>
+      </span>
+    </div>
+    <div class="p-md-12"><p-button [disabled]="!userForm.valid" label="Save" (onClick)="save()"></p-button></div>
+  </div>
+</form>

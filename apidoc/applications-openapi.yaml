@@ -1,0 +1,77 @@
+openapi: 3.0.0
+info:
+  title: Spotlight Applications API
+  version: 1.0.0-20190220
+servers:
+  - url: http://localhost:9001/appsapi/v1
+tags:
+  - name: Submissions
+security:
+  - bearer: []
+paths:
+  /submissions/steps:
+    post:
+      summary: Creates and returns a new submission step
+      description: |
+        Creates and returns a new submission step. If a process step named "start" is used, then a new submission for the process will be created. Submission id in the payload is optional, if not sent then the step will be added to the last open submission. Status is optionasl as well, if not sent then a status "success" will be used.
+        You can close a previous open submission step sending a new step: if the new step has a different name, then the previous open submission step will be closed and a new one will be created, otherwise only the previous open submission step will be closed. 
+        If adhoc is set to true, then the server will not look for a scheduled submission. Period should be in format '1Q-2019' and can only be set on submission creation. Records, warnings, and errors are optionals, if set they will overwrite any previous value.
+      tags:
+        - Submissions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - processStepName
+                - time
+              properties:
+                processStepName:
+                  type: string
+                  example: 'start'
+                time:
+                  type: string
+                  format: date-time
+                status:
+                  type: string
+                  example: 'success'
+                submissionId:
+                  type: integer
+                adHoc:
+                  type: boolean
+                records:
+                  type: integer
+                  example: 10
+                warnings:
+                  type: integer
+                  example: 10
+                errors:
+                  type: integer
+                  example: 10
+                period:
+                  type: string
+                  example: '1Q-2019'
+      responses:
+        201:
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  submissionId:
+                    type: integer
+        400:
+          description: Bad request
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not Found
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer

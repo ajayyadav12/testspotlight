@@ -1,0 +1,18 @@
+.center-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.submission-altid {
+  color: gray;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 15ch;
+  display: inline-grid;
+}
+
+.tooltip-altid {
+  word-break: break-all;
+}

@@ -1,0 +1,62 @@
+@import '~src/styles-variables.scss';
+
+.status-circle {
+  margin-left: 0.5em;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.circle {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+i {
+  font-size: 1.8em;
+  cursor: pointer;
+  color: $gray;
+  &:hover {
+    color: $blue;
+  }
+}
+
+.footer {
+  color: #686868;
+  font-style: italic;
+  font-size: 80%;
+}
+
+.table-icon {
+  font-size: 1.8em;
+  padding: 2px;
+  cursor: pointer;
+  &:hover {
+    background-color: lightgray;
+    border-radius: 50%;
+  }
+}
+
+.floating-icons {
+  float: right;
+  width: 35px;
+  right: 0px;
+}
+
+.row-even {
+  background-color: #f9f9f9;
+}
+
+.row-odd {
+  background-color: white;
+}
+
+.isolation-logo {
+  height: 25px;
+  width: 25px;
+  vertical-align: top;
+  bottom: 15px;
+  position: absolute;
+}

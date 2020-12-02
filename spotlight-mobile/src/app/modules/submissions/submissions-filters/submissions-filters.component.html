@@ -1,0 +1,31 @@
+<h1 mat-dialog-title>Filters</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Processes</mat-label>
+    <mat-select multiple [(ngModel)]="selectedProcesses">
+      <mat-option *ngFor="let process of processes" [value]="process">
+        {{ process.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Parents</mat-label>
+    <mat-select multiple [(ngModel)]="selectedParents">
+      <mat-option *ngFor="let parent of parents" [value]="parent">
+        {{ parent.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <mat-form-field>
+    <mat-label>Status</mat-label>
+    <mat-select multiple [(ngModel)]="selectStatuses">
+      <mat-option *ngFor="let status of statuses" [value]="status">
+        {{ status.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Go back</button>
+  <button mat-button (click)="onClickFilter()" cdkFocusInitial color="primary">Filter</button>
+</div>
