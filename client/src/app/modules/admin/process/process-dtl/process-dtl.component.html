@@ -1,17 +1,8 @@
-<p-tabMenu #hey [model]="processMenu" [activeItem]="processMenu[0]"> </p-tabMenu> <br /><br />
+<p-card>
+	<p-tabMenu #hey [model]="processMenu" [activeItem]="activeItem"> </p-tabMenu>
+	<br />
 
-<section [hidden]="isTabActive(hey.activeItem, 0)">
-  <app-process-dtl-summary [isVisible]="!isTabActive(hey.activeItem, 0)"></app-process-dtl-summary>
-</section>
-<section [hidden]="isTabActive(hey.activeItem, 1)">
-  <app-process-dtl-steps [isVisible]="!isTabActive(hey.activeItem, 1)"></app-process-dtl-steps>
-</section>
-<section [hidden]="isTabActive(hey.activeItem, 2)">
-  <app-process-dtl-notifications></app-process-dtl-notifications>
-</section>
-<section [hidden]="isTabActive(hey.activeItem, 3)">
-  <app-process-dtl-users [isVisible]="!isTabActive(hey.activeItem, 3)"></app-process-dtl-users>
-</section>
-<section *ngIf="!isTabActive(hey.activeItem, 4)">
-  <app-process-dtl-tree></app-process-dtl-tree>
-</section>
+	<section>
+		<router-outlet></router-outlet>
+	</section>
+</p-card>

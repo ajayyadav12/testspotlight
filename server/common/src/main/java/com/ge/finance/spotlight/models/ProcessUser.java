@@ -1,7 +1,6 @@
 package com.ge.finance.spotlight.models;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 @Table(name="T_PROCESS_USER")

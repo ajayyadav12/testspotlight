@@ -1,5 +1,5 @@
 // tslint:disable
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { Injectable, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { By } from '@angular/platform-browser';
@@ -19,16 +19,21 @@ import { of, Observable } from 'rxjs';
 @Injectable()
 class MockViewsService {
   getViews(moduleName: string): Observable<any> {
-    return of([{ name: 'test', id: 1 }]);
+    return of([{ name: 'test', id: 1, settings: '{}' }, { name: 'test 2', id: 2, settings: null }]);
   }
 
   saveView(view): Observable<any> {
-    return of({ name: 'test', id: 1 });
+    return of({ name: 'test', id: 1, settings: '{}' });
   }
 
   deleteView(id): Observable<any> {
-    return of({ name: 'test', id: 1 });
+    return of({ name: 'test', id: 1, settings: '{}' });
   }
+
+  updateMultiple(views): Observable<any> {
+    return of(views);
+  }
+
 }
 
 @Injectable()
@@ -76,8 +81,8 @@ describe('GEViewsComponent', () => {
     component.onSelectView = jest.fn(x => true);
 
     component.getViews();
-    expect(component.view).toBeNull();
-    expect(component.views.length).toBeGreaterThan(0);
+    expect(component.view).toBeUndefined();
+    expect(component.views.length).toEqual(1);
     expect(component.onSelectView).toHaveBeenCalled();
   });
 
@@ -118,6 +123,24 @@ describe('GEViewsComponent', () => {
     component.deleteView();
 
     expect(component.views.length).toBe(0);
+  });
+
+  it('should run #onStarView() and set default', async () => {
+    component.views = [{ name: 'test', id: 1, default: false, settings: { }}];
+    component.view = { id: 1 };
+    component.onStarView();
+    expect(component.views.length).toBeGreaterThan(0);
+    expect(component.view).toBeDefined();
+    expect(component.view.default).toBeTruthy();
+  });
+
+  it('should run #onStarView() and unset default', async () => {
+    component.views = [{ name: 'test', id: 1, default: true, settings: { }}];
+    component.view = { id: 1 };
+    component.onStarView();
+    expect(component.views.length).toBeGreaterThan(0);
+    expect(component.view).toBeDefined();
+    expect(component.view.default).toBeFalsy();
   });
 
   it('should run #deleteView() and NOT delete from views', async () => {

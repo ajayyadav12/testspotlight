@@ -1,0 +1,41 @@
+.value-only-wrapper {
+	height: 128px;
+	line-height: 40px;
+	cursor: pointer !important;
+	&:hover {
+		text-shadow: 0px 0px 2px gray;
+	}
+}
+
+.value-only {
+	font-size: 3em;
+	text-align: center;
+	font-weight: bold;
+}
+
+.value-only-icon {
+	text-align: center;
+}
+
+.warning {
+	background: #fff3ef;
+	color: orange;
+	padding: 1px 10px;
+	font-weight: 700;
+	font-size: 1.2em;
+	border-radius: 17px;
+}
+
+.success {
+	background: #e1f6e1;
+	color: green;
+	font-size: 1.2em;
+	border-radius: 2em;
+	padding: 2px;
+}
+
+.value-only-title {
+	color: gray;
+	text-align: center;
+	font-size: 1.1em;
+}

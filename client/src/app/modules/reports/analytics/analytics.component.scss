@@ -1,0 +1,55 @@
+@import '~src/styles-variables.scss';
+.filters {
+	box-shadow: 1px 1px 10px 2px $light-blue;
+	background-color: white;
+	.icon {
+		position: absolute;
+		background: lightgray;
+		height: 56px;
+		line-height: 69px;
+		width: 45px;
+		text-align: center;
+		font-size: 1.5em;
+	}
+	.content {
+		margin-left: 4em;
+	}
+}
+.option {
+	text-align: center;
+	vertical-align: middle;
+	background: lightgray;
+	height: 50px;
+	border-radius: 5px;
+	display: inline-block;
+	width: 200px;
+	margin-right: 1em;
+	cursor: pointer;
+	line-height: 50px;
+	.title {
+		font-size: 1.1em;
+	}
+}
+
+.option2 {
+	text-align: center;
+	vertical-align: top;
+	background: white;
+	height: 50px;
+	border-radius: 5px;
+	display: inline-block;
+	width: 200px;
+	margin-right: 1em;
+	cursor: pointer;
+	line-height: 50px;
+	.title {
+		font-size: 1.1em;
+	}
+}
+:host ::ng-deep .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active {
+	background-color: #ffb6c1; //<Replace your custom color>
+	border: 1px solid #d600d9;
+}
+li.ui-tabmenuitem.ui-state-default.ui-state-active {
+	background: #d600d9;
+}

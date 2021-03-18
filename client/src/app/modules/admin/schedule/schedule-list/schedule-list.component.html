@@ -1,26 +1,41 @@
-<div *ngIf="hasProcesses">
-  <div style="display: inline-block">
-    <p-button label="New Schedule" routerLink="/schedule/0"></p-button>
-  </div>
-  <div style="float:right">
-    <span class="ui-float-label">
-      <p-dropdown
-        id="processId"
-        [(ngModel)]="processId"
-        [options]="processes"
-        placeholder="Select Process"
-        (onChange)="onChangeProcess($event)"
-        (deleteRecord)="onDeleteRecord($event)"
-      ></p-dropdown>
-      <label for="scheduleEndDate">Process</label>
-    </span>
-  </div>
+<div class="list-banner">
+	<button
+		[disabled]="!hasProcesses"
+		pButton
+		type="button"
+		icon="pi pi-refresh"
+		class="p-button-raised p-button-text p-button-plain"
+		(click)="setupProcessDropdown()"
+	></button>
+	<p-button [disabled]="!hasProcesses" label="New Schedule" (onClick)="openNewScheduleDialog()"></p-button>
 </div>
-<p></p>
-<app-ge-table
-  [value]="schedules"
-  [columns]="columns"
-  routerLink="/schedule/"
-  [loading]="loading"
-  (deleteRecord)="onDeleteRecord($event)"
-></app-ge-table>
+<div>
+	<p-dropdown
+		id="processId"
+		[(ngModel)]="processId"
+		[options]="processes"
+		placeholder="Select Process"
+		filter="true"
+		(onChange)="onChangeProcess($event)"
+		(deleteRecord)="onDeleteRecord($event)"
+	></p-dropdown>
+</div>
+
+<br />
+<p-card
+	><app-ge-table
+		[value]="schedules"
+		[columns]="columns"
+		routerLink="/schedule/"
+		[loading]="loading"
+		(deleteRecord)="onDeleteRecord($event)"
+	></app-ge-table
+></p-card>
+
+<p-dialog
+	header="New Schedule"
+	[(visible)]="newScheduleDialog"
+	[style]="{ 'min-width': '800px', 'max-width': '1100px' }"
+>
+	<app-schedule-dtl-form *ngIf="newScheduleDialog"></app-schedule-dtl-form>
+</p-dialog>

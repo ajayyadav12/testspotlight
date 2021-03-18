@@ -1,117 +1,157 @@
 @import '~src/styles-variables.scss';
 
-.input {
-  margin-left: 0.5em;
-  vertical-align: middle;
+table,
+th,
+td {
+	border: 1px $black;
+	border-style: ridge;
+	border-collapse: collapse;
+	font-size: small;
 }
 
-.status-circle {
-  margin-left: 0.5em;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  display: inline-block;
+.input {
+	margin-left: 0.5em;
+	vertical-align: middle;
 }
 
 .circle {
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+}
+
+.rectangle {
+	/* height: 20px;
+  width: 100px;
+  border-radius: 10px;
+  padding: 15px;
+  border: 1px solid;
+  font-size: 16px;
+  text-align: center; */
+
+	padding: 5px;
+	text-align: center;
+	color: white;
+	border-radius: 0.5em;
+	font-size: 14px;
+	margin: 0;
 }
 
 .fail-row {
-  background-color: #f080805c !important;
+	background-color: #f080805c !important;
 }
 
 .fail-circle {
-  animation: fail-circle-animation 2s infinite;
-  cursor: pointer;
+	animation: fail-circle-animation 2s infinite;
+	cursor: pointer;
 }
 
 @keyframes fail-circle-animation {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.5);
-  }
+	0%,
+	100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.5);
+	}
 }
 
 i {
-  font-size: 1.8em;
-  cursor: pointer;
-  color: $gray;
-  &:hover {
-    color: $blue;
-  }
+	font-size: 1.8em;
+	cursor: pointer;
+	color: $gray;
+	&:hover {
+		color: $blue;
+	}
 }
 
 .active-filters {
-  color: orange;
+	color: orange;
 }
 
 .note-icon-sub {
-  font-size: 1.6em;
-  color: #afafaf;
-  vertical-align: middle;
-  padding-left: 0.2em;
-  cursor: pointer;
-  &:hover {
-    color: #3a3a3a;
-  }
+	font-size: 1.6em;
+	color: #afafaf;
+	vertical-align: middle;
+	padding-left: 0.2em;
+	cursor: pointer;
+	&:hover {
+		color: #3a3a3a;
+	}
 }
 
 .note {
-  color: #4e4e4e;
-  padding: 0.5em;
-  word-break: break-all;
+	color: #4e4e4e;
+	padding: 0.5em;
+	word-break: break-all;
 }
 
 .altId {
-  display: block;
-  color: #808080;
-  font-style: italic;
-  font-size: 95%;
-  padding: 0.3em;
-  padding-left: 0.7em;
-  word-wrap: break-word;
+	display: block;
+	color: #808080;
+	font-style: italic;
+	font-size: 95%;
+	padding: 0.3em;
+	padding-left: 0.7em;
+	word-wrap: break-word;
 }
 
 .footer {
-  color: #686868;
-  font-style: italic;
-  font-size: 80%;
+	color: #686868;
+	font-style: italic;
+	font-size: 80%;
 }
 
 .isolation-logo {
-  height: 25px;
-  width: 25px;
-  vertical-align: top;
-  bottom: 15px;
-  position: absolute;
+	height: 25px;
+	width: 25px;
+	vertical-align: top;
+	bottom: 15px;
+	position: absolute;
 }
 
 .open-submission {
-  cursor: pointer;
-  animation: open-submission-animation 5s infinite;
-  animation-fill-mode: forwards;
+	cursor: pointer;
+	animation: open-submission-animation 5s infinite;
+	animation-fill-mode: forwards;
 }
 
 @keyframes open-submission-animation {
-  0% {
-    transform: translate(0, 0);
-  }
+	0% {
+		transform: translate(0, 0);
+	}
 
-  7% {
-    transform: translate(0, -10px);
-  }
+	7% {
+		transform: translate(0, -10px);
+	}
 
-  14% {
-    transform: translate(0, 0);
-  }
+	14% {
+		transform: translate(0, 0);
+	}
 
-  100% {
-    transform: translate(0, 0);
-  }
+	100% {
+		transform: translate(0, 0);
+	}
+}
+
+@media screen and (max-width: 920px) {
+	.col-sm-hide {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 1200px) {
+	.col-md-hide {
+		display: none;
+	}
+}
+
+.expand-icon {
+	color: lightgray;
+	position: absolute;
+	color: lightgray;
+	z-index: 1;
+	margin-top: -8px;
+	right: 48px;
+	font-size: 1em;
 }

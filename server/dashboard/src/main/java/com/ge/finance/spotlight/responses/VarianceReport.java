@@ -1,7 +1,6 @@
 package com.ge.finance.spotlight.responses;
 
 import com.ge.finance.spotlight.models.Submission;
-import java.util.Date;
 
 public class VarianceReport {
 

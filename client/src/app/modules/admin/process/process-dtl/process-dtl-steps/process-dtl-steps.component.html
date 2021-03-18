@@ -1,24 +1,101 @@
 <div class="p-grid">
-  <div class="p-md-5">
-    <span class="ui-float-label">
-      <input [(ngModel)]="stepName" pInputText type="text" name="stepname" id="stepname" *ngIf="isVisible"
-        [autofocus]="isVisible" (keyup.enter)="addStep()" />
-      <label for="float-input">Step Name</label>
-    </span>
-  </div>
-  <div class="p-md-4">
-    <div class="p-md-4">
-      <p-checkbox [(ngModel)]="required" binary="true" id="required" name="required" label="Required"></p-checkbox>
-    </div>
-    <div class="p-md-4">
-      <p-checkbox [(ngModel)]="parallel" binary="true" id="parallel" name="parallel" label="Parallel"></p-checkbox>
-    </div>
-  </div>
-  <div class="p-md-1">
-    <p-button [disabled]="!stepName" label="Add" (onClick)="addStep()"></p-button>
-  </div>
-  <div class="p-md-6">
-    <h3>List</h3>
-    <app-ge-table [value]="processSteps" [columns]="columns" (deleteRecord)="onDeleteRecord($event)"></app-ge-table>
-  </div>
+	<div class="p-md-12">
+		<p-button label="New Step" (onClick)="newNotification()" [disabled]="!isAdmin && !canEdit"></p-button>
+	</div>
+	<div [ngClass]="{ 'p-md-12': stepId === -1, 'p-md-8': stepId > -1 }">
+		<div class="p-md-12">
+			<h3>List</h3>
+			<app-ge-table
+				[value]="processSteps"
+				[columns]="columns"
+				(deleteRecord)="onDeleteRecord($event)"
+				[customEdit]="true"
+				(editRecord)="onEditRecord($event)"
+				[readonly]="!isAdmin && !canEdit"
+			></app-ge-table>
+		</div>
+	</div>
+	<div [hidden]="stepId === -1" class="p-md-1 vr"></div>
+	<div [hidden]="stepId === -1" class="p-md-3">
+		<h3>{{ stepId > 0 ? 'Update ID: ' + stepId : 'Create New' }}</h3>
+		<form [formGroup]="processStepForm">
+			<div class="p-grid" style="color: #525252; font-size: 87%">
+				<div class="p-grid">
+					<div class="p-md-12">
+						<span class="p-float-label">
+							<input
+								formControlName="name"
+								pInputText
+								type="text"
+								name="name"
+								id="name"
+								*ngIf="isVisible"
+								(change)="nameAlert()"
+								[autofocus]="isVisible"
+							/>
+							<label for="float-input">Step Name</label>
+						</span>
+					</div>
+					<div class="p-md-12">
+						<span class="p-float-label">
+							<input
+								formControlName="duration"
+								pInputText
+								type="text"
+								name="duration"
+								id="duration"
+								*ngIf="isVisible"
+								[autofocus]="isVisible"
+							/>
+							<label for="float-input">Duration</label>
+						</span>
+					</div>
+					<div class="p-md-12">
+						<div class="p-md-4">
+							<p-checkbox
+								formControlName="required"
+								binary="true"
+								id="required"
+								name="required"
+								label="Required"
+							>
+							</p-checkbox>
+						</div>
+						<div class="p-md-4">
+							<p-checkbox
+								formControlName="parallel"
+								binary="true"
+								id="parallel"
+								name="parallel"
+								label="Parallel"
+							>
+							</p-checkbox>
+						</div>
+						<div class="p-md-4">
+							<p-checkbox
+								formControlName="disabled"
+								binary="true"
+								id="disabled"
+								name="disabled"
+								[(ngModel)]="selectedValues"
+								label="Disabled"
+								(onChange)="messageAlert()"
+							>
+							</p-checkbox>
+						</div>
+					</div>
+				</div>
+				<div class="p-md-12"></div>
+				<div class="p-md-11 p-offset-1">
+					<p-button
+						[disabled]="!processStepForm.valid"
+						label="{{ stepId > 0 ? 'Update' : 'Save' }}"
+						(onClick)="onSubmit()"
+					>
+					</p-button>
+					<button pButton class="p-button-text p-button-plain" label="Cancel" (click)="cancel()"></button>
+				</div>
+			</div>
+		</form>
+	</div>
 </div>

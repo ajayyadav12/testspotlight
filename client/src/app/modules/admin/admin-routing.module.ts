@@ -10,14 +10,8 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'sender',
-    loadChildren: () => import('./sender/sender.module').then(m => m.SenderModule),
-    canActivate: [AuthGuard, RoleGuard],
-    data: { expectedRoles: ['admin'] }
-  },
-  {
-    path: 'receiver',
-    loadChildren: () => import('./receiver/receiver.module').then(m => m.ReceiverModule),
+    path: 'system',
+    loadChildren: () => import('./system/system.module').then(m => m.SystemModule),
     canActivate: [AuthGuard, RoleGuard],
     data: { expectedRoles: ['admin'] }
   },
@@ -44,4 +38,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class AdminRoutingModule {}
+export class AdminRoutingModule { }

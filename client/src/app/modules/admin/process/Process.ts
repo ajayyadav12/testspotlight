@@ -1,13 +1,12 @@
-import { Sender } from '../sender/Sender';
-import { Receiver } from '../receiver/Receiver';
+import { System } from '../system/System';
 import { GETable } from 'src/app/shared/ge-table/GETable';
 
 export interface Process extends GETable {
   id: number;
   name: string;
   sender_id: number;
-  sender: Sender;
-  receiver: Receiver;
+  sender: System;
+  receiver: System;
   processType: any;
   receiverName: string;
   senderName: string;

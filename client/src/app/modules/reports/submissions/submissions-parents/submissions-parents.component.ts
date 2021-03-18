@@ -5,6 +5,8 @@ import { SubmissionsService } from '../submissions.service';
 import { Subject } from 'rxjs';
 import { DateCommon } from 'src/app/shared/DateCommon';
 import { Table } from 'primeng/table';
+import * as moment from 'moment-timezone';
+import { first, map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-submissions-parents',
@@ -88,7 +90,7 @@ export class SubmissionsParentsComponent implements OnInit, OnDestroy {
         return;
       }
       this.queryParams = params;
-      if (this.table) this.table.reset();
+      if (this.table) { this.table.reset(); }
       this.getParentSubmissions(params);
     });
   }
@@ -119,7 +121,7 @@ export class SubmissionsParentsComponent implements OnInit, OnDestroy {
    */
   getParentSubmissions(params?) {
     this.loading = true;
-    let _params: any = {};
+    const _params: any = {};
     Object.assign(_params, params ? params : this.queryParams);
     _params.sortOrder = -1;
     _params.sortField = 'id';
@@ -149,14 +151,32 @@ export class SubmissionsParentsComponent implements OnInit, OnDestroy {
   }
 
   parentMapping(s) {
+    // this.childTotalRecords = 0;
+    moment.tz.setDefault('America/New_York');
+    let startMoment = moment(s.startTime);
+    let endMoment = moment(s.endTime);
     s.title = s.process.name;
     s.status = s.status.name;
     s.start = new Date(s.startTime);
     s.end = new Date(s.endTime);
     s.elapsedTime = DateCommon.dateDifference(s.startTime, s.endTime ? s.endTime : new Date(), true);
 
+    s.startTime = startMoment.tz('America/New_York').format('MM/DD/YY hh:mm a');
+    if (s.endTime) {
+      s.endTime = endMoment.tz('America/New_York').format('MM/DD/YY hh:mm a');
+    }
+
+
     // prepare empty mapping for child processes
     s.childProcesses = [];
+    if (s.children.length > 0) {
+      s.children.forEach(map => {
+        s.records += map.records;
+        s.errors += map.errors;
+        s.warnings += map.warnings;
+      })
+
+    }
 
     // sort children before mapping so that data[] in process map (and its status maps) are also sorted
     if (s.children.length > 1) {
@@ -198,6 +218,7 @@ export class SubmissionsParentsComponent implements OnInit, OnDestroy {
 
         s.childProcesses[index].info.stats.count++;
         s.childProcesses[index].info.stats.totalRecords += c.records;
+
 
         // update time window for map
         if (!c.endTime) {
@@ -294,7 +315,7 @@ export class SubmissionsParentsComponent implements OnInit, OnDestroy {
       const altIdSection = child.altId ? ` <i>(${child.altId})</i>` : '';
       submission.notes =
         `<b>#${child.id} ${child.process.name}</b>${altIdSection} - Status: <b>${child.status}</b> <br> ${
-          child.notes ? child.notes : ''
+        child.notes ? child.notes : ''
         } <br><br>` + submission.notes;
     });
     this.showIsolation = true;

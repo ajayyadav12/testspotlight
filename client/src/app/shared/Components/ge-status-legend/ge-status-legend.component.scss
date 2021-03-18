@@ -1,0 +1,26 @@
+@import '~src/styles-variables.scss';
+
+.status-circles {
+	span {
+		margin-left: 0.5em;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		display: inline-block;
+		&:nth-child(1) {
+			background-color: $green;
+		}
+		&:nth-child(2) {
+			background-color: $blue;
+		}
+		&:nth-child(3) {
+			background-color: $yellow;
+		}
+		&:nth-child(4) {
+			background-color: $red;
+		}
+		&:nth-child(5) {
+			background-color: #bb99ff;
+		}
+	}
+}

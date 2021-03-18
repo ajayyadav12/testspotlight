@@ -1,6 +1,9 @@
 package com.ge.finance.spotlight.models;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 
 @Entity
@@ -27,6 +30,7 @@ public class SubmissionStep {
     private Status status;
     @Column(name = "notes")
     private String notes = "";
+    @Lob
     @Column(name = "request_payload")
     private String requestPayload = "";
 
@@ -91,6 +95,7 @@ public class SubmissionStep {
         }
     }
 
+    @JsonIgnore
 	public String getRequestPayload() {
 		return requestPayload;
 	}
@@ -99,6 +104,13 @@ public class SubmissionStep {
         if (requestPayload != "") {
             this.requestPayload += this.requestPayload == "" ? requestPayload : (" \n " + requestPayload);
         }		
-	}
+    }
+    
+    public long getDurationMins() {
+        Date to = (this.endTime != null) ? this.endTime : new Date();
+        long msec = to.getTime() - this.startTime.getTime();
+        long mins = (long) Math.floor(msec / 60000);
+        return Math.max(1, mins);
+    }
 
 }

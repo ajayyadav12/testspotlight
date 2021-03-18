@@ -1,53 +1,82 @@
-<div class="p-grid">
-  <app-dashboard-filters></app-dashboard-filters>
-  <div class="p-md-12 p-sm-12">
-    <h3>Submissions</h3>
-    <p-card [style]="{ height: '230px' }">
-      <app-dashboard-submission-banner (displayDrillDownDialog)="onDisplayDrillDown($event)">
-      </app-dashboard-submission-banner>
-    </p-card>
-  </div>
-  <div class="p-md-6 p-sm-12">
-    <h3>Trending <i class="ge-action pi pi-window-maximize" (click)="expandModule('trending')"></i></h3>
-    <p-card [style]="{ height: '450px' }">
-      <app-dashboard-trending-chart></app-dashboard-trending-chart>
-    </p-card>
-  </div>
-  <div class="p-md-6 p-sm-12">
-    <h3>Activity / Upcoming <i class="ge-action pi pi-window-maximize" (click)="expandModule('activity')"></i></h3>
-    <p-card [style]="{ height: '450px', 'overflow-y': 'scroll' }">
-      <app-dashboard-activity></app-dashboard-activity>
-    </p-card>
-  </div>
+<p-selectButton [options]="types" [(ngModel)]="displayType"> </p-selectButton>
+<app-dashboard-ops *ngIf="displayType == 0"></app-dashboard-ops>
+
+<div class="p-grid" *ngIf="displayType == 1">
+	<div class="p-md-12">
+		<app-dashboard-filters></app-dashboard-filters>
+	</div>
+	<div class="p-md-12">
+		<div class="ge-ui-card">
+			<div class="card-banner">Submissions</div>
+			<div style="padding-top: 1em">
+				<app-dashboard-submission-banner (displayDrillDownDialog)="onDisplayDrillDown($event)">
+				</app-dashboard-submission-banner>
+			</div>
+		</div>
+	</div>
+	<div class="p-md-6 p-sm-12">
+		<div class="ge-ui-card">
+			<div class="card-banner">
+				Trends
+				<i
+					style="color: lightgray"
+					class="ge-action pi pi-window-maximize"
+					(click)="expandModule('trending')"
+					title="Expand/Collapse"
+				></i>
+			</div>
+			<div class="ge-ui-card-content" [style]="{ height: '350px' }">
+				<app-dashboard-trending-chart></app-dashboard-trending-chart>
+			</div>
+		</div>
+	</div>
+	<div class="p-md-6 p-sm-12">
+		<div class="ge-ui-card">
+			<div class="card-banner">
+				Activity / Upcoming
+				<i
+					style="color: lightgray"
+					class="ge-action pi pi-window-maximize"
+					(click)="expandModule('activity')"
+					title="Expand/Collapse"
+				></i>
+			</div>
+			<div class="ge-ui-card-content" [style]="{ height: '350px', 'overflow-y': 'scroll' }">
+				<app-dashboard-activity></app-dashboard-activity>
+			</div>
+		</div>
+	</div>
 </div>
 
 <p-dialog
-  [modal]="true"
-  [(visible)]="displayDrillDownDialog"
-  *ngIf="displayDrillDownDialog"
-  [style]="{ 'min-width': '500px', 'max-width': '1500px' }"
-  [maximizable]="true"
+	[modal]="true"
+	[(visible)]="displayDrillDownDialog"
+	*ngIf="displayDrillDownDialog"
+	[style]="{ 'min-width': '500px', 'max-width': '1500px' }"
+	[maximizable]="true"
+	title="Expand/Collapse"
 >
-  <p-header> Drill Down Data </p-header>
-  <app-dashboard-submission-drill-down [displayType]="displayTypeDrillDown"></app-dashboard-submission-drill-down>
+	<p-header> Drill Down Data </p-header>
+	<app-dashboard-submission-drill-down [displayType]="displayTypeDrillDown"> </app-dashboard-submission-drill-down>
 </p-dialog>
 
 <p-dialog
-  [modal]="true"
-  [(visible)]="displayExpandModule"
-  *ngIf="displayExpandModule"
-  [style]="{ 'min-width': '100%' }"
-  [maximizable]="true"
+	[modal]="true"
+	[(visible)]="displayExpandModule"
+	*ngIf="displayExpandModule"
+	title="Expand/Collapse"
+	[style]="{ 'min-width': '100%' }"
+	[maximizable]="true"
 >
-  <p-header> Expanded view </p-header>
-  <section [ngSwitch]="expandedModule">
-    <app-dashboard-activity *ngSwitchCase="'activity'"></app-dashboard-activity>
-    <app-dashboard-trending-chart uniqueId="exp" *ngSwitchCase="'trending'"></app-dashboard-trending-chart>
-    <app-dashboard-submission-banner
-      uniqueId="exp"
-      *ngSwitchCase="'banner'"
-      (displayDrillDownDialog)="onDisplayDrillDown($event)"
-    >
-    </app-dashboard-submission-banner>
-  </section>
+	<p-header> Expanded view </p-header>
+	<section [ngSwitch]="expandedModule">
+		<app-dashboard-activity uniqueId="exp" *ngSwitchCase="'activity'"></app-dashboard-activity>
+		<app-dashboard-trending-chart uniqueId="exp" *ngSwitchCase="'trending'"> </app-dashboard-trending-chart>
+		<app-dashboard-submission-banner
+			uniqueId="exp"
+			*ngSwitchCase="'banner'"
+			(displayDrillDownDialog)="onDisplayDrillDown($event)"
+		>
+		</app-dashboard-submission-banner>
+	</section>
 </p-dialog>

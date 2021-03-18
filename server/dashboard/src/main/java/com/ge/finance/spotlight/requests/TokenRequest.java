@@ -1,35 +1,10 @@
 package com.ge.finance.spotlight.requests;
 
 public class TokenRequest {
-
-    private Long sso;
-    private String password;
-    private String url;
-    private String source;
-
-    public Long getSso() {
-        return sso;
-    }
-
-    public void setSso(Long sso) {
-        this.sso = sso;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
+        
+    private String source;    
+    private String code; 
+    private String redirectURI;
 
     public String getSource() {
         return this.source;
@@ -38,5 +13,21 @@ public class TokenRequest {
     public void setSource(String source) {
         this.source = source;
     }
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getRedirectURI() {
+		return redirectURI;
+	}
+
+	public void setRedirectURI(String redirectURI) {
+		this.redirectURI = redirectURI;
+	}
 
 }

@@ -1,0 +1,57 @@
+<form [formGroup]="permissionForm">
+	<div class="p-md-11">
+		<h3>User Permissions</h3>
+	</div>
+	<div class="p-md-11">
+		<span class="p-float-label">
+			<p-dropdown
+				optionLabel="name"
+				name="sender"
+				showClear="true"
+				inputId="sender"
+				formControlName="sender"
+				[options]="systems"
+				showClear="true"
+				(onClick)="getSenderReceiver()"
+			>
+			</p-dropdown>
+			<label for="float-input">Sender</label>
+		</span>
+	</div>
+	<div class="p-md-11">
+		<span class="p-float-label">
+			<p-dropdown
+				optionLabel="name"
+				name="receiver"
+				showClear="true"
+				inputId="receiver"
+				formControlName="receiver"
+				[options]="systems"
+				showClear="true"
+				(onClick)="getSenderReceiver()"
+			>
+			</p-dropdown>
+			<label for="float-input">Receiver</label>
+		</span>
+	</div>
+	<div class="p-md-3 p-offset-1">
+		<p-checkbox formControlName="view" binary="true" name="view" label="View"></p-checkbox>
+	</div>
+	<div class="p-md-3 p-offset-1">
+		<p-checkbox formControlName="upload" binary="true" name="upload" label="Upload"></p-checkbox>
+	</div>
+
+	<div class="p-md-12">
+		<p-button [disabled]="!permissionForm.valid" label="Grant" (onClick)="grantPermissions()"></p-button>
+	</div>
+</form>
+
+<div class="p-md-11">
+	<app-ge-table
+		[value]="permissions"
+		[columns]="columns"
+		[loading]="loading"
+		(deleteRecord)="onDeleteRecord($event)"
+		[globalFilter]="true"
+	></app-ge-table>
+</div>

@@ -1,0 +1,35 @@
+<div class="p-grid">
+    <div class="p-md-12">
+        <h3>Automated Notifications</h3>
+    </div>
+    <div class="p-md-12" style="color: #525252; font-size: 87%">
+        <p-checkbox [(ngModel)]="alertSettings.submissionDelayedEscalationAlrt" binary="true"
+            id="submissionDelayedEscalationAlrt" name="submissionDelayedEscalationAlrt"
+            label="Delayed Submissions - Escalation" [disabled]="!isAdmin && !canEdit">
+        </p-checkbox>
+    </div>
+    <div class="p-md-12" style="color: #525252; font-size: 87%">
+        <p-checkbox [(ngModel)]="alertSettings.submissionEscalationAlrt" binary="true"
+            id="submissionEscalationAlrt" name="submissionEscalationAlrt"
+            label="Failed Submissions - Escalation" [disabled]="!isAdmin && !canEdit">
+        </p-checkbox>
+    </div>
+    <div class="p-md-12" style="color: #525252; font-size: 87%">
+        <p-checkbox [(ngModel)]="alertSettings.longRunningSubAlrt" binary="true"
+            id="longRunningSubAlrt" name="longRunningSubAlrt" label="Long Running Submissions" [disabled]="!isAdmin && !canEdit">
+        </p-checkbox>
+    </div>
+    <div class="p-md-12" style="color: #525252; font-size: 87%">
+        <p-checkbox [(ngModel)]="alertSettings.longRunningStepAlrt" binary="true"
+            id="longRunningStepAlrt" name="longRunningStepAlrt" label="Long Running Steps" [disabled]="!isAdmin && !canEdit">
+        </p-checkbox>
+    </div>
+    <div class="p-md-12" style="color: #525252; font-size: 87%">
+        <p-checkbox [(ngModel)]="alertSettings.requiredStepAlrt" binary="true" id="requiredStepAlrt"
+            name="requiredStepAlrt" label="Required Steps" [disabled]="!isAdmin && !canEdit">
+        </p-checkbox>
+    </div>
+    <div class="p-md-12">
+        <p-button label="Update Alerts" (onClick)="updateAlerts()" [disabled]="!isAdmin && !canEdit"></p-button>
+    </div>
+</div>

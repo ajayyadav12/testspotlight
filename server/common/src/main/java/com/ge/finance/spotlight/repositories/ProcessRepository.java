@@ -7,7 +7,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface ProcessRepository extends JpaRepository<Process, Long>, JpaSpecificationExecutor<Process> {
 
@@ -20,11 +22,11 @@ public interface ProcessRepository extends JpaRepository<Process, Long>, JpaSpec
 
     List<Process> findByProcessParentId(Long processParentId);
 
-    long countByProcessParentId(Long processParentId);
+    Collection<Process> findBySenderIdInAndReceiverIdIn(Collection<Long> senderIdList, Collection<Long> receiverIdList);
 
-    long countBySenderId(Long senderId);
+    boolean existsByProcessParentId(Long processParentId);
 
-    long countByReceiverId(Long receiverId);
+    boolean existsBySenderIdOrReceiverId(Long senderId, Long receiverId);    
 
     long countByAppOwnerId(Long ownerId);
 
@@ -35,5 +37,11 @@ public interface ProcessRepository extends JpaRepository<Process, Long>, JpaSpec
 
     @Query("SELECT new com.ge.finance.spotlight.dto.ProcessDTO (process.id, process.name, process.isParent) FROM Process process WHERE process.approved = 'A' AND process.id in (:processIdList) ORDER BY process.name")
     List<ProcessDTO> findByIdAllProcess(@Param("processIdList") List<Long> processIdList);
+
+    List<ProcessDTO> findByIsParentAndProcessParentIdOrderByName(char isParent, Long parentId);
+
+    List<ProcessDTO> findBySubmissionEscalationAlrt(char isParent);
+
+    Optional<Process> findFirstByName(String name);
 
 }

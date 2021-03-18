@@ -9,6 +9,11 @@ import javax.persistence.criteria.Root;
 
 public class AdHocFilter<T> implements Specification<T> {
 
+  /**
+	 *
+	 */
+  private static final long serialVersionUID = -1551787264861989225L;
+  
   private String paramName;
   private char value;
 

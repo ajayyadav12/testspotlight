@@ -1,88 +1,101 @@
 <div class="p-grid p-no-gutter" style="color: #585757">
-  <div class="p-col-12"></div>
-  <div class="p-col-10 p-offset-1">
-    <div>
-      <p style="font-size: 160%; color: #3a3a3a">
-        <b>{{ reportInfo.process.info.name }}</b>
-      </p>
-      <br />
-      <p style="font-style: italic">
-        <span>a </span>
-        <span *ngIf="reportInfo.process.info.isParent">Parent</span>
-        <span *ngIf="!reportInfo.process.info.isParent">Child</span>
-        <span> Process</span>
-      </p>
-      <p style="font-style: italic; margin-top: .2em">spans {{ reportInfo.labels.rangeLength }}</p>
-    </div>
-  </div>
-  <div class="p-col-12"></div>
-  <div class="p-col-12"></div>
-  <div class="p-col-10 p-offset-1">
-    <form [formGroup]="scheduleForm">
-      <div class="p-grid">
-        <div class="p-md-12">
-          <span class="ui-float-label">
-            <input
-              formControlName="additionalEmails"
-              pInputText
-              type="text"
-              name="additionalEmails"
-              id="additionalEmails"
-            />
-            <label for="float-input">Additional Emails (Separated by empty an space)</label>
-          </span>
-        </div>
-        <div class="p-col-12"></div>
-        <div class="p-col-12">
-          <h4 style="padding-left: 0.5em">Recurrence Settings</h4>
-          <div class="p-grid">
-            <div class="p-col-12"></div>
-            <div class="p-col-3 p-offset-1">
-              <span class="ui-float-label">
-                <p-calendar formControlName="startDate" id="startDate" [(ngModel)]="today" disabled="true">
-                </p-calendar>
-                <label for="startDate">Start Date</label>
-              </span>
-            </div>
-            <div class="p-col-3 p-offset-2">
-              <span class="ui-float-label">
-                <p-calendar
-                  formControlName="endDate"
-                  id="endDate"
-                  [minDate]="today"
-                  [(ngModel)]="customEndDate"
-                  (onChange)="togglePeriod()"
-                  showButtonBar="true"
-                  monthNavigator="true"
-                  yearNavigator="true"
-                  yearRange="2019:2030"
-                >
-                </p-calendar>
-                <label for="endDate">End Date</label>
-              </span>
-            </div>
-            <div class="p-col-2">
-              <p-checkbox
-                formControlName="defaultEndDate"
-                binary="true"
-                name="defaultEndDate"
-                label="End of the year"
-                (onChange)="togglePeriod()"
-              ></p-checkbox>
-            </div>
-            <div class="p-col-10 p-offset-1" [ngSwitch]="scheduleForm.value.recurrencePattern">
-              <section *ngSwitchCase="'M'">
-                <h5>Monthly Recurrence</h5>
-                <app-schedule-dtl-monthly [scheduleForm]="scheduleForm" (monthOptionChanged)="onMonthOptionChanged()">
-                </app-schedule-dtl-monthly>
-              </section>
-            </div>
-          </div>
-        </div>
-        <div class="p-col-11">
-          <p-button [disabled]="!scheduleForm.valid" label="Save" (onClick)="save()" style="float: right"></p-button>
-        </div>
-      </div>
-    </form>
-  </div>
+	<div class="p-col-12"></div>
+	<div class="p-col-10 p-offset-1">
+		<div>
+			<p style="font-size: 160%; color: #3a3a3a">
+				<b>{{ reportInfo.process.info.name }}</b>
+			</p>
+			<br />
+			<p style="font-style: italic">
+				<span>a </span>
+				<span *ngIf="reportInfo.process.info.isParent">Parent</span>
+				<span *ngIf="!reportInfo.process.info.isParent">Child</span>
+				<span> Process</span>
+			</p>
+			<p style="font-style: italic; margin-top: 0.2em">spans {{ reportInfo.labels.rangeLength }}</p>
+		</div>
+	</div>
+	<div class="p-col-12"></div>
+	<div class="p-col-12"></div>
+	<div class="p-col-10 p-offset-1">
+		<form [formGroup]="scheduleForm">
+			<div class="p-grid">
+				<div class="p-md-12">
+					<span class="p-float-label">
+						<input
+							formControlName="additionalEmails"
+							pInputText
+							type="text"
+							name="additionalEmails"
+							id="additionalEmails"
+						/>
+						<label for="float-input">Additional Emails (Separated by empty an space)</label>
+					</span>
+				</div>
+				<div class="p-col-12"></div>
+				<div class="p-col-12">
+					<h4 style="padding-left: 0.5em">Recurrence Settings</h4>
+					<div class="p-grid">
+						<div class="p-col-12"></div>
+						<div class="p-col-3 p-offset-1">
+							<span class="p-float-label">
+								<p-calendar
+									formControlName="startDate"
+									id="startDate"
+									[(ngModel)]="today"
+									disabled="true"
+								>
+								</p-calendar>
+								<label for="startDate">Start Date</label>
+							</span>
+						</div>
+						<div class="p-col-3 p-offset-2">
+							<span class="p-float-label">
+								<p-calendar
+									formControlName="endDate"
+									id="endDate"
+									[minDate]="today"
+									[(ngModel)]="customEndDate"
+									(onChange)="togglePeriod()"
+									showButtonBar="true"
+									monthNavigator="true"
+									yearNavigator="true"
+									yearRange="2019:2030"
+								>
+								</p-calendar>
+								<label for="endDate">End Date</label>
+							</span>
+						</div>
+						<div class="p-col-2">
+							<p-checkbox
+								formControlName="defaultEndDate"
+								binary="true"
+								name="defaultEndDate"
+								label="End of the year"
+								(onChange)="togglePeriod()"
+							></p-checkbox>
+						</div>
+						<div class="p-col-10 p-offset-1" [ngSwitch]="scheduleForm.value.recurrencePattern">
+							<section *ngSwitchCase="'M'">
+								<h5>Monthly Recurrence</h5>
+								<app-schedule-dtl-monthly
+									[scheduleForm]="scheduleForm"
+									(monthOptionChanged)="onMonthOptionChanged()"
+								>
+								</app-schedule-dtl-monthly>
+							</section>
+						</div>
+					</div>
+				</div>
+				<div class="p-col-11">
+					<p-button
+						[disabled]="!scheduleForm.valid"
+						label="Save"
+						(onClick)="save()"
+						style="float: right"
+					></p-button>
+				</div>
+			</div>
+		</form>
+	</div>
 </div>

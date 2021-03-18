@@ -33,4 +33,21 @@ Uncomment line
 
 in `build.gradle`, and change the active profile property `spring.profiles.active` to `dev` in `dashboard/src/main/resources/application.properties` file.
 
-Finally run `gradlew dashboard:bootWar` to build dashboard WAR. You can find these WAR files in `build/libs/` in the respective project folder. A similar process is required for building the applications api.
+Finally run `gradlew -Ptomcat dashboard:bootWar` to build dashboard WAR. You can find these WAR files in `build/libs/` in the respective project folder. A similar process is required for building the applications api.
+
+### Testing
+
+Two test suites exist for dashboard and applications modules, and one for cronjobs. All modules implement unit tests for classes that are run with the commands:
+
+    gradlew dashboard:testDev
+    gradlew applications:testDev
+    gradlew cronjobs:testDev
+    
+and dashboard and applications modules implement integration tests which load the complete application along with a in-memory H2 database, and are run with the commands:
+
+    gradlew dashboard:testStage
+    gradlew applications:testStage
+    
+Unit tests should be run anytime a pull request is merged into development branch, and as integration tests are heavier than unit tests they should be run only when merging into stage/QA branch.
+
+Please add the suffix `-UnitTest` to classes that implement unit tests, `-JpaTest` for JPA query tests, and `-EndpointTest` for integration tests. For more information please refer to folder `src/test/` in each module.

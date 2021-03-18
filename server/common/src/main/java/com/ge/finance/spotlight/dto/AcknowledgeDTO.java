@@ -1,7 +1,8 @@
 package com.ge.finance.spotlight.dto;
 
-public class AcknowledgeDTO{
-    private String acknowledgementNote;        
+public class AcknowledgeDTO {
+    private String acknowledgementNote;
+    private String acknowledgedBy;
 
     /**
      * @return the acknowledgeNote
@@ -15,5 +16,14 @@ public class AcknowledgeDTO{
      */
     public void setAcknowledgementNote(String acknowledgementNote) {
         this.acknowledgementNote = acknowledgementNote;
-    }        
+    }
+
+    public String getAcknowledgedBy() {
+        return this.acknowledgedBy;
+    }
+
+    public void setAcknowledgedBy(String acknowledgedBy) {
+        this.acknowledgedBy = acknowledgedBy;
+    }
+
 }

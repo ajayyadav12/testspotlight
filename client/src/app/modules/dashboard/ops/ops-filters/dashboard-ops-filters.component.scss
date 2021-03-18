@@ -1,0 +1,24 @@
+@import '~src/styles-variables.scss';
+
+ul.ui-inputtext {
+	border: none !important;
+	width: 100% !important;
+	max-width: 100% !important;
+}
+
+.filtersOps {
+	box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 2px 1px -1px rgba(0, 0, 0, 0.12);
+	background-color: white;
+	.icon {
+		position: absolute;
+		height: 54px;
+		line-height: 54px;
+		width: 45px;
+		text-align: center;
+		font-size: 1.5em;
+		cursor: pointer;
+	}
+	.content {
+		margin-left: 4em;
+	}
+}

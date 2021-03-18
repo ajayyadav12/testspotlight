@@ -1,71 +1,58 @@
-<div class="p-grid">
+<!-- <div class="p-grid">
   <div class="p-md-11" *ngIf="!displayAllSchedules">
     <div class="p-grid">
       <div class="p-md-5">
         <form [formGroup]="reportForm">
           <div class="p-grid">
-            <div class="p-md-6">
-              <p-dropdown
-                formControlName="level"
-                [options]="levels"
-                placeholder="Level"
-                (onChange)="getProcesses()"
-                autofocus
-              ></p-dropdown>
+            <div class="p-md-12">
+              <div class="p-grid">
+                <div class="p-md-3"><b>Search By</b></div>
+                <div class="p-md-3">
+                  <p-radioButton name="searchBy" value="dateRange" label="Date Range" formControlName="searchBy"
+                    (onClick)="disablePeriod();" inputId="dateRange">
+                  </p-radioButton>
+                </div>
+                <div class="p-md-3">
+                  <p-radioButton name="searchBy" value="datePeriod" label="Period" formControlName="searchBy"
+                    inputId="datePeriod" (onClick)="disablePeriod();">
+                  </p-radioButton>
+                </div>
+                <div class="p-md-3">
+                  <p-radioButton name="searchBy" value="defaultPeriod" label="Last 30 days" formControlName="searchBy"
+                    inputId="defaultPeriod" (onClick)="disablePeriod();">
+                  </p-radioButton>
+                </div>
+               <div class="p-md-3">
+                  <p-checkbox formControlName="defaultPeriod" binary="true" name="defaultPeriod" label="Last 30 days"
+                    (onChange)="togglePeriod()"></p-checkbox>
+                </div> 
+              </div>
             </div>
             <div class="p-md-6">
-              <p-dropdown
-                formControlName="process"
-                [options]="processesToLoad"
-                placeholder="Process"
-                filter="true"
-                filterPlaceholder="Search"
-                [disabled]="!processesToLoad.length || isScheduleActive"
-                (onClick)="resetForm()"
-              ></p-dropdown>
+              <p-dropdown formControlName="level" [options]="levels" placeholder="Level" (onChange)="getProcesses()"
+                autofocus></p-dropdown>
             </div>
-            <div class="p-md-7">
-              <p-calendar
-                formControlName="period"
-                id="period"
-                selectionMode="range"
-                [maxDate]="today"
-                placeholder="Time Period"
-                (onChange)="togglePeriod()"
-                showButtonBar="true"
-              ></p-calendar>
-            </div>
-            <div class="p-md-5">
-              <p-checkbox
-                formControlName="defaultPeriod"
-                binary="true"
-                name="defaultPeriod"
-                label="Last 30 days"
-                (onChange)="togglePeriod()"
-              ></p-checkbox>
+            <div class="p-md-6">
+              <p-dropdown formControlName="process" [options]="processesToLoad" placeholder="Process" filter="true"
+                filterPlaceholder="Search" [disabled]="!processesToLoad.length || isScheduleActive"
+                [(ngModel)]="processSelected" (onClick)="resetForm()" (onChange)="onChange($event)"></p-dropdown>
             </div>
             <div class="p-md-12">
-              <p-button
-                [disabled]="!reportForm.valid || loading.report || loading.complete"
-                label="Generate"
-                (onClick)="prepareReport()"
-              ></p-button>
-              <p-button
-                *ngIf="!(reportScheduled || isScheduleActive)"
-                [disabled]="!(stats.count && hasProcessAccess)"
-                label="Schedule Report"
-                styleClass="ui-button-secondary"
-                style="float: right"
-                (onClick)="displayScheduleDialog = true"
-              ></p-button>
-              <p-button
-                *ngIf="isScheduleActive || reportScheduled"
-                [disabled]="true"
-                label="Scheduled"
-                icon="pi pi-clock"
-                styleClass="ui-button-success"
-                style="float: right"
-              ></p-button>
+              <app-period-and-bu [reportForm]="reportForm" [isPeriod]="isPeriod"></app-period-and-bu>
+            </div>
+            <div class="p-md-7" *ngIf="isDateRange">
+              <p-calendar formControlName="period" id="period" selectionMode="range" [maxDate]="today"
+                placeholder="Time Period" (onChange)="togglePeriod()" showButtonBar="true"></p-calendar>
+            </div>
+
+            <div class="p-md-12">
+              <p-button [disabled]="!reportForm.valid || loading.report || loading.complete" label="Generate"
+                (onClick)="prepareReport()"></p-button>
+              <p-button *ngIf="!(reportScheduled || isScheduleActive)" [disabled]="!(stats.count && hasProcessAccess)"
+                label="Schedule Report" styleClass="ui-button-secondary" style="float: right"
+                (onClick)="displayScheduleDialog = true"></p-button>
+              <p-button *ngIf="isScheduleActive || reportScheduled" [disabled]="true" label="Scheduled"
+                icon="pi pi-clock" styleClass="ui-button-success" style="float: right"></p-button>
             </div>
           </div>
         </form>
@@ -101,11 +88,8 @@
             <app-status-submission [dataToLoad]="dataToLoad" [reportInfo]="info"></app-status-submission>
           </div>
           <div [ngClass]="isParent ? 'p-col-6' : 'p-col-4'">
-            <app-data-distribution
-              *ngIf="!isParent"
-              [dataToLoad]="dataToLoad"
-              [reportInfo]="info"
-            ></app-data-distribution>
+            <app-data-distribution *ngIf="!isParent" [dataToLoad]="dataToLoad" [reportInfo]="info">
+            </app-data-distribution>
             <app-status-parent *ngIf="isParent" [dataToLoad]="dataToLoad" [reportInfo]="info"></app-status-parent>
           </div>
         </div>
@@ -119,19 +103,156 @@
     <p-menu #menu [popup]="true" [model]="scheduleMenu" [style]="{ 'text-align': 'right', width: '120px' }"></p-menu>
     <button type="button" pButton icon="pi pi-bars" style="float: right" (click)="menu.toggle($event)"></button>
   </div>
+</div> -->
+<div class="filters">
+	<div class="icon"><span class="pi pi-cog"></span></div>
+	<div class="content">
+		<form [formGroup]="reportForm">
+			<div class="p-grid">
+				<div class="p-md-12" style="display: flex">
+					<p-radioButton name="searchBy" value="dateRange" [(ngModel)]="searchBy"
+						[ngModelOptions]="{ standalone: true }" (onClick)="onChangeDateOption(searchBy)"
+						inputId="dateRange">
+					</p-radioButton>
+					<span style="margin-left: 5px; margin-right: 5px"></span>
+					<p-calendar formControlName="period" id="period" selectionMode="range" placeholder="Date Range"
+						[maxDate]="today" showButtonBar="true" [numberOfMonths]="2">
+					</p-calendar>
+
+					<span class="bar"></span>
+					<span style="margin-left: 15px; margin-right: 15px"></span>
+
+					<p-radioButton name="searchBy" value="defaultPeriod" label="Last 30 days" [(ngModel)]="searchBy"
+						[ngModelOptions]="{ standalone: true }" (onClick)="onChangeDateOption(searchBy)"
+						inputId="defaultPeriod">
+					</p-radioButton>
+					<span class="bar"></span>
+					<span style="margin-left: 15px; margin-right: 15px"></span>
+
+					<p-radioButton name="searchBy" value="datePeriod" label="Period" [(ngModel)]="searchBy"
+						[ngModelOptions]="{ standalone: true }" (onClick)="onChangeDateOption(searchBy)"
+						inputId="datePeriod"
+						pTooltip="Please enter a valid format (Hint: Quarterly : Q20-(1-4), Yearly : Y2020 ,Monthly : M20-03/MMM-YY)"
+						tooltipPosition="bottom">
+					</p-radioButton>
+					<span style="margin-left: 10px; margin-right: 10px"></span>
+					<div style="margin-top: 9px; position: relative;display: inline-block;">
+						<span *ngIf="reportForm.value.bu==null" class="optional-text">Optional</span>
+						<app-period-and-bu [reportForm]="reportForm" [isPeriod]="isPeriod" style="margin-top: 8px">
+						</app-period-and-bu>
+					</div>
+					<span class="bar"></span>
+					<span style="margin-left: 15px; margin-right: 15px"></span>
+
+					<p-dropdown formControlName="level" [options]="levels" placeholder="Level"
+						(onChange)="getProcesses()" autofocus></p-dropdown>
+					<span class="bar"></span>
+					<span style="margin-left: 15px; margin-right: 15px"></span>
+					<div style="margin-right: 10px; display: inline-block; position: relative">
+						<span *ngIf="!reportForm.valid" class="required-text">Required</span>
+						<p-dropdown formControlName="process" [options]="processesToLoad" placeholder="Process"
+							[showClear]="true" filter="true" filterPlaceholder="Search"
+							[disabled]="!processesToLoad.length || isScheduleActive" [(ngModel)]="processSelected"
+							(onClick)="resetForm()" (onChange)="onChange($event)"></p-dropdown>
+					</div>
+					<!-- <p-dropdown
+            formControlName="process"
+            [options]="processes"
+            placeholder="Process"
+            filter="true"
+            filterPlaceholder="Search"
+            [autofocus]="true" 
+            (onClick)="resetForm()"
+            [(ngModel)]="processSelected"
+            (onChange)="onChange($event)"
+          >
+          </p-dropdown> -->
+					<!-- <p-button label="Generate" (onClick)="prepareReport()"> </p-button> -->
+				</div>
+			</div>
+		</form>
+	</div>
 </div>
 
-<p-dialog
-  *ngIf="displayScheduleDialog"
-  header="Schedule Report"
-  [(visible)]="displayScheduleDialog"
-  [modal]="true"
-  [style]="{ width: '800px' }"
-  [contentStyle]="{ height: '300px' }"
-  [maximizable]="true"
->
-  <app-schedule-report
-    [reportInfo]="info"
-    (exit)="displayScheduleDialog = !$event; reportScheduled = $event"
-  ></app-schedule-report>
+<div class="p-md-12">
+	<div class="ge-ui-card">
+		<div class="card-banner" style="height: 40px">
+			<span class="title">KPI's</span>
+			<p-menu #menu [popup]="true" [model]="scheduleMenu" [style]="{ 'text-align': 'right', width: '120px' }">
+			</p-menu>
+			<button type="button" pButton icon="pi pi-bars" style="float: right" (click)="menu.toggle($event)"></button>
+		</div>
+		<div class="ge-ui-card-content container" style="margin-left: 340px">
+			<div class="option">
+				<span class="title" *ngIf="stats.count">
+					<span *ngIf="stats.empty.length"> {{ stats.count }} / {{ stats.count + stats.empty.length }} </span>
+					<span *ngIf="!stats.empty.length">{{ stats.count }}</span>
+				</span>
+			</div>
+
+			<div class="option">
+				<span class="title" *ngIf="stats.count">{{ info.labels.avgPeriod }}</span>
+			</div>
+
+			<div class="option">
+				<span class="title" *ngIf="stats.count">{{ info.labels.avgHist }}</span>
+			</div>
+		</div>
+		<div class="ge-ui-card-content" style="margin-left: 340px">
+			<div class="option2">
+				<span class="title">Total Submissions</span>
+			</div>
+			<div class="option2">
+				<span class="title">Period Average</span>
+			</div>
+			<div class="option2">
+				<span class="title">Historical Average</span>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="p-md-12" *ngIf="!displayAllSchedules">
+	<div class="ge-ui-card">
+		<div class="card-banner">
+			<span class="title">Status</span>
+		</div>
+		<div class="ge-ui-card-content">
+			<div class="p-col-12">
+				<div *ngIf="loading.report" class="p-grid p-justify-center">
+					<div class="p-col-2">
+						<i class="pi pi-spin pi-spinner loading"></i>
+					</div>
+				</div>
+				<app-variance-chart *ngIf="loading.chart" [deviationMap]="deviationMap"></app-variance-chart>
+				<div class="p-md-12">
+					<div class="p-grid" *ngIf="loading.chart">
+						<div [ngClass]="isParent ? 'p-col-6' : 'p-col-4'">
+							<app-status-steps *ngIf="!isParent" [dataToLoad]="dataToLoad" [reportInfo]="info">
+							</app-status-steps>
+							<app-status-children *ngIf="isParent" [dataToLoad]="dataToLoad" [reportInfo]="info">
+							</app-status-children>
+						</div>
+						<div class="p-col-4" *ngIf="!isParent">
+							<app-status-submission [dataToLoad]="dataToLoad" [reportInfo]="info">
+							</app-status-submission>
+						</div>
+						<div [ngClass]="isParent ? 'p-col-6' : 'p-col-4'">
+							<app-data-distribution *ngIf="!isParent" [dataToLoad]="dataToLoad" [reportInfo]="info">
+							</app-data-distribution>
+							<app-status-parent *ngIf="isParent" [dataToLoad]="dataToLoad" [reportInfo]="info">
+							</app-status-parent>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="p-md-11" *ngIf="displayAllSchedules">
+	<app-schedule-report-list></app-schedule-report-list>
+</div>
+<p-dialog *ngIf="displayScheduleDialog" header="Schedule Report" [(visible)]="displayScheduleDialog" [modal]="true"
+	[style]="{ width: '800px' }" [contentStyle]="{ height: '300px' }" [maximizable]="true">
+	<app-schedule-report [reportInfo]="info" (exit)="displayScheduleDialog = !$event; reportScheduled = $event">
+	</app-schedule-report>
 </p-dialog>

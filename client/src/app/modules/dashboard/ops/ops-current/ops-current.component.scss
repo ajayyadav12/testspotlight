@@ -1,0 +1,49 @@
+.loading-text {
+    display: block;
+    background-color: #f1f1f1;
+    min-height: 19px;
+    animation: pulse 1s infinite ease-in-out;
+    text-indent: -99999px;
+    overflow: hidden;
+}
+
+.circle {
+	width: 15px;
+	height: 15px;
+    border-radius: 50%;
+}
+
+.statuses {
+    border: thin solid gray;
+    box-shadow: 5px 5px 5px #888888;
+}
+
+.tablests {
+    border: 1px solid black;
+    margin-left: 100px;
+    margin-right: 50px;
+}
+
+.tdstatus {
+    display: flex;   
+    align-items: center;
+    align-content: center;
+  }
+
+  .red-bottom-border {
+    border-bottom: 3px solid red;
+}
+
+.container { 
+    height: 300px;
+    position: relative;
+    
+  }
+  
+  .vertical-center {
+    margin: 0;
+    position: absolute;
+    top: 0%;
+    -ms-transform: translateY(-0%);
+    transform: translateY(-0%);
+  }

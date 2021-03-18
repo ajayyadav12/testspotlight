@@ -1,0 +1,209 @@
+<div class="warning">
+	<i>All times are in ET</i>
+</div>
+<form [formGroup]="scheduleForm">
+	<div class="p-grid">
+		<div class="p-md-6">
+			<h4>Process Setup</h4>
+			<div class="p-grid">
+				<div class="p-md-12">
+					<span class="p-float-label">
+						<p-dropdown formControlName="processId" [options]="processes" [autofocus]="true"> </p-dropdown>
+						<label for="scheduleStartDate">Process</label>
+					</span>
+					&nbsp;
+					<p-checkbox
+						(onChange)="onPredecessorEndTime($event)"
+						value="predecessorEndTime"
+						name="predecessorEndTime"
+						binary="true"
+						label="Predecessor"
+						formControlName="predecessorEndTime"
+						[(ngModel)]="predecessorEndTime"
+					>
+					</p-checkbox>
+				</div>
+				<div class="p-md-12" *ngIf="predecessorEndTime">
+					<h4>Expected Duration</h4>
+					<p-dropdown
+						[options]="times"
+						placeholder="Duration"
+						[(ngModel)]="predecessorDuration"
+						[ngModelOptions]="{ standalone: true }"
+					></p-dropdown>
+				</div>
+				<div class="p-md-12" *ngIf="predecessorEndTime">
+					<p-button label="Save" (onClick)="save()"> </p-button>
+				</div>
+				<div class="p-md-4" *ngIf="!predecessorEndTime">
+					<span class="p-float-label">
+						<p-calendar
+							formControlName="scheduleStartDate"
+							id="scheduleStartDate"
+							[maxDate]="scheduleForm.value.scheduleEndDate"
+						></p-calendar>
+						<label for="scheduleStartDate">Start Date</label>
+					</span>
+				</div>
+				<div class="p-md-4" *ngIf="!predecessorEndTime">
+					<span class="p-float-label">
+						<p-calendar
+							formControlName="scheduleEndDate"
+							id="scheduleEndDate"
+							(onSelect)="onChangeEndDate($event)"
+							[minDate]="scheduleForm.value.scheduleStartDate"
+						></p-calendar>
+						<label for="scheduleEndDate">End Date</label>
+					</span>
+				</div>
+				<div class="p-md-4" *ngIf="!predecessorEndTime">
+					<p-checkbox
+						(onChange)="onOneYearAheadEndDate($event)"
+						value="incomingEndDate"
+						name="noEndDate"
+						formControlName="noEndDate"
+						binary="true"
+						label="Ends in 1 Year"
+					></p-checkbox>
+				</div>
+			</div>
+		</div>
+		<div class="p-md-6" *ngIf="!predecessorEndTime">
+			<h4 *ngIf="!hourlyRecurrance">Process Time</h4>
+			<div class="p-grid p-fluid p-formgrid">
+				<div class="p-md-4">
+					<span class="p-float-label" *ngIf="!hourlyRecurrance">
+						<p-calendar
+							formControlName="startTime"
+							id="startTime"
+							hourFormat="12"
+							[timeOnly]="true"
+						></p-calendar>
+						<label for="startTime">Start Time</label>
+					</span>
+				</div>
+				<div class="p-md-4">
+					<span class="p-float-label" *ngIf="!hourlyRecurrance">
+						<p-calendar
+							formControlName="endTime"
+							id="endTime"
+							hourFormat="12"
+							[timeOnly]="true"
+						></p-calendar>
+						<label for="endTime">End Time</label>
+					</span>
+				</div>
+				<div class="p-md-4">
+					<p-dropdown
+						(onChange)="onChangeDuration($event)"
+						[options]="times"
+						placeholder="Duration"
+						[(ngModel)]="duration"
+						[ngModelOptions]="{ standalone: true }"
+						[disabled]="scheduleForm.value.recurrencePattern === 'C'"
+						*ngIf="!hourlyRecurrance"
+					></p-dropdown>
+				</div>
+				<div class="p-md-4 p-field">
+					<span class="p-float-label" *ngIf="!hourlyRecurrance">
+						<input
+							formControlName="tolerance"
+							id="float-input"
+							type="number"
+							size="30"
+							pInputText
+							min="0"
+						/>
+						<label for="float-input">Tolerance (mins)</label>
+					</span>
+				</div>
+				<div class="p-md-4">
+					<span class="p-float-label" *ngIf="!hourlyRecurrance">
+						<p-calendar
+							formControlName="criticalDate"
+							id="criticalDate"
+							[minDate]="scheduleForm.value.scheduleStartDate"
+							[maxDate]="scheduleForm.value.scheduleEndDate"
+						>
+						</p-calendar>
+						<label for="criticalDate">Critical Date</label>
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="p-md-3" *ngIf="!predecessorEndTime">
+			<h4>Recurrence Pattern</h4>
+			<div class="p-grid" style="width: 250px; margin-bottom: 10px">
+				<div class="p-md-12">
+					<p-radioButton
+						(onClick)="onClickRecurrencePattern()"
+						name="recurrenceGroup"
+						value="D"
+						label="Daily"
+						[(ngModel)]="recurrencePattern"
+						[ngModelOptions]="{ standalone: true }"
+						inputId="opt1"
+					></p-radioButton>
+				</div>
+				<div class="p-md-12">
+					<p-radioButton
+						(onClick)="onClickRecurrencePattern()"
+						name="recurrenceGroup"
+						value="W"
+						label="Weekly"
+						[(ngModel)]="recurrencePattern"
+						[ngModelOptions]="{ standalone: true }"
+						inputId="opt2"
+					></p-radioButton>
+				</div>
+				<div class="p-md-12">
+					<p-radioButton
+						(onClick)="onClickRecurrencePattern()"
+						name="recurrenceGroup"
+						value="M"
+						label="Monthly / Quarterly"
+						[(ngModel)]="recurrencePattern"
+						[ngModelOptions]="{ standalone: true }"
+						inputId="opt3"
+					></p-radioButton>
+				</div>
+				<div class="p-md-12">
+					<p-radioButton
+						(onClick)="onClickRecurrencePattern()"
+						name="recurrenceGroup"
+						value="C"
+						label="Custom"
+						[(ngModel)]="recurrencePattern"
+						[ngModelOptions]="{ standalone: true }"
+						inputId="opt5"
+					></p-radioButton>
+				</div>
+				<div class="p-md-12">
+					<p-button [disabled]="!scheduleForm.valid || scheduleForm.pristine" label="Save" (onClick)="save()">
+					</p-button>
+				</div>
+			</div>
+		</div>
+		<div [ngSwitch]="recurrencePattern" class="p-md-9" *ngIf="!predecessorEndTime">
+			<section *ngSwitchCase="'D'">
+				<h4>Daily</h4>
+				<app-schedule-dtl-daily [scheduleForm]="scheduleForm" (dailyOptionChanged)="onDailyOptionChanged()">
+				</app-schedule-dtl-daily>
+			</section>
+			<section *ngSwitchCase="'W'">
+				<h4>Weekly</h4>
+				<app-schedule-dtl-weekly [scheduleForm]="scheduleForm" [days]="days"></app-schedule-dtl-weekly>
+			</section>
+			<section *ngSwitchCase="'M'">
+				<h4>Monthly</h4>
+				<app-schedule-dtl-monthly [scheduleForm]="scheduleForm" (monthOptionChanged)="onMonthOptionChanged()">
+				</app-schedule-dtl-monthly>
+			</section>
+			<section *ngSwitchCase="'C'">
+				<h4>Custom</h4>
+				<app-schedule-dtl-custom [scheduleForm]="scheduleForm" [incomingDates]="incomingRecurrence">
+				</app-schedule-dtl-custom>
+			</section>
+		</div>
+	</div>
+</form>

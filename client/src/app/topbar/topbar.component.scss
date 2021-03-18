@@ -1,0 +1,144 @@
+@import "~src/styles-variables.scss";
+
+.topbar-container {
+  padding: 5px 30px;
+  background: white;
+  height: 50px;
+  box-shadow: 0 3px 11px rgba(45, 45, 45, 0.11);
+}
+
+.profile {
+  .icons {
+    display: inline-block;
+    vertical-align: super;
+
+    span {
+      font-size: 1.4em;
+      color: gray;
+      margin-right: 12px;
+      cursor: pointer;
+      &:hover {
+        color: $primary-blue;
+      }
+    }
+  }
+  position: absolute;
+  top: 0px;
+  right: 30px;
+
+  img {
+    width: 40px;
+    height: 40px;
+    border-radius: 40px;
+    display: inline-block;
+  }
+
+  .profile-data {
+    vertical-align: super;
+    font-size: 0.9em;
+    margin-left: 10px;
+    display: inline-block;
+    .name {
+      font-weight: bold;
+    }
+  }
+}
+
+.page-title {
+  position: absolute;
+  top: 15px;
+  color: $primary-blue;
+  font-weight: bold;
+  font-size: 1.2em;
+  padding-left: 10px;
+  padding-left: 10px;
+  border-left: solid 5px $primary-blue;
+  border-radius: 2px;
+}
+
+.back-arrow {
+  padding-right: 5px;
+  vertical-align: bottom;
+  color: $primary-blue !important;
+}
+
+.notification-item {
+  padding: 10px;
+  .icon {
+    margin-right: 20px;
+  }
+  .name {
+    margin-right: 20px;
+  }
+  .type {
+  }
+
+  .date {
+    padding-left: 100px;
+    color: gray;
+  }
+}
+
+.table-1 {
+  tr {
+    border: 0.5px solid darkgray;
+  }
+
+  border-collapse: collapse;
+  border: 0.5px darkgrey;
+  display: block;
+  max-height: 300px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+}
+
+.logout {
+  color: white;
+  text-decoration: none;
+  padding: 15px 10px;
+  position: relative;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+.notification {
+  color: white;
+  text-decoration: none;
+  padding: 15px 10px;
+  position: relative;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+.notification .badge {
+  font-size: 0.9em !important;
+  position: absolute;
+  top: -1px;
+  right: -13px;
+  padding: 1px 8px;
+  border-radius: 15%;
+  color: white !important;
+  background: red;
+  width: 37px;
+  max-width: 37px;
+  text-align: center;
+  font-weight: bold;
+}
+.onloadwhite {
+  background: white;
+}
+
+body .ui-overlaypanel .ui-overlaypanel-content {
+  padding: 0em 0em !important;
+}
+.ui-overlaypanel-content {
+  padding: 0em 0em !important;
+}
+
+body .ui-overlaypanel {
+  border: 0px solid #c8c8c8;
+}
+
+.p-overlaypanel:after, .p-overlaypanel:before {   
+    display:none;        
+}

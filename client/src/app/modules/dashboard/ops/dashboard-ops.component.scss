@@ -1,0 +1,19 @@
+@import '~src/styles-variables.scss';
+
+.stats {
+  text-align: center;
+}
+
+.stats-title {
+  font-weight: 600;
+  font-size: 1.2em;
+}
+
+.stats-value {
+  font-size: 2em;
+}
+
+#chart {
+  width: 100%;
+  height: 230px;
+}

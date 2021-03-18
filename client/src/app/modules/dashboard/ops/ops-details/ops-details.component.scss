@@ -1,0 +1,101 @@
+.circle {
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+}
+
+.circle .tooltiptext {
+  visibility: hidden;
+  width: auto;
+  background-color: white;
+  color: black;
+  text-align: left;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+
+  box-shadow: 5px 5px 5px 5px #888888;
+}
+
+.circle:hover .tooltiptext {
+  visibility: visible;
+}
+
+.square {
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+}
+
+.rectangle {
+	width: 20px;
+	height: 15px;
+	border-radius: 50%;
+}
+
+.last5 {
+  position: relative;
+  //display: inline-block;
+  //border-bottom: 1px dotted black;  
+}
+
+.last5 .rectangle {
+    /* height: 20px;
+    width: 100px;
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid;
+    font-size: 16px;
+    text-align: center; */
+  
+  
+    padding: 10px;
+      text-align: center;
+      color: white;
+      border-radius : 0.5em;
+      font-size: 6px;
+  }
+
+  .last5 .tooltiptext {
+    visibility: hidden;
+    width: 1000%;
+    background-color: white;
+    color: black;
+    text-align: left;
+    border-radius: 6px;
+    
+    /* Position the tooltip */
+    //position: absolute;
+
+    position: absolute;
+    z-index: 1;
+    top:-5px;
+    right: 105%;
+
+    box-shadow: 5px 5px 5px 5px #888888;
+  }
+  
+  .last5:hover .tooltiptext {
+    visibility: visible;
+  }
+
+  .text-align {
+    text-align: center;
+  }
+
+  .content-align {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  #wrapper {
+    
+    text-align: center;
+  }
+  #yourdiv {
+    
+    display: inline-block;
+  }

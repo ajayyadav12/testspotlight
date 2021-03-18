@@ -1,10 +1,10 @@
-import { DateCommon } from 'src/app/shared/DateCommon';
 import { ScheduleSubmissionsService } from './../../schedule-submissions.service';
 import { MessageService } from 'primeng/api';
 import { GENotes } from 'src/app/shared/Components/GENotes';
-import { ActivatedRoute } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import * as moment from 'moment-timezone';
+import { GeUpdateScheduledSubmissionComponent } from 'src/app/shared/Components/ge-update-scheduled-submission/ge-update-scheduled-submission.component';
 
 @Component({
   selector: 'app-schedule-dtl-submissions',
@@ -12,44 +12,50 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./schedule-dtl-submissions.component.scss']
 })
 export class ScheduleDtlSubmissionsComponent implements OnInit {
+  @ViewChild('updateScheduledSubmission', { static: true })
+  updateScheduledSubmissionComponent: GeUpdateScheduledSubmissionComponent;
   loading = false;
   scheduleDefId;
 
   displayDisabledDialog = false;
-  displayEditDialog = false;
   disableNoteData: GENotes;
+  editNoteData: GENotes;
 
   menuItems = [{ label: 'Edit Ocurrence' }, { label: 'Disable submission' }];
 
   upcomingSubmissions = [];
   columns = [
     { field: 'id', header: 'ID' },
-    { field: 'startTime', header: 'Start Time' },
-    { field: 'endTime', header: 'End Time' },
+    { field: 'startTime', header: 'Start Time(EST)' },
+    { field: 'endTime', header: 'End Time(EST)' },
     { field: 'acknowledgementFlag', header: 'Acknowledged' },
-    { field: 'disabled', header: 'Disabled' }
+    { field: 'disabled', header: 'Disabled' },
+    { field: 'delayed', header: 'Delayed' }
   ];
-  upcomingSubmissionForm: FormGroup;
-  schedSubmissionID;
-  editScheduleId = 0;
+  processType;
+  uniqueId;
 
   constructor(
     private scheduleSubmissionsSvc: ScheduleSubmissionsService,
     private route: ActivatedRoute,
-    private fb: FormBuilder,
+    private router: Router,
     private msgSvc: MessageService
-  ) {
-    this.upcomingSubmissionForm = this.fb.group({
-      startTime: [null, Validators.required],
-      endTime: [null, Validators.required]
-    });
-  }
+  ) { }
 
   ngOnInit() {
     this.scheduleDefId = Number.parseInt(this.route.snapshot.paramMap.get('id'), 10);
     if (this.scheduleDefId !== 0) {
       this.getUpcomingSubmissions(this.scheduleDefId);
     }
+    this.router.routeReuseStrategy.shouldReuseRoute = () => {
+      return false;
+    }
+
+    this.route.queryParams.subscribe(params => {
+      this.processType = params['delayed'];
+      this.uniqueId = params['uniqueId'];
+    });
+
   }
 
   getUpcomingSubmissions(scheduleDefId: number) {
@@ -59,6 +65,14 @@ export class ScheduleDtlSubmissionsComponent implements OnInit {
         this.upcomingSubmissionMapping(s);
       });
     });
+
+  }
+
+
+  moveToFirst(s, r) {
+    r.splice(r.indexOf(s), 1);
+    r.unshift(s);
+
   }
 
   onClickMenuOption(event) {
@@ -68,49 +82,55 @@ export class ScheduleDtlSubmissionsComponent implements OnInit {
         id: row.id,
         note: row.disabledNote,
         flag: row.disabled,
-        date: null
+        date: null,
+        name: null
       };
       this.displayDisabledDialog = true;
     } else if (event.item === 'Edit Ocurrence') {
       const startTime = new Date(row.startTime);
       const endTime = new Date(row.endTime);
-
-      DateCommon.convertFromEST(startTime, false);
-      DateCommon.convertFromEST(endTime, false);
-      this.editScheduleId = row.id;
-      this.upcomingSubmissionForm.setValue({ startTime: startTime, endTime: endTime });
-      this.displayEditDialog = true;
-      this.schedSubmissionID = row.id;
+      this.editNoteData = {
+        id: row.id,
+        note: row.editNotes,
+        flag: null,
+        date: null,
+        name: null
+      };
+      this.updateScheduledSubmissionComponent.setValue({ startTime: startTime, endTime: endTime, editNotes: this.editNoteData.note });
+      this.updateScheduledSubmissionComponent.toggle();
+      this.updateScheduledSubmissionComponent.schedSubmissionID = row.id;
     }
   }
 
   upcomingSubmissionMapping(scheduledSubmission) {
-    scheduledSubmission.startTime = new Date(scheduledSubmission.startTime);
-    scheduledSubmission.endTime = new Date(scheduledSubmission.endTime);
+    if (this.uniqueId != null && this.uniqueId != 'undefined' && scheduledSubmission.id == this.uniqueId) {
+      scheduledSubmission.backgroundColor = '#F080805C';
+      this.moveToFirst(scheduledSubmission, this.upcomingSubmissions);
+
+    }
+    moment.tz.setDefault('America/New_York');
+
+    let startMoment = moment(new Date(scheduledSubmission.startTime));
+    let endMoment = moment(new Date(scheduledSubmission.endTime));
+
+    scheduledSubmission.startTime = startMoment.tz('America/New_York').format('MM/DD/YY hh:mm a');
+    scheduledSubmission.endTime = endMoment.tz('America/New_York').format('MM/DD/YY hh:mm a');
+
     scheduledSubmission.cursor = 'pointer';
   }
 
-  updateUpcomingSubmission() {
-    const startTime = this.upcomingSubmissionForm.value.startTime;
-    const endTime = this.upcomingSubmissionForm.value.endTime;
-
-    DateCommon.convertToEST(startTime, false);
-    DateCommon.convertToEST(endTime, false);
-    this.scheduleSubmissionsSvc
-      .updateUpcomingSubmission(this.schedSubmissionID, startTime, endTime)
-      .subscribe(value => {
-        const index = this.upcomingSubmissions.findIndex(x => {
-          return x.id === value.id;
-        });
-        this.upcomingSubmissions[index] = value;
-        this.upcomingSubmissionMapping(this.upcomingSubmissions[index]);
-        this.displayEditDialog = false;
-        this.msgSvc.add({
-          severity: 'success',
-          summary: 'Single ocurrence updated!',
-          detail: `All is set. Good luck!`
-        });
-      });
+  onUpdateSubmission(value) {
+    const index = this.upcomingSubmissions.findIndex(x => {
+      return x.id === value.id;
+    });
+    this.upcomingSubmissions[index] = value;
+    this.upcomingSubmissionMapping(this.upcomingSubmissions[index]);
+    this.updateScheduledSubmissionComponent.toggle();
+    this.msgSvc.add({
+      severity: 'success',
+      summary: 'Single ocurrence updated!',
+      detail: `All is set. Good luck!`
+    });
   }
 
   onSubmitDisabledNote(noteValue) {

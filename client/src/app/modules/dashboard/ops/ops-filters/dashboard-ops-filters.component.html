@@ -1,0 +1,55 @@
+<div class="filtersOps">
+	<div class="icon" pTooltip="Show/Hide Filters" (click)="hide = !hide">
+		<span class="pi pi-filter"></span>
+	</div>
+	<p-overlayPanel #fields> </p-overlayPanel>
+	<div [hidden]="hide" class="content">
+		<div class="p-grid p-fluid p-formgrid">
+			<div class="p-md-2">
+				<p-dropdown
+					(onChange)="filter()"
+					placeholder="Select Area"
+					[options]="area"
+					[(ngModel)]="selectedArea"
+					[showClear]="true"
+				></p-dropdown>
+			</div>
+			<div *ngIf="selectedArea < 1" class="p-md-2">
+				<p-dropdown
+					[(ngModel)]="selectedClosePhaseid"
+					(enable)="(selectedArea < 5)"
+					[options]="finance"
+					placeholder="Select Finance"
+					[autofocus]="true"
+					(onChange)="openSystemSelector()"
+				>
+				</p-dropdown>
+			</div>
+			<div class="p-md-2">
+				<p-dropdown
+					[(ngModel)]="selectedSystem"
+					[options]="systems"
+					placeholder="Select System"
+					[autofocus]="true"
+					optionLabel="name"
+					dataKey="id"
+					filter="true"
+					(onChange)="openClosePhaseRelationship()"
+					[showClear]="true"
+				>
+				</p-dropdown>
+			</div>
+
+			<div class="p-md-2">
+				<button
+					style="width: auto"
+					pButton
+					type="button"
+					label="Clear"
+					(click)="resetFilters()"
+					class="p-button-text p-button-plain"
+				></button>
+			</div>
+		</div>
+	</div>
+</div>

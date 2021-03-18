@@ -1,92 +1,62 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { GEChipFilter } from './GEChipFilter';
-
-const DAYS_DEFAULT = 7;
+import { GEFiltersComponent } from 'src/app/shared/Components/ge-filters/ge-filters.component';
 
 @Component({
-  selector: 'app-dashboard-filters',
-  templateUrl: './dashboard-filters.component.html',
-  styleUrls: ['./dashboard-filters.component.scss'],
-  encapsulation: ViewEncapsulation.None
+	selector: 'app-dashboard-filters',
+	templateUrl: './dashboard-filters.component.html',
+	styleUrls: ['./dashboard-filters.component.scss'],
+	encapsulation: ViewEncapsulation.None,
 })
 export class DashboardFiltersComponent implements OnInit {
-  filterSelection = ['processes', 'bu', 'adHoc'];
-  displayFilters = false;
-  days = DAYS_DEFAULT;
-  daysOptions = [
-    { label: 'Last 7 days', value: 7 },
-    { label: 'Last 14 days', value: 14 },
-    { label: 'Last 30 days', value: 30 },
-    { label: 'Last 90 days', value: 90 }
-  ];
-  params;
-  chipFilters: GEChipFilter[] = [];
-  view;
-  constructor(private router: Router, private activatedRoute: ActivatedRoute) { }
+	@ViewChild('filter', { static: true })
+	filter: GEFiltersComponent;
+	filterSelection = ['process', 'parent', 'days'];
 
-  get existChipFilters() {
-    return this.chipFilters ? this.chipFilters.length > 0 : false;
-  }
+	params;
 
-  ngOnInit() {
-    this.activatedRoute.queryParams.subscribe(params => {
-      this.params = params;
-      this.days = this.params.days ? Number.parseInt(this.params.days) : this.days;
-      try {
-        const lsChipFilters = JSON.parse(JSON.parse(localStorage.getItem('submission-chip-filters')));
-        this.chipFilters = Object.keys(this.params).length ? lsChipFilters : [];
-      } catch (error) {
-        // Do nothing
-      }
-    });
-  }
+	view;
+	autoRefreshOn = true;
+	autoRefreshHandler;
+	timing: number = localStorage.getItem('dashboard-autorefresh-timing')
+		? Number.parseInt(localStorage.getItem('dashboard-autorefresh-timing'))
+		: 20;
+	constructor(private router: Router, private activatedRoute: ActivatedRoute) {}
 
-  onClickRefresh() {
-    this.router.navigate(['/dashboard'], {
-      queryParams: { refresh: Math.random() * 10 },
-      queryParamsHandling: 'merge'
-    });
-  }
+	ngOnInit() {
+		this.onchangeTiming(null);
+		this.activatedRoute.queryParams.subscribe((params) => {
+			this.params = params;
+			this.filter.updateFilters();
+		});
+	}
 
-  /**
-   * Update 'days' value from URL query params when user's change value from dropdown
-   * @param event
-   */
-  onChangeDays(event) {
-    const queryParams = {
-      days: this.days
-    };
-    this.router.navigate(['/dashboard'], { queryParams: queryParams, queryParamsHandling: 'merge' });
-  }
+	onClickRefresh() {
+		this.router.navigate(['/dashboard'], {
+			queryParams: { refresh: Math.random() * 10 },
+			queryParamsHandling: 'merge',
+		});
+	}
 
-  /**
-   * Get new chip filters, set view dropdown to null and update local storage
-   * @param chipFilters
-   */
-  onChangeParams(chipFilters) {
-    this.chipFilters = chipFilters;
-    this.view = null;
-  }
+	onchangeTiming(timing) {
+		clearInterval(this.autoRefreshHandler);
+		localStorage.setItem('dashboard-autorefresh-timing', this.timing.toString());
+		if (this.timing > 0) {
+			this.autoRefreshOn = true;
+			this.autoRefreshSetup();
+		} else {
+			this.autoRefreshOn = false;
+		}
+	}
 
-  /**
-   * Remove value from URL query params when user's remove chips
-   * @param event
-   */
-  onRemoveFilter(event) {
-    const param = event.value;
-    let newParam: any = {};
-    Object.assign(newParam, this.activatedRoute.snapshot.queryParams);
+	ngOnDestroy() {
+		clearInterval(this.autoRefreshHandler);
+	}
 
-    if (['childId', 'parentId', 'sender', 'receiver'].some(x => x === param.paramName)) {
-      newParam[param.paramName] = newParam[param.paramName].replace(param.id + ',', '');
-    } else {
-      newParam[param.paramName] = null;
-    }
-
-    newParam[param.paramName] = '' ? null : newParam[param.paramName];
-
-    localStorage.setItem('submission-chip-filters', JSON.stringify(this.chipFilters));
-    this.router.navigate(['/dashboard'], { queryParams: newParam, queryParamsHandling: 'merge' });
-  }
+	autoRefreshSetup() {
+		this.autoRefreshHandler = setInterval(() => {
+			this.onClickRefresh();
+		}, 60000 * this.timing);
+	}
 }

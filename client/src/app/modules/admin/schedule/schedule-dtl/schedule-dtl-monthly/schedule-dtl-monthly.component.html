@@ -1,101 +1,133 @@
 <div *ngIf="scheduleForm" [formGroup]="scheduleForm" class="p-grid">
-  <div class="p-grid" formGroupName="monthlyRecurrence">
-    <div class="p-md-12">
-      <div class="p-grid">
-        <div class="p-md-2">
-          <p-radioButton
-            (onClick)="onClickMonthOption()"
-            name="Option"
-            value="day"
-            label="Day"
-            formControlName="option"
-          ></p-radioButton>
-        </div>
-        <div class="p-md-5">
-          <span class="ui-float-label">
-            <input formControlName="daysNumber" id="float-input" type="number" size="30" pInputText min="1" max="31" />
-            <label for="float-input">of every</label>
-          </span>
-        </div>
-        <div class="p-md-5">
-          <span class="ui-float-label">
-            <input
-              formControlName="monthsNumber"
-              id="float-input"
-              type="number"
-              size="30"
-              pInputText
-              min="1"
-              max="12"
-            />
-            <label for="float-input">month(s)</label>
-          </span>
-        </div>
-      </div>
-    </div>
-    <div class="p-md-12">
-      <div class="p-grid">
-        <div class="p-md-2">
-          <p-radioButton
-            (onClick)="onClickMonthOption()"
-            name="Option"
-            value="the"
-            label="The"
-            formControlName="option"
-          ></p-radioButton>
-        </div>
-        <div class="p-md-3">
-          <p-dropdown formControlName="ocurrence" [options]="ocurrences" placeholder="Ocurrence"></p-dropdown>
-        </div>
-        <div class="p-md-3">
-          <p-dropdown formControlName="day" [options]="days2" placeholder="Day of the week"></p-dropdown>
-        </div>
-        <div class="p-md-4">
-          <span class="ui-float-label">
-            <input formControlName="every" id="float-input" type="number" size="30" pInputText min="1" max="12" />
-            <label for="float-input"
-              >of every
-              {{ scheduleForm.value.monthlyRecurrence.every ? scheduleForm.value.monthlyRecurrence.every : 0 }}
-              month(s)</label
-            >
-          </span>
-        </div>
-      </div>
-    </div>
-    <div class="p-md-12">
-      <div class="p-grid">
-        <div class="p-md-2">
-          <p-radioButton
-            (onClick)="onClickMonthOption()"
-            name="Option"
-            value="lcd"
-            label="LCD"
-            formControlName="option"
-          ></p-radioButton>
-        </div>
-        <div class="p-md-3">
-          <span class="ui-float-label">
-            <p-dropdown formControlName="fromLCD" [options]="LCDs" id="fromLCD"></p-dropdown>
-            <label for="fromLCD">From</label>
-          </span>
-        </div>
-        <div class="p-md-3">
-          <span class="ui-float-label">
-            <p-dropdown formControlName="toLCD" [options]="LCDs" id="toLCD"></p-dropdown>
-            <label for="toLCD">To</label>
-          </span>
-        </div>
-        <div class="p-md-4">
-          <span class="ui-float-label">
-            <input formControlName="monthsLCD" id="float-input" type="number" size="30" pInputText min="1" max="12" />
-            <label for="float-input"
-              >of every
-              {{ scheduleForm.value.monthlyRecurrence.monthsLCD ? scheduleForm.value.monthlyRecurrence.monthsLCD : 0 }}
-              month(s)</label
-            >
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
+	<div class="p-grid" formGroupName="monthlyRecurrence">
+		<div class="p-md-12">
+			<div class="p-grid p-fluid p-formgrid">
+				<div class="p-md-2">
+					<p-radioButton
+						(onClick)="onClickMonthOption()"
+						name="Option"
+						value="day"
+						label="Day"
+						formControlName="option"
+					></p-radioButton>
+				</div>
+				<div class="p-md-5">
+					<span class="p-float-label">
+						<input
+							formControlName="daysNumber"
+							id="float-input"
+							type="number"
+							size="30"
+							pInputText
+							min="1"
+							max="31"
+						/>
+						<label for="float-input">of every</label>
+					</span>
+				</div>
+				<div class="p-md-5">
+					<span class="p-float-label">
+						<input
+							formControlName="monthsNumber"
+							id="float-input"
+							type="number"
+							size="30"
+							pInputText
+							min="1"
+							max="12"
+						/>
+						<label for="float-input">month(s)</label>
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="p-md-12">
+			<div class="p-grid p-fluid p-formgrid">
+				<div class="p-md-2">
+					<p-radioButton
+						(onClick)="onClickMonthOption()"
+						name="Option"
+						value="the"
+						label="The"
+						formControlName="option"
+					></p-radioButton>
+				</div>
+				<div class="p-md-3">
+					<p-dropdown formControlName="ocurrence" [options]="ocurrences" placeholder="Ocurrence"></p-dropdown>
+				</div>
+				<div class="p-md-3">
+					<p-dropdown formControlName="day" [options]="days2" placeholder="Day of the week"></p-dropdown>
+				</div>
+				<div class="p-md-4">
+					<span class="p-float-label">
+						<input
+							formControlName="every"
+							id="float-input"
+							type="number"
+							size="30"
+							pInputText
+							min="1"
+							max="12"
+						/>
+						<label for="float-input"
+							>of every
+							{{
+								scheduleForm.value.monthlyRecurrence.every
+									? scheduleForm.value.monthlyRecurrence.every
+									: 0
+							}}
+							month(s)</label
+						>
+					</span>
+				</div>
+			</div>
+		</div>
+		<div class="p-md-12">
+			<div class="p-grid p-fluid p-formgrid">
+				<div class="p-md-2">
+					<p-radioButton
+						(onClick)="onClickMonthOption()"
+						name="Option"
+						value="lcd"
+						label="LCD"
+						formControlName="option"
+					></p-radioButton>
+				</div>
+				<div class="p-md-3">
+					<span class="p-float-label">
+						<p-dropdown formControlName="fromLCD" [options]="LCDs" id="fromLCD"></p-dropdown>
+						<label for="fromLCD">From</label>
+					</span>
+				</div>
+				<div class="p-md-3">
+					<span class="p-float-label">
+						<p-dropdown formControlName="toLCD" [options]="LCDs" id="toLCD"></p-dropdown>
+						<label for="toLCD">To</label>
+					</span>
+				</div>
+				<div class="p-md-4">
+					<span class="p-float-label">
+						<input
+							formControlName="monthsLCD"
+							id="float-input"
+							type="number"
+							size="30"
+							pInputText
+							min="1"
+							max="12"
+						/>
+						<label for="float-input"
+							>of every
+							{{
+								scheduleForm.value.monthlyRecurrence.monthsLCD
+									? scheduleForm.value.monthlyRecurrence.monthsLCD
+									: 0
+							}}
+							month(s)</label
+						>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

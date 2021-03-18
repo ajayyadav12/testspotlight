@@ -20,10 +20,7 @@ public class ParentSubmission {
     private Date startTime;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="end_time")
-    private Date endTime;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="update_time")
-    private Date updateTime;    
+    private Date endTime;     
     @Column(name="ad_hoc_flag")
     private char adHoc;
     @OneToMany(fetch = FetchType.EAGER, mappedBy= "submissionParentId")	
@@ -32,6 +29,13 @@ public class ParentSubmission {
     @ManyToOne
     @JoinColumn(name="status_id")
     private Status status;
+
+    @Transient
+    private int errors;
+    @Transient
+    private int warnings;
+    @Transient
+    private int records;
 // 
 // 
     /**
@@ -88,21 +92,7 @@ public class ParentSubmission {
      */
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
-    }
-
-    /**
-     * @return the updateTime
-     */
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    /**
-     * @param updateTime the updateTime to set
-     */
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }    
+    }  
 
     public boolean getAdHoc() {
         return adHoc == 'Y';
@@ -138,6 +128,31 @@ public class ParentSubmission {
      */
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+
+    public int getErrors() {
+        return this.errors;
+    }
+
+    public void setErrors(int errors) {
+        this.errors = errors;
+    }
+
+    public int getWarnings() {
+        return this.warnings;
+    }
+
+    public void setWarnings(int warnings) {
+        this.warnings = warnings;
+    }
+
+    public int getRecords() {
+        return this.records;
+    }
+
+    public void setRecords(int records) {
+        this.records = records;
     }
 
 }

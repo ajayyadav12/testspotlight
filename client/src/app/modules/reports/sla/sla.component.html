@@ -1,0 +1,46 @@
+<div class="p-grid">
+    <div class="p-md-12">
+        <app-sla-filters (onChangeFilters)="getSubmission($event)"></app-sla-filters>
+    </div>
+    <div class="p-md-12">
+        <app-ge-table (onRowSelect)="enableCharts($event)" [rows]="10"
+            columnWithStyle="slacompliant" [showEditDelete]="false" [loading]="loading"
+            [value]="submissionsSLA" [columns]="columns">
+
+        </app-ge-table>
+    </div>
+    <div [hidden]="false" class="p-md-12">
+        <div class="ge-ui-card">
+            <div class="card-banner">
+                {{selectedView === 'trends'? 'Trends - Drill Down':'Wing to Wing Details - Drill Down'}}
+                <i style="color:lightgray" class="ge-action pi pi-window-maximize"
+                    (click)="expandDialogBox()" title="Expand/Collapse"></i>
+                <div style="float: right;">
+                    <p-selectButton [disabled]="submissionsSLA.length === 0" [options]="views"
+                        [(ngModel)]="selectedView"></p-selectButton>
+                </div>
+            </div>
+            <div class="ge-ui-card-content">
+                <app-sla-trend #trendComp
+                    [hidden]="selectedView === null || selectedView !== 'trends'">
+                </app-sla-trend>
+                <app-sla-w2w-details #w2wComp
+                    [hidden]="selectedView === null || selectedView !== 'submissions'">
+                </app-sla-w2w-details>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p-dialog [modal]="true" [(visible)]="displayExpandModule" title="Expand/Collapse"
+    [style]="{ 'min-width': '100%' }" [maximizable]="true">
+    <p-header> Expanded view </p-header>
+    <section>
+        <app-sla-trend uniqueId="exp" #trendCompexp
+            [hidden]="selectedView === null || selectedView !== 'trends'">
+        </app-sla-trend>
+        <app-sla-w2w-details uniqueId="exp" #w2wCompexp
+            [hidden]="selectedView === null || selectedView !== 'submissions'">
+        </app-sla-w2w-details>
+    </section>
+</p-dialog>

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ProcessUserRepository extends JpaRepository<ProcessUser, Long> {
@@ -16,8 +17,11 @@ public interface ProcessUserRepository extends JpaRepository<ProcessUser, Long> 
 
     List<ProcessUser> findByUserIdAndProcessId(Long userId, Long processId);
 
-    long countByUserId(Long userId);
+    @Query("select pu from ProcessUser pu join pu.user u where u.sso = :sso")
+    Collection<ProcessUser> findByUserSSO(@Param("sso") Long sso);
 
-    long countByProcessId(Long processId);
+    boolean existsByUserId(Long userId);
+
+    boolean existsByProcessId(Long processId);
 
 }

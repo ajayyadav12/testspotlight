@@ -2,6 +2,8 @@ package com.ge.finance.spotlight.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.ge.finance.spotlight.exceptions.ForbiddenException;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,13 +42,18 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     private Optional<UsernamePasswordAuthenticationToken> getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(Constants.HEADER);
-        if (token != null) {
-            String processId = JWT.require(Algorithm.HMAC512(secret.getBytes())).build().verify(token.replace("Bearer ", "")).getSubject();
-            if (processId != null) {
-                return Optional.of(new UsernamePasswordAuthenticationToken(processId, null, Collections.emptyList()));
+        try {            
+            if (token != null) {
+                String processId = JWT.require(Algorithm.HMAC512(secret.getBytes())).build().verify(token.replace("Bearer ", "")).getSubject();
+                if (processId != null) {
+                    return Optional.of(new UsernamePasswordAuthenticationToken(processId, null, Collections.emptyList()));
+                }
             }
+            return Optional.empty();
+        } catch (Exception e) {
+            throw new ForbiddenException(String.format("Token '%s' is not valid on this environment", token));
         }
-        return Optional.empty();
+        
     }
 
 }

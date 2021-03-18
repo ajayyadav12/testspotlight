@@ -15,10 +15,10 @@ public class Process {
     private String name;
     @ManyToOne
     @JoinColumn(name = "sender_id")
-    private Sender sender;
+    private System sender;
     @ManyToOne
     @JoinColumn(name = "receiver_id")
-    private Receiver receiver;
+    private System receiver;
     @ManyToOne
     @JoinColumn(name = "process_type_id")
     private ProcessType processType;
@@ -41,12 +41,6 @@ public class Process {
     @JoinColumn(name = "functional_owner_id")
     private User functionalOwner;
     @ManyToOne
-    @JoinColumn(name = "predecessor")
-    private Process predecessor;
-    @ManyToOne
-    @JoinColumn(name = "successor")
-    private Successor successor;
-    @ManyToOne
     @JoinColumn(name = "app_owner_id")
     private User appOwner;
     @Column(name = "approved_flag")
@@ -59,10 +53,16 @@ public class Process {
     private Long maxRunTimeMinutes;
     @Column(name = "submission_escalation_alrt")
     private char submissionEscalationAlrt = 'Y';
+    @Column(name = "submission_delayed_escal_alrt")
+    private char submissionDelayedEscalationAlrt = 'Y';
     @Column(name = "long_running_sub_alrt")
     private char longRunningSubAlrt = 'Y';
     @Column(name = "long_running_step_alrt")
     private char longRunningStepAlrt = 'Y';
+    @Column(name = "required_step_alrt")
+    private char requiredStepAlrt = 'Y';
+    @Column(name = "ignore_child_seq")
+    private char ignoreChildSequence = 'Y';
 
     public void setId(Long id) {
         this.id = id;
@@ -80,19 +80,19 @@ public class Process {
         return name;
     }
 
-    public void setSender(Sender sender) {
+    public void setSender(System sender) {
         this.sender = sender;
     }
 
-    public Sender getSender() {
+    public System getSender() {
         return this.sender;
     }
 
-    public void setReceiver(Receiver receiver) {
+    public void setReceiver(System receiver) {
         this.receiver = receiver;
     }
 
-    public Receiver getReceiver() {
+    public System getReceiver() {
         return receiver;
     }
 
@@ -153,34 +153,6 @@ public class Process {
     }
 
     /**
-     * @return the predecessor
-     */
-    public Process getPredecessor() {
-        return predecessor;
-    }
-
-    /**
-     * @param predecessor the predecessor to set
-     */
-    public void setPredecessor(Process predecessor) {
-        this.predecessor = predecessor;
-    }
-
-    /**
-     * @return the successor
-     */
-    public Successor getSuccessor() {
-        return successor;
-    }
-
-    /**
-     * @param successor the successor to set
-     */
-    public void setSuccessor(Successor successor) {
-        this.successor = successor;
-    }
-
-    /**
      * @return the appOwner
      */
     public User getAppOwner() {
@@ -236,6 +208,14 @@ public class Process {
         this.submissionEscalationAlrt = submissionEscalationAlrt ? 'Y' : 'N';
     }
 
+    public boolean getSubmissionDelayedEscalationAlrt() {
+        return submissionDelayedEscalationAlrt == 'Y';
+    }
+
+    public void setSubmissionDelayedEscalationAlrt(boolean submissionDelayedEscalationAlrt) {
+        this.submissionDelayedEscalationAlrt = submissionDelayedEscalationAlrt ? 'Y' : 'N';
+    }
+
     public boolean getLongRunningSubAlrt() {
         return longRunningSubAlrt == 'Y';
     }
@@ -252,20 +232,36 @@ public class Process {
         this.longRunningStepAlrt = longRunningStepAlrt ? 'Y' : 'N';
     }
 
-	public Long getMaxRunTimeHours() {
-		return maxRunTimeHours;
-	}
+    public Long getMaxRunTimeHours() {
+        return maxRunTimeHours;
+    }
 
-	public void setMaxRunTimeHours(Long maxRunTimeHours) {
-		this.maxRunTimeHours = maxRunTimeHours;
-	}
+    public void setMaxRunTimeHours(Long maxRunTimeHours) {
+        this.maxRunTimeHours = maxRunTimeHours;
+    }
 
-	public Long getMaxRunTimeMinutes() {
-		return maxRunTimeMinutes;
-	}
+    public Long getMaxRunTimeMinutes() {
+        return maxRunTimeMinutes;
+    }
 
-	public void setMaxRunTimeMinutes(Long maxRunTimeMinutes) {
-		this.maxRunTimeMinutes = maxRunTimeMinutes;
-	}
+    public void setMaxRunTimeMinutes(Long maxRunTimeMinutes) {
+        this.maxRunTimeMinutes = maxRunTimeMinutes;
+    }
+
+    public boolean getRequiredStepAlrt() {
+        return requiredStepAlrt == 'Y';
+    }
+
+    public void setRequiredStepAlrt(boolean requiredStepAlrt) {
+        this.requiredStepAlrt = requiredStepAlrt ? 'Y' : 'N';
+    }
+
+    public boolean getIgnoreChildSequence() {
+        return ignoreChildSequence == 'Y';
+    }
+
+    public void setIgnoreChildSequence(boolean ignoreChildSequence) {
+        this.ignoreChildSequence = ignoreChildSequence ? 'Y' : 'N';
+    }
 
 }

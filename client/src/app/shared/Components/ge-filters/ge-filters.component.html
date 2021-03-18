@@ -1,118 +1,225 @@
-<p-sidebar
-  [modal]="true"
-  [(visible)]="displayFilters"
-  position="right"
-  dismissible="false"
-  (onHide)="onHideSidebar($event)"
-  (onShow)="onShowSidebar($event)"
->
-  <h3><b>Filters</b></h3>
-  <form [formGroup]="submissionFilterForm">
-    <div class="p-grid">
-      <div class="p-md-12"></div>
-      <div class="p-md-6" [hidden]="!showFilter('from')">
-        <p class="field" *ngIf="input.from">From</p>
-        <p-calendar placeholder="From" formControlName="from" showButtonBar="true"></p-calendar>
-      </div>
-      <div class="p-md-6" [hidden]="!showFilter('to')">
-        <p class="field" *ngIf="input.to">To</p>
-        <p-calendar placeholder="To" formControlName="to" showButtonBar="true"></p-calendar>
-      </div>
-      <div class="p-md-12 divide"></div>
-      <div class="p-md-2" [hidden]="!showFilter('processes')">
-        <p-radioButton name="levels" value="PR" label=" " formControlName="level" inputId="opt1"></p-radioButton>
-      </div>
-      <div class="p-md-10" [hidden]="!showFilter('processes')">
-        <p class="field" *ngIf="input.processes.length">Processes</p>
-        <p-multiSelect
-          dataKey="id"
-          optionLabel="name"
-          filterPlaceHolder="Search"
-          defaultLabel="Processes"
-          [options]="processes"
-          formControlName="processes"
-          [panelStyle]="{ minWidth: '12em' }"
-        ></p-multiSelect>
-      </div>
-      <div class="p-md-12 divide"></div>
-      <div class="p-md-2" [hidden]="!showFilter('processes')">
-        <p-radioButton name="levels" value="PA" label=" " formControlName="level" inputId="opt2"></p-radioButton>
-      </div>
-      <div class="p-md-10" [hidden]="!showFilter('processes')">
-        <p class="field" *ngIf="input.parents.length">Parents</p>
-        <p-multiSelect
-          dataKey="id"
-          optionLabel="name"
-          filterPlaceHolder="Search"
-          defaultLabel="Parents"
-          [options]="parentProcesses"
-          formControlName="parents"
-          [panelStyle]="{ minWidth: '12em' }"
-        ></p-multiSelect>
-      </div>
-      <div class="p-md-12 divide"></div>
-      <div class="p-md-2" [hidden]="!showFilter('processes')">
-        <p-radioButton name="levels" value="SR" label=" " formControlName="level" inputId="opt3"></p-radioButton>
-      </div>
-      <div class="p-md-10" [hidden]="!showFilter('processes')">
-        <p class="field" *ngIf="input.senders.length">Senders</p>
-        <p-multiSelect
-          filterPlaceHolder="Search"
-          dataKey="id"
-          optionLabel="name"
-          defaultLabel="Senders"
-          [options]="senders"
-          formControlName="senders"
-          [panelStyle]="{ minWidth: '12em' }"
-        ></p-multiSelect>
-      </div>
-      <div class="p-md-10 p-offset-2" [hidden]="!showFilter('processes')">
-        <p class="field" *ngIf="input.receivers.length">Receivers</p>
-        <p-multiSelect
-          filterPlaceHolder="Search"
-          dataKey="id"
-          optionLabel="name"
-          defaultLabel="Receivers"
-          [options]="receivers"
-          formControlName="receivers"
-          [panelStyle]="{ minWidth: '12em' }"
-        ></p-multiSelect>
-      </div>
-      <div class="p-md-12 divide"></div>
-      <div class="p-md-12" [hidden]="!showFilter('status')">
-        <p class="field" *ngIf="input.status.length">Status</p>
-        <p-multiSelect
-          filterPlaceHolder="Search"
-          defaultLabel="Status"
-          [options]="status"
-          formControlName="status"
-          [panelStyle]="{ minWidth: '12em' }"
-        ></p-multiSelect>
-      </div>
-      <div class="p-md-12" [hidden]="!showFilter('bu')">
-        <p class="field" *ngIf="input.bu">Business</p>
-        <p-dropdown placeholder="Business" [options]="businesses" formControlName="bu" [showClear]="true"></p-dropdown>
-      </div>
-      <div class="p-md-12" [hidden]="!showFilter('adHoc')">
-        <p class="field">Adhoc</p>
-        <p-dropdown [options]="adHoc" formControlName="adHoc" [showClear]="true"></p-dropdown>
-      </div>
-      <div class="p-md-12" [hidden]="!showFilter('altId')">
-        <span class="ui-float-label">
-          <input formControlName="altId" pInputText type="text" name="altId" id="altId" />
-          <label for="float-input">Alt ID</label>
-        </span>
-      </div>
-      <div class="p-md-12 divide"></div>
-      <div class="p-md-12">
-        <p-button label="Filter" (onClick)="filter()"></p-button>
-        <p-button
-          label="Clear"
-          style="float: right"
-          styleClass="ui-button-secondary"
-          (onClick)="onClickClear()"
-        ></p-button>
-      </div>
-    </div>
-  </form>
-</p-sidebar>
+<div class="filters">
+	<div class="icon" pTooltip="Show/Hide Filters" (click)="hide = !hide">
+		<span class="pi pi-filter"></span>
+	</div>
+	<p-overlayPanel #fields>
+		<p-listbox
+			[options]="fieldOptions"
+			[(ngModel)]="filterSelection"
+			[multiple]="true"
+			[checkbox]="true"
+			[filter]="true"
+			[showToggleAll]="false"
+		>
+		</p-listbox>
+	</p-overlayPanel>
+	<div [hidden]="hide" class="content">
+		<form [formGroup]="submissionFilterForm">
+			<div class="p-grid p-fluid p-formgrid p-nogutter">
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('days')">
+					<p-dropdown
+						(onChange)="filter()"
+						formControlName="days"
+						[options]="daysOptions"
+						placeholder="Days"
+					></p-dropdown>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('dateRange')">
+					<p-calendar
+						dateFormat="mm/dd/y"
+						(onSelect)="filter()"
+						formControlName="dateRange"
+						placeholder="Date Range"
+						selectionMode="range"
+						[numberOfMonths]="2"
+					>
+					</p-calendar>
+				</div>
+
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('periodFrom')">
+					<input
+						tooltipEvent="focus"
+						pInputText
+						[pTooltip]="periodTooltipText"
+						tooltipPosition="bottom"
+						type="text"
+						pInputText
+						placeholder="Period From"
+						formControlName="periodFrom"
+						maxlength="6"
+						onkeyup="this.value = this.value.toUpperCase();"
+						(change)="checkPattern()"
+					/>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('periodTo')">
+					<input
+						tooltipEvent="focus"
+						pInputText
+						[pTooltip]="periodTooltipText"
+						tooltipPosition="bottom"
+						type="text"
+						pInputText
+						placeholder="Period To"
+						formControlName="periodTo"
+						maxlength="6"
+						onkeyup="this.value = this.value.toUpperCase();"
+						(change)="checkPattern()"
+					/>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('id')">
+					<span class="p-float-label">
+						<input (change)="filter()" formControlName="id" pInputText type="number" name="id" id="id" />
+						<label for="float-input">Submission ID</label>
+					</span>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('process')">
+					<p-multiSelect
+						(onChange)="fixValues('PR'); filter()"
+						dataKey="id"
+						optionLabel="name"
+						filterPlaceHolder="Search"
+						defaultLabel="Processes"
+						[options]="processes"
+						formControlName="processes"
+						[panelStyle]="{ minWidth: '12em' }"
+						(onBlur)="getProcesses()"
+					>
+					</p-multiSelect>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('parent')">
+					<p-multiSelect
+						(onChange)="fixValues('PA'); filter()"
+						dataKey="id"
+						optionLabel="name"
+						filterPlaceHolder="Search"
+						defaultLabel="Parents"
+						[options]="parentProcesses"
+						formControlName="parents"
+						[panelStyle]="{ minWidth: '12em' }"
+						(onBlur)="getProcesses()"
+					>
+					</p-multiSelect>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('sender')">
+					<p-multiSelect
+						(onChange)="fixValues('SR'); filter()"
+						filterPlaceHolder="Search"
+						dataKey="id"
+						optionLabel="name"
+						defaultLabel="Senders"
+						[options]="systems"
+						formControlName="senders"
+						[panelStyle]="{ minWidth: '12em' }"
+						(onBlur)="getSender()"
+					>
+					</p-multiSelect>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('receiver')">
+					<p-multiSelect
+						(onChange)="fixValues('SR'); filter()"
+						filterPlaceHolder="Search"
+						dataKey="id"
+						optionLabel="name"
+						defaultLabel="Receivers"
+						[options]="systems"
+						formControlName="receivers"
+						[panelStyle]="{ minWidth: '12em' }"
+						(onBlur)="getSender()"
+					>
+					</p-multiSelect>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('status')">
+					<p-multiSelect
+						(onChange)="filter()"
+						filterPlaceHolder="Search"
+						defaultLabel="Status"
+						[options]="status"
+						formControlName="status"
+						[panelStyle]="{ minWidth: '12em' }"
+					>
+					</p-multiSelect>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('duration')">
+					<p-dropdown
+						placeholder="Duration"
+						[options]="timeDuration"
+						formControlName="duration"
+						[showClear]="true"
+					>
+					</p-dropdown>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('duration')">
+					<p-spinner
+						(onChange)="filter()"
+						placeholder="(In Min)"
+						[min]="0"
+						[max]="10000"
+						formControlName="durationTime"
+					>
+					</p-spinner>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('bu')">
+					<p-dropdown
+						(onChange)="filter()"
+						placeholder="Business"
+						[options]="businesses"
+						formControlName="bu"
+						[showClear]="true"
+					>
+					</p-dropdown>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('adHoc')">
+					<p-dropdown
+						(onChange)="filter()"
+						placeholder="Ad hoc"
+						[options]="adHoc"
+						formControlName="adHoc"
+						[showClear]="true"
+					></p-dropdown>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('altId')">
+					<span class="p-float-label">
+						<input
+							(change)="filter()"
+							formControlName="altId"
+							pInputText
+							type="text"
+							name="altId"
+							id="altId"
+						/>
+						<label for="float-input">Alt ID</label>
+					</span>
+				</div>
+				<div class="p-md-2 p-sm-6" [hidden]="!showFilter('notes')">
+					<span class="p-float-label">
+						<input
+							(change)="filter()"
+							formControlName="notes"
+							pInputText
+							type="text"
+							name="notes"
+							id="notes"
+						/>
+						<label for="float-input">Submission Notes</label>
+					</span>
+				</div>
+				<div class="p-md-4 p-sm-6">
+					<button
+						pButton
+						label="Add Filter"
+						(click)="fields.toggle($event)"
+						style="width: auto; min-width: 82px"
+						class="p-button-sm"
+					></button>
+					<button
+						pButton
+						label="Clear"
+						class="p-button-text p-button-plain p-button-sm"
+						(click)="onClickClear()"
+						style="width: auto"
+					></button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

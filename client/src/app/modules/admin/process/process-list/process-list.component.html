@@ -1,0 +1,45 @@
+<div class="list-banner">
+	<button
+		pButton
+		type="button"
+		icon="pi pi-refresh"
+		class="p-button-raised p-button-text p-button-plain"
+		(click)="getProcesses()"
+	></button>
+	<p-button *ngIf="isAdmin || isApplication" label="New Process" (onClick)="openNewProcessDialog()"></p-button>
+</div>
+<app-ge-process-copy [(display)]="showCopyDialog" [process]="selectedProcess"></app-ge-process-copy>
+<div class="mx-auto">
+	<p-dropdown
+		[(ngModel)]="selectedP"
+		[options]="processes"
+		placeholder="Select Process"
+		[autofocus]="true"
+		optionLabel="name"
+		dataKey="id"
+		filter="true"
+		(onChange)="onChangeProcess($event)"
+		[showClear]="true"
+	>
+	</p-dropdown>
+	<button pButton type="button" label="Clear" (click)="resetFilters()" class="p-button-text p-button-plain"></button>
+</div>
+<br />
+<p-card>
+	<app-ge-table
+		[value]="processes"
+		[columns]="columns"
+		routerLink="/process/"
+		(deleteRecord)="onDeleteRecord($event)"
+		[loading]="loading"
+		iconColumn="name"
+		showCustomControl="true"
+		[readonly]="isUser"
+		(customControl)="onCopyProcess($event)"
+	>
+	</app-ge-table>
+</p-card>
+
+<p-dialog header="New Process" [(visible)]="newProcessDialog" [style]="{ 'min-width': '500px', 'max-width': '800px' }">
+	<app-process-dtl-summary *ngIf="newProcessDialog"></app-process-dtl-summary>
+</p-dialog>

@@ -9,6 +9,10 @@ import javax.persistence.criteria.Root;
 
 public class StringFilter<T> implements Specification<T> {
 
+  /**
+	 *
+	 */
+	private static final long serialVersionUID = 3405835496208980767L;
   private String paramName;
   private String value;
 

@@ -1,5 +1,10 @@
-<p-tabMenu #menu [model]="analyticsMenu"></p-tabMenu> <br />
+<div class="p-col-5">
+	<p-card style="display: flex">
+		<p-tabMenu #menu [activeItem]="activeItem" [model]="analyticsMenu"></p-tabMenu> <br />
+	</p-card>
+</div>
 
+<br />
 <section>
-  <router-outlet></router-outlet>
+	<router-outlet></router-outlet>
 </section>

@@ -3,8 +3,7 @@ package com.ge.finance.spotlight.models;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "T_PROCESS_STEP", uniqueConstraints = { @UniqueConstraint(columnNames = "process_id"),
-        @UniqueConstraint(columnNames = "name") })
+@Table(name = "T_PROCESS_STEP")
 @NamedQuery(name = "ProcessStep.findByProcessId", query = "select p from ProcessStep p where p.processId = :processId order by p.id")
 public class ProcessStep {
 
@@ -17,10 +16,13 @@ public class ProcessStep {
     private Long id;
     @Column(name = "process_id")
     private Long processId;
+    private Long associatedStepId;
     private String name;
     private Long duration;
+    private Long manualDuration;
     private char required = 'N';
     private char parallel = 'N';
+    private char disabled = 'N';
 
     public Long getId() {
         return id;
@@ -69,4 +71,29 @@ public class ProcessStep {
     public void setParallel(boolean parallel) {
         this.parallel = parallel ? 'Y' : 'N';
     }
+
+    public boolean getDisabled() {
+        return disabled == 'Y';
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled ? 'Y' : 'N';
+    }
+
+    public Long getAssociatedStepId() {
+        return this.associatedStepId;
+    }
+
+    public void setAssociatedStepId(Long associatedStepId) {
+        this.associatedStepId = associatedStepId;
+    }
+
+    public Long getManualDuration() {
+        return this.manualDuration;
+    }
+
+    public void setManualDuration(Long manualDuration) {
+        this.manualDuration = manualDuration;
+    }
+
 }

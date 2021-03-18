@@ -1,62 +1,49 @@
-<div *ngIf="submissionList == true">
-    <div class="p-grid">
-        <div class="p-col p-col-align-center" [ngStyle]="{ 'text-align': isLightVersion ? 'right' : 'left' }">
-            <p-selectButton [options]="types" [(ngModel)]="displayType"
-                (onChange)="updateTitle($event);showDialog($event)">
-            </p-selectButton>
-        </div>
+<div *ngIf="submissionList === true">
+  <div class="p-grid">
+    <div class="p-col p-col-align-center"
+      [ngStyle]="{ 'text-align': isLightVersion ? 'right' : 'left' }">
+      <p-selectButton [options]="types" [(ngModel)]="displayType"
+        (onChange)="updateTab($event); showDialog($event)">
+      </p-selectButton>
     </div>
-    <div [style]="{ width: '100%', height: '450px'}">
-        <app-ge-table [isLightVersion]="true" [columns]="columns" [value]="scheduledSubmissions"
-            [showEditDelete]="false" [loading]="loading" [menuItems]="menuItems"
-            (clickMenuOption)="onClickMenuOption($event)" *ngIf="displayType === 0"></app-ge-table>
+  </div>
+  <div [style]="{ width: '100%'}" *ngIf="displayType === 0">
+    <app-ge-table [rows]="10" [isLightVersion]="true" [columns]="columns"
+      [value]="scheduledSubmissions" [showEditDelete]="false" [loading]="loading"
+      [menuItems]="menuItems" (clickMenuOption)="onClickMenuOption($event)"></app-ge-table>
+  </div>
+  <div class="p-grid" *ngIf="displayType === 1">
+    <div #middle class="p-col-12" style="overflow-y: scroll;">
+      <app-submissions-calendar [submissionCalender]="true"
+        calendarViews="timeGridWeek,timeGridDay">
+      </app-submissions-calendar>
     </div>
-    <div class="p-grid">
-        <div #middle class="p-col-12" style="overflow-y: scroll;">
-            <app-submissions-calendar [submissions]="scheduledSubmissions" *ngIf="displayType === 1"
-                [submissionCalender]="true" calendarViews="timeGridWeek,timeGridDay">
-            </app-submissions-calendar>
-        </div>
+  </div>
+  <div class="p-grid">
+    <div class="p-col-12" [hidden]="displayType !== 2">
+      <canvas [id]="'activity_scatter_chart'+uniqueId" [height]="!uniqueId ? 280: 600"></canvas>
     </div>
+  </div>
 </div>
-<div *ngIf="submissionList == false">
-    <span> No data found.</span>
+<div *ngIf="submissionList === false">
+  <span> No data found.</span>
 </div>
 
 <p-dialog [modal]="true" [(visible)]="displayAcknowledgmentDialog" *ngIf="acknowledgementData"
-    (onHide)="acknowledgementData = null" [style]="{ 'min-width': '500px', 'max-width': '800px' }" [maximizable]="true">
-    <p-header> Acknowledgment Note </p-header>
-    <app-ge-notes-dialog [noteData]="acknowledgementData" (submitNote)="setAcknowledgementFlag($event)">
-    </app-ge-notes-dialog>
+  (onHide)="acknowledgementData = null" [style]="{ 'min-width': '500px', 'max-width': '800px' }"
+  [maximizable]="true">
+  <p-header> Acknowledgment Note </p-header>
+  <app-ge-notes-dialog [noteData]="acknowledgementData"
+    (submitNote)="setAcknowledgementFlag($event)">
+  </app-ge-notes-dialog>
 </p-dialog>
-<p-dialog [modal]="true" [(visible)]="displayDisabledDialog" *ngIf="disableNoteData" (onHide)="disableNoteData = null"
-    [style]="{ 'min-width': '500px', 'max-width': '800px' }" [maximizable]="true">
-    <p-header> Disabled Note </p-header>
-    <app-ge-notes-dialog [noteData]="disableNoteData" (submitNote)="onSubmitDisabledNote($event)"></app-ge-notes-dialog>
+<p-dialog [modal]="true" [(visible)]="displayDisabledDialog" *ngIf="disableNoteData"
+  (onHide)="disableNoteData = null" [style]="{ 'min-width': '500px', 'max-width': '800px' }"
+  [maximizable]="true">
+  <p-header> Disabled Note </p-header>
+  <app-ge-notes-dialog [noteData]="disableNoteData" (submitNote)="onSubmitDisabledNote($event)">
+  </app-ge-notes-dialog>
 </p-dialog>
-<p-dialog [modal]="true" [(visible)]="displayEditDialog">
-    <p-header>
-        Edit Schedule Submission <b>#{{ editScheduleId }}</b></p-header>
-    <p>Time is set on EST</p>
-    <form [formGroup]=" upcomingSubmissionForm">
-        <div class="p-grid" style="margin: 20px 50px 400px 50px">
-            <div class="p-md-6">
-                <span class="ui-float-label">
-                    <p-calendar formControlName="startTime" [showTime]="true"> </p-calendar>
-                    <label for="startTime">Start Date</label>
-                </span>
-            </div>
-            <div class="p-md-6">
-                <span class="ui-float-label">
-                    <p-calendar formControlName="endTime" [showTime]="true"> </p-calendar>
-                    <label for="endTime">End Date</label>
-                </span>
-            </div>
-            <div class="p-md-12">
-                <p-button [disabled]="!upcomingSubmissionForm.valid" label="Update"
-                    (onClick)="updateUpcomingSubmission()">
-                </p-button>
-            </div>
-        </div>
-    </form>
-</p-dialog>
+<app-ge-update-scheduled-submission #updateScheduledSubmission
+  (onUpdateSubmission)="onUpdateSubmission($event)">
+</app-ge-update-scheduled-submission>

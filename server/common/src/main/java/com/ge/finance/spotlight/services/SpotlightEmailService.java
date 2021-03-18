@@ -2,25 +2,17 @@ package com.ge.finance.spotlight.services;
 
 import java.util.Map;
 
-import com.ge.finance.spotlight.models.AnalyticsReport;
-import com.ge.finance.spotlight.models.ParentSubmission;
+import com.ge.finance.spotlight.models.*;
 import com.ge.finance.spotlight.models.Process;
-import com.ge.finance.spotlight.models.ProcessStep;
-import com.ge.finance.spotlight.models.ScheduledSubmission;
-import com.ge.finance.spotlight.models.Submission;
-import com.ge.finance.spotlight.models.SubmissionStep;
-import com.ge.finance.spotlight.models.User;
+import com.ge.finance.spotlight.dto.EmailModel;
 
 public interface SpotlightEmailService {
 
         public Map<String, String> sendProcessSummaryReport(Long notificationTemplateId,
                         AnalyticsReport analyticsReport, String to);
 
-        public void genericSend(Long notificationTemplateId, String to, ScheduledSubmission schedSubmission,
-                        Submission submission, Process process, User user, SubmissionStep submissionStep,
-                        ParentSubmission parentSubmission, ProcessStep processStep);
+        public void genericSend(EmailModel emailModel);
 
-        public void genericSMSSend(Long notificationTemplateId, String to, ScheduledSubmission schedSubmission,
-                        Submission submission, Process process, User user, SubmissionStep submissionStep,
-                        ParentSubmission parentSubmission);
+        void sendProcessExportDecision(Long notificationTemplateId, String to, Process process, User user, ProcessExportRequest processExportRequest);
+
 }

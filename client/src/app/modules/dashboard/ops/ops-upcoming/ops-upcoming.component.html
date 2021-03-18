@@ -1,0 +1,11 @@
+<div *ngIf="submissionList2 === true">
+    <div class="p-grid">
+        <div class="p-col-12">
+            <canvas id="{{'upcoming_scatter_chart'+uniqueId}}" height="{{uniqueId ? 800  : 240}}"></canvas>
+        </div>
+    </div>    
+</div>
+
+<div *ngIf="submissionList2 === false">
+   <span> No data found.</span>
+ </div>

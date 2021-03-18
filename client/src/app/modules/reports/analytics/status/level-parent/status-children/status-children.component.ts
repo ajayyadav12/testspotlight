@@ -88,7 +88,7 @@ export class StatusChildrenComponent implements OnInit {
    */
   mapDeviationData(): any {
     this.dataToLoad.forEach(v => {
-      let children = [];
+      const children = [];
 
       v.submission.children.forEach(child => {
         let found = false;
@@ -172,8 +172,8 @@ export class StatusChildrenComponent implements OnInit {
    *  Map childMap by status group for chart
    */
   setRows() {
-    let rows: any[] = [['Success', 'Warning', 'Failed'], []];
-    let names = [];
+    const rows: any[] = [['Success', 'Warning', 'Failed'], []];
+    const names = [];
 
     this.deviationMap.childMap.forEach(map => {
       rows.push([map.success.percentage * 100, map.warning.percentage * 100, map.failed.percentage * 100]);

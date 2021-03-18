@@ -35,6 +35,7 @@ export class UserDtlComponent implements OnInit {
       email: [{ value: null, disabled: true }]
     });
     this.id = Number.parseInt(this.route.snapshot.paramMap.get('id'), 10);
+    this.id = this.id ? this.id : 0;
     if (this.id !== 0) {
       this.getUser(this.id);
     }
@@ -72,7 +73,7 @@ export class UserDtlComponent implements OnInit {
           summary: 'Welcome to the family!',
           detail: `User '${value.name}' created`
         });
-        this.router.navigate(['/user']);
+        this.router.navigate(['/user', value.id]);
       });
     }
   }

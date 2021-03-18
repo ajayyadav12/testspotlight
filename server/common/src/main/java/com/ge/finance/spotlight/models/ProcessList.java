@@ -13,10 +13,10 @@ public class ProcessList {
     private String name;
     @ManyToOne
     @JoinColumn(name="sender_id")
-    private Sender sender;
+    private System sender;
     @ManyToOne
     @JoinColumn(name="receiver_id")
-    private Receiver receiver;    
+    private System receiver;    
     
     public void setId(Long id) {
         this.id = id;
@@ -34,7 +34,7 @@ public class ProcessList {
         return name;
     }
 
-    public void setSender(Sender sender) {
+    public void setSender(System sender) {
         this.sender = sender;
     }
 
@@ -42,7 +42,7 @@ public class ProcessList {
         return this.sender != null ? this.sender.getName() : "";
     }
 
-    public void setReceiver(Receiver receiver) {
+    public void setReceiver(System receiver) {
         this.receiver = receiver;
     }
 

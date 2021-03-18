@@ -3,4 +3,5 @@ export interface GENotes {
   flag: boolean;
   note: string;
   date: Date;
+  name: string;
 }

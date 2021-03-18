@@ -1,6 +1,5 @@
 package com.ge.finance.spotlight.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.ge.finance.spotlight.models.MessageGateway;

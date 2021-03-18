@@ -1,39 +1,41 @@
 <form [formGroup]="templateForm">
-  <div class="p-grid">
-    <div class="p-md-12">
-      <span class="ui-float-label">
-        <input formControlName="id" pInputText type="number" name="id" id="id" [autofocus] />
-        <label for="float-input">ID</label>
-      </span>
-    </div>
-    <div class="p-md-12">
-      <span class="ui-float-label">
-        <input formControlName="name" pInputText type="text" name="name" id="name" />
-        <label for="float-input">Name</label>
-      </span>
-    </div>
-    <div class="p-md-12">
-      <span class="ui-float-label">
-        <input formControlName="subject" pInputText type="text" name="subject" id="subject" />
-        <label for="float-input">Subject</label>
-      </span>
-    </div>
-    <div class="p-md-10">
-      <p-editor formControlName="body" [style]="{ height: '320px' }"></p-editor>
-    </div>
-    <div class="p-md-2">
-      <div style="text-align: center"><h4>Field values</h4></div>
-      <div *ngFor="let v of fieldValues">
-        <button
-          style="width: 100%; margin-bottom: 5px"
-          (click)="onOptionClick(v.value)"
-          pButton
-          type="button"
-          label="{{ v.label }}"
-          class="ui-button-secondary"
-        ></button>
-      </div>
-    </div>
-    <div class="p-md-12"><p-button [disabled]="!templateForm.valid" label="Save" (onClick)="save()"></p-button></div>
-  </div>
+	<div class="p-grid">
+		<div class="p-md-12">
+			<span class="p-float-label">
+				<input formControlName="id" pInputText type="number" name="id" id="id" [autofocus] />
+				<label for="float-input">ID</label>
+			</span>
+		</div>
+		<div class="p-md-12">
+			<span class="p-float-label">
+				<input formControlName="name" pInputText type="text" name="name" id="name" />
+				<label for="float-input">Name</label>
+			</span>
+		</div>
+		<div class="p-md-12">
+			<span class="p-float-label">
+				<input formControlName="subject" pInputText type="text" name="subject" id="subject" />
+				<label for="float-input">Subject</label>
+			</span>
+		</div>
+		<div class="p-md-10">
+			<p-editor formControlName="body" [style]="{ height: '320px' }"></p-editor>
+		</div>
+		<div class="p-md-2">
+			<div style="text-align: center"><h4>Field values</h4></div>
+			<div *ngFor="let v of fieldValues">
+				<button
+					style="width: 100%; margin-bottom: 5px"
+					(click)="onOptionClick(v.value)"
+					pButton
+					type="button"
+					label="{{ v.label }}"
+					class="p-button-raised p-button-text p-button-plain"
+				></button>
+			</div>
+		</div>
+		<div class="p-md-12">
+			<p-button [disabled]="!templateForm.valid" label="Save" (onClick)="save()"></p-button>
+		</div>
+	</div>
 </form>

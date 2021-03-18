@@ -148,11 +148,11 @@ export class VarianceExportComponent implements OnInit {
    * Scale down to fit letter format
    */
   downloadPDF() {
-    let data = document.getElementById('page');
+    const data = document.getElementById('page');
 
     html2canvas(data).then(canvas => {
       // parameters: 'p' portarait orientation, 'in' inches unit, 'letter' document format
-      let pdf = new jspdf('p', 'in', 'letter');
+      const pdf = new jspdf('p', 'in', 'letter');
 
       const imgWidth = 8.5;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;

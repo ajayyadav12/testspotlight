@@ -11,7 +11,7 @@ plugins {
 apply plugin: 'java'
 
 group 'com.ge.finance.spotlight'
-version '2.2.0'
+version '3.5.0'
 
 sourceCompatibility = 1.8
 
@@ -24,18 +24,31 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-security')
     compile('org.springframework.boot:spring-boot-starter-mail')        
-    compile('javax.xml.bind:jaxb-api:2.3.0')
-    compile("com.auth0:java-jwt:3.4.0")
-    compile('org.freemarker:freemarker:2.3.28')    
+    compile('javax.xml.bind:jaxb-api:2.3.1')
+    compile("com.auth0:java-jwt:3.10.0")
+    compile('org.freemarker:freemarker:2.3.28')
+    compile('com.box:box-java-sdk:2.32.0')
     testCompile('org.springframework.boot:spring-boot-starter-test') {
         exclude group: "org.mockito", module: "mockito-core"
     }
-    testCompile("org.mockito:mockito-core:2.23.4")
-    testCompile('org.springframework.security:spring-security-test')
+    testCompile("org.mockito:mockito-core:3.1.0")
 }
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE")
+        mavenBom("org.springframework.boot:spring-boot-dependencies:2.2.6.RELEASE")
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

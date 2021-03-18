@@ -1,0 +1,61 @@
+<div class="p-grid" style="color: #525252; font-size: 87%">
+	<div class="p-col">
+		<div class="p-grid p-dir-col">
+			<p-checkbox class="p-col" binary="true" label="Summary" [(ngModel)]="summary"></p-checkbox>
+			<p-checkbox class="p-col" binary="true" label="Steps" [(ngModel)]="steps"></p-checkbox>
+			<p-checkbox class="p-col" binary="true" label="Notifications" [(ngModel)]="notifications"></p-checkbox>
+			<p-checkbox class="p-col" binary="true" label="Users" [(ngModel)]="users"></p-checkbox>
+			<p-checkbox class="p-col" binary="true" label="Schedules" [(ngModel)]="schedules"></p-checkbox>
+			<p-button label="Export" (click)="onExport()"></p-button>
+		</div>
+	</div>
+	<div class="p-col">
+		<div class="p-grid p-dir-col">
+			<input type="file" (change)="onFileSelected($event)" />
+			<p-button label="Import" [disabled]="!correctFormat" (click)="onImport()"></p-button>
+		</div>
+	</div>
+</div>
+<p-dialog header="Notes" [(visible)]="display" [modal]="true" [draggable]="false" [resizable]="false">
+	<textarea [(ngModel)]="notes" cols="50" rows="10"></textarea>
+	<p-footer>
+		<p-button (click)="onSubmit()" [label]="action" [styleClass]="styleClass"></p-button>
+	</p-footer>
+</p-dialog>
+<div class="p-grid">
+	<div class="p-md-12">
+		<p-table styleClass="p-datatable-striped p-datatable-sm" [columns]="columns" [value]="requests">
+			<ng-template pTemplate="header" let-columns>
+				<tr>
+					<th *ngFor="let column of columns">{{ column.header }}</th>
+					<th>Export</th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body" let-request let-columns="columns">
+				<tr>
+					<td *ngFor="let column of columns">{{ request[column.field] }}</td>
+					<th>
+						<p-button
+							*ngIf="isAdmin"
+							label="Accept"
+							(click)="approve(request.id)"
+							[disabled]="request.state != 'REQUESTED'"
+						></p-button>
+						<p-button
+							*ngIf="isAdmin"
+							label="Decline"
+							(click)="decline(request.id)"
+							[disabled]="request.state != 'REQUESTED'"
+							styleClass="ui-button-danger"
+						></p-button>
+						<p-button
+							label="Export"
+							(click)="export(request.id)"
+							[disabled]="request.state != 'ACCEPTED'"
+						></p-button>
+					</th>
+				</tr>
+			</ng-template>
+		</p-table>
+	</div>
+</div>

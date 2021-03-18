@@ -1,341 +1,255 @@
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
-import { GoogleCharts } from 'google-charts';
 import { SubmissionsService } from '../../reports/submissions/submissions.service';
 import { ActivatedRoute } from '@angular/router';
+import * as Chart from 'chart.js';
+import { Colors } from 'src/app/shared/Constants/Colors';
 
 @Component({
-  selector: 'app-dashboard-submission-banner',
-  templateUrl: './dashboard-submission-banner.component.html',
-  styleUrls: ['./dashboard-submission-banner.component.scss']
+	selector: 'app-dashboard-submission-banner',
+	templateUrl: './dashboard-submission-banner.component.html',
+	styleUrls: ['./dashboard-submission-banner.component.scss'],
 })
 export class DashboardSubmissionBannerComponent implements OnInit, AfterViewInit {
-  @Input() uniqueId = '';
-  @Output() displayDrillDownDialog = new EventEmitter<boolean>();
+	@Input() uniqueId = '';
+	@Output() displayDrillDownDialog = new EventEmitter<boolean>();
 
-  constructor(private submissionSvc: SubmissionsService, private activatedRoute: ActivatedRoute) { }
-  days = 7;
-  params;
-  isShowingLineChart = true;
-  dataFound = true;
+	constructor(private submissionSvc: SubmissionsService, private activatedRoute: ActivatedRoute) {}
+	days = 7;
+	params;
+	isShowingLineChart = true;
+	warning = 0;
+	success = 0;
+	inProgressChart;
+	failedChart;
+	delayedChart;
 
-  ngOnInit() { }
+	ngOnInit() {}
 
-  ngAfterViewInit(): void {
-    this.activatedRoute.queryParams.subscribe(params => {
-      this.days = params.days ? params.days : this.days;
-      this.getSubmissionCount(params);
-    });
-  }
+	ngAfterViewInit(): void {
+		this.activatedRoute.queryParams.subscribe((params) => {
+			this.days = params.days ? params.days : this.days;
+			this.getSubmissionCount(params);
+		});
+		this.drawContent();
+	}
 
-  getSubmissionCount(params: any = { days: this.days }) {
-    this.params = this.getUpdatedParams(params);
+	drawContent() {
+		Chart.pluginService.register({
+			afterDraw: (chart) => {
+				if (chart.config.type !== 'doughnut') return;
+				const width = chart.width;
+				const height = chart.height;
+				const ctx = chart.ctx;
 
-    this.submissionSvc.getSubmissionCount(this.params).subscribe(value => {
-      GoogleCharts.load(
-        _ => {
-          this.drawChartFailed(value);
-          this.drawChartInProgress(value);
-          this.drawChartInDelayed(value);
-          this.drawChartInWarning(value);
-          this.drawChartInSuccess(value);
-        },
-        { packages: ['corechart'] }
-      );
-    });
-  }
+				let fontSize = (height / 150).toFixed(2);
+				ctx.font = fontSize + 'em sans-serif';
+				ctx.textBaseline = 'middle';
 
-  getUpdatedParams(_params) {
-    let params: any = {};
-    Object.assign(params, _params);
-    switch (params.level) {
-      case 'PR':
-        params.parentId = null;
-        params.receiver = null;
-        params.sender = null;
-        break;
-      case 'PA':
-        params.childId = null;
-        params.receiver = null;
-        params.sender = null;
-        break;
-      case 'SR':
-        params.childId = null;
-        params.parentId = null;
-        break;
-    }
+				const text = chart.options.title.text[0];
+				const value = chart.options.title.text[1];
+				const textX = Math.round((width - ctx.measureText(text).width) / 2);
+				const textY = height / 2;
 
-    return {
-      days: params.days ? params.days : this.days,
-      childId: params.childId ? params.childId : '-1,',
-      parentId: params.parentId ? params.parentId : '-1,',
-      receiver: params.receiver ? params.receiver : '-1,',
-      sender: params.sender ? params.sender : '-1,',
-      adHoc: params.adHoc ? params.adHoc : '-1',
-      bu: params.bu ? params.bu : '-1'
-    };
-  }
+				ctx.fillText(text, textX, textY + 15);
+				fontSize = (height / 65).toFixed(2);
+				ctx.font = fontSize + 'em sans-serif';
+				ctx.fillText(value, textX, textY - 10);
+				ctx.save();
+			},
+		});
+	}
 
-  drawChartFailed(submissionStats: any[]) {
-    let chart = new GoogleCharts.api.visualization.PieChart(
-      document.getElementById('bonus_chart_failed' + this.uniqueId)
-    );
-    let dataTable = new GoogleCharts.api.visualization.DataTable();
-    var failed = 0;
-    var unacknowledged = 0;
-    var textSize = 15;
-    var textTitle = 'Failed vs Unaknowledged';
+	getSubmissionCount(params: any = { days: this.days }) {
+		this.params = this.getUpdatedParams(params);
 
-    submissionStats.forEach(ss => {
-      failed = failed + ss[1];
-      unacknowledged = unacknowledged + ss[6];
-    });
+		this.submissionSvc.getSubmissionCount(this.params).subscribe((value) => {
+			this.drawChartFailed(value);
+			this.drawChartInProgress(value);
+			this.drawChartInDelayed(value);
+			this.drawChartInWarning(value);
+			this.drawChartInSuccess(value);
+		});
+	}
 
-    dataTable = GoogleCharts.api.visualization.arrayToDataTable([
-      ['Task', 'Status'],
-      ['Failed', failed - unacknowledged],
-      ['Unacknowledged', unacknowledged]
-    ]);
+	getUpdatedParams(_params) {
+		const params: any = {};
+		Object.assign(params, _params);
+		switch (params.level) {
+			case 'PR':
+				params.parentId = null;
+				params.receiver = null;
+				params.sender = null;
+				break;
+			case 'PA':
+				params.childId = null;
+				params.receiver = null;
+				params.sender = null;
+				break;
+			case 'SR':
+				params.childId = null;
+				params.parentId = null;
+				break;
+		}
 
-    if (unacknowledged == 0) {
-      textSize = 50;
-      textTitle = 'Failed';
-    }
+		return {
+			days: params.days ? params.days : this.days,
+			childId: params.childId ? params.childId : '-1,',
+			parentId: params.parentId ? params.parentId : '-1,',
+			receiver: params.receiver ? params.receiver : '-1,',
+			sender: params.sender ? params.sender : '-1,',
+			adHoc: params.adHoc ? params.adHoc : '-1',
+			bu: params.bu ? params.bu : '-1',
+		};
+	}
 
-    var options = {
-      title: textTitle,
-      pieSliceText: 'value',
-      pieSliceTextStyle: { fontSize: textSize },
-      titleTextStyle: { fontSize: 15 },
-      slices: {
-        0: { color: '#f44336' },
-        1: { color: '#E78C3F' }
-      },
-      is3D: true,
-      legend: 'none',
-      width: 180,
-      height: 200
-    };
+	drawChartFailed(submissionStats: any[]) {
+		const canvas: any = document.getElementById('bonus_chart_failed');
 
-    chart.draw(dataTable, options);
+		let failed = 0;
+		let unacknowledged = 0;
 
-    GoogleCharts.api.visualization.events.addListener(chart, 'select', _ => {
-      this.changeMousePointerOut();
-      this.showDialog(1);
-    });
+		submissionStats.forEach((ss) => {
+			failed = failed + ss[1];
+			unacknowledged = unacknowledged + ss[6];
+		});
 
-    GoogleCharts.api.visualization.events.addListener(chart, 'onmouseover', _ => {
-      this.changeMousePointerOn();
-    });
+		if (this.failedChart) this.failedChart.destroy();
 
-    GoogleCharts.api.visualization.events.addListener(chart, 'onmouseout', _ => {
-      this.changeMousePointerOut();
-    });
-  }
+		this.failedChart = new Chart(canvas.getContext('2d'), {
+			type: 'doughnut',
+			data: {
+				datasets: [
+					{
+						data: [failed - unacknowledged, unacknowledged],
+						backgroundColor: [Colors.red, Colors.yellow],
+					},
+				],
+				labels: ['Acknowledge', 'Unacknowledged'],
+			},
+			options: {
+				cutoutPercentage: 80,
+				responsive: false,
+				legend: {
+					display: false,
+				},
+				title: {
+					text: ['Failed', failed.toString()],
+				},
+				onClick: (event, activeElements) => {
+					this.showDialog(1);
+				},
+			},
+		});
+	}
 
-  drawChartInProgress(submissionStats: any[]) {
-    let chart = new GoogleCharts.api.visualization.PieChart(
-      document.getElementById('bonus_chart_inprogress' + this.uniqueId)
-    );
-    let dataTable = new GoogleCharts.api.visualization.DataTable();
-    var inprogress = 0;
-    var longrunning = 0;
-    var textSize = 15;
-    var textTitle = 'In Progress vs Long Running';
+	drawChartInProgress(submissionStats: any[]) {
+		const canvas: any = document.getElementById('bonus_chart_inprogress');
 
-    submissionStats.forEach(ss => {
-      inprogress = inprogress + ss[7];
-      longrunning = longrunning + ss[3];
-    });
+		let inprogress = 0;
+		let longrunning = 0;
 
-    dataTable = GoogleCharts.api.visualization.arrayToDataTable([
-      ['Task', 'Status'],
-      ['In Progress', inprogress - longrunning],
-      ['Long Running', longrunning]
-    ]);
+		submissionStats.forEach((ss) => {
+			inprogress = inprogress + ss[7];
+			longrunning = longrunning + ss[3];
+		});
 
-    if (longrunning == 0) {
-      textSize = 50;
-      textTitle = 'In Progress';
-    }
+		if (this.inProgressChart) this.inProgressChart.destroy();
 
-    var options = {
-      title: textTitle,
-      pieSliceText: 'value',
-      pieSliceTextStyle: { fontSize: textSize },
-      titleTextStyle: { fontSize: 15 },
-      slices: {
-        0: { color: '#027ad9' },
-        1: { color: 'gray' }
-      },
-      is3D: true,
-      legend: 'none',
-      width: 180,
-      height: 200
-    };
+		this.inProgressChart = new Chart(canvas.getContext('2d'), {
+			type: 'doughnut',
+			data: {
+				datasets: [
+					{
+						data: [Math.max(inprogress - longrunning, 0), longrunning],
+						backgroundColor: [Colors.blue, Colors.gray],
+					},
+				],
+				labels: ['In Progress', 'Long Running'],
+			},
+			options: {
+				cutoutPercentage: 80,
+				responsive: false,
+				legend: {
+					display: false,
+				},
+				title: {
+					text: ['In Progress', Math.abs(inprogress - longrunning).toString()],
+				},
+				onClick: (event, activeElements) => {
+					this.showDialog(2);
+				},
+			},
+		});
+	}
 
-    chart.draw(dataTable, options);
+	drawChartInDelayed(submissionStats: any[]) {
+		const canvas: any = document.getElementById('bonus_chart_delayed');
+		let delayed = 0;
+		let unacknowledged = 0;
 
-    GoogleCharts.api.visualization.events.addListener(chart, 'select', _ => {
-      this.changeMousePointerOut();
-      this.showDialog(2);
-    });
-    GoogleCharts.api.visualization.events.addListener(chart, 'onmouseover', _ => {
-      this.changeMousePointerOn();
-    });
+		submissionStats.forEach((ss) => {
+			delayed = delayed + ss[4];
+			unacknowledged = unacknowledged + ss[8];
+		});
 
-    GoogleCharts.api.visualization.events.addListener(chart, 'onmouseout', _ => {
-      this.changeMousePointerOut();
-    });
-  }
-  drawChartInDelayed(submissionStats: any[]) {
-    let chart = new GoogleCharts.api.visualization.PieChart(
-      document.getElementById('bonus_chart_delayed' + this.uniqueId)
-    );
-    let dataTable = new GoogleCharts.api.visualization.DataTable();
-    var delayed = 0;
-    var unacknowledged = 0;
-    var textSize = 15;
-    var textTitle = 'Delayed vs Unacknowledged';
+		if (this.delayedChart) this.delayedChart.destroy();
 
-    submissionStats.forEach(ss => {
-      delayed = delayed + ss[4];
-      unacknowledged = unacknowledged + ss[8];
-    });
+		this.delayedChart = new Chart(canvas.getContext('2d'), {
+			type: 'doughnut',
+			data: {
+				datasets: [
+					{
+						data: [delayed, unacknowledged],
+						backgroundColor: [Colors.gray, '#F17D1B'],
+					},
+				],
+				labels: ['Delayed', 'Unacknowledged'],
+			},
+			options: {
+				cutoutPercentage: 80,
+				responsive: false,
+				legend: {
+					display: false,
+				},
+				title: {
+					text: ['Delayed', delayed.toString()],
+				},
+				onClick: (event, activeElements) => {
+					this.showDialog(3);
+				},
+			},
+		});
+	}
 
-    dataTable = GoogleCharts.api.visualization.arrayToDataTable([
-      ['Task', 'Status'],
-      ['Delayed', delayed],
-      ['Unacknowledged', unacknowledged]
-    ]);
+	drawChartInWarning(submissionStats: any[]) {
+		let warning = 0;
 
-    if (unacknowledged == 0 || delayed == 0) {
-      textSize = 50;
-      textTitle = 'Delayed';
-    }
+		submissionStats.forEach((ss) => {
+			warning = warning + ss[2];
+		});
 
-    var options = {
-      title: textTitle,
-      pieSliceText: 'value',
-      pieSliceTextStyle: { fontSize: textSize },
-      titleTextStyle: { fontSize: 15 },
-      slices: {
-        0: { color: 'gray' },
-        1: { color: '#F17D1B' }
-      },
-      is3D: true,
-      legend: 'none',
-      width: 180,
-      height: 200
-    };
+		this.warning = warning;
+	}
 
-    chart.draw(dataTable, options);
+	drawChartInSuccess(submissionStats: any[]) {
+		let success = 0;
 
-    GoogleCharts.api.visualization.events.addListener(chart, 'select', _ => {
-      this.changeMousePointerOut();
-      this.showDialog(3);
-    });
+		submissionStats.forEach((ss) => {
+			success = success + ss[5];
+		});
 
-    GoogleCharts.api.visualization.events.addListener(chart, 'onmouseover', _ => {
-      this.changeMousePointerOn();
-    });
+		this.success = success;
+	}
 
-    GoogleCharts.api.visualization.events.addListener(chart, 'onmouseout', _ => {
-      this.changeMousePointerOut();
-    });
-  }
+	showDialog(value) {
+		this.displayDrillDownDialog.emit(value);
+	}
 
-  drawChartInWarning(submissionStats: any[]) {
-    let chart = new GoogleCharts.api.visualization.PieChart(
-      document.getElementById('bonus_chart_warning' + this.uniqueId)
-    );
-    let dataTable = new GoogleCharts.api.visualization.DataTable();
-    var warning = 0;
+	changeMousePointerOn() {
+		document.body.style.cursor = 'pointer';
+	}
 
-    submissionStats.forEach(ss => {
-      warning = warning + ss[2];
-    });
-
-    dataTable = GoogleCharts.api.visualization.arrayToDataTable([['Task', 'Status'], ['warning', warning]]);
-
-    var options = {
-      title: 'Warning',
-      pieSliceText: 'value',
-      pieSliceTextStyle: { fontSize: 50 },
-      titleTextStyle: { fontSize: 15 },
-      slices: { 0: { color: '#ffa600' } },
-      is3D: true,
-      legend: 'none',
-      width: 180,
-      height: 200
-    };
-
-    chart.draw(dataTable, options);
-
-    GoogleCharts.api.visualization.events.addListener(chart, 'select', _ => {
-      this.changeMousePointerOut();
-      this.showDialog(4);
-    });
-
-    GoogleCharts.api.visualization.events.addListener(chart, 'onmouseover', _ => {
-      this.changeMousePointerOn();
-    });
-
-    GoogleCharts.api.visualization.events.addListener(chart, 'onmouseout', _ => {
-      this.changeMousePointerOut();
-    });
-  }
-
-  drawChartInSuccess(submissionStats: any[]) {
-    let chart = new GoogleCharts.api.visualization.PieChart(
-      document.getElementById('bonus_chart_success' + this.uniqueId)
-    );
-    let dataTable = new GoogleCharts.api.visualization.DataTable();
-    var success = 0;
-
-    submissionStats.forEach(ss => {
-      success = success + ss[5];
-    });
-
-    dataTable = GoogleCharts.api.visualization.arrayToDataTable([['Task', 'Status'], ['Success', success]]);
-
-    var options = {
-      title: 'Success',
-      pieSliceText: 'value',
-      pieSliceTextStyle: { fontSize: 50 },
-      titleTextStyle: { fontSize: 15 },
-      slices: { 0: { color: '#00bf6f' } },
-      is3D: true,
-      legend: 'none',
-      width: 180,
-      height: 200
-    };
-
-
-    chart.draw(dataTable, options);
-
-    GoogleCharts.api.visualization.events.addListener(chart, 'select', _ => {
-      this.changeMousePointerOut();
-      this.showDialog(5);
-    });
-
-    GoogleCharts.api.visualization.events.addListener(chart, 'onmouseover', _ => {
-      this.changeMousePointerOn();
-    });
-
-    GoogleCharts.api.visualization.events.addListener(chart, 'onmouseout', _ => {
-      this.changeMousePointerOut();
-    });
-  }
-
-  showDialog(value) {
-    this.displayDrillDownDialog.emit(value);
-  }
-
-  changeMousePointerOn() {
-    document.body.style.cursor = 'pointer';
-  }
-
-  changeMousePointerOut() {
-    document.body.style.cursor = 'initial';
-  }
+	changeMousePointerOut() {
+		document.body.style.cursor = 'initial';
+	}
 }

@@ -5,18 +5,18 @@ export class AnalyticsCommon {
    * Convert Object to CSV and download
    */
   public static downloadCSVFile(submissions, columns) {
-    let data = submissions;
+    const data = submissions;
 
     // use first data point to get element keys
-    let elements = Object.keys(data[0]);
+    const elements = Object.keys(data[0]);
 
     // remove element: fileName
     elements.pop();
 
     // create new row for each submission in data[]
-    let rows = [];
+    const rows = [];
     data.map(row => {
-      let rowData = [];
+      const rowData = [];
       elements.map(fieldName => {
         rowData.push(row[fieldName].toString());
       });
@@ -29,11 +29,11 @@ export class AnalyticsCommon {
     rows.unshift(headers.join(','));
 
     // separate each array index by return and new line
-    let csvArray = rows.join('\r\n');
+    const csvArray = rows.join('\r\n');
 
     // generate csv file
-    var a = document.createElement('a');
-    var blob = new Blob([csvArray], { type: 'text/csv' }),
+    const a = document.createElement('a');
+    const blob = new Blob([csvArray], { type: 'text/csv' }),
       url = window.URL.createObjectURL(blob);
 
     // imitate user interaction for download

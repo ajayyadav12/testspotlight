@@ -1,17 +1,13 @@
 <div class="p-grid">
   <div class="p-md-5">
-    <p-dropdown
-      [(ngModel)]="selectedUser"
-      filter="true"
-      optionLabel="name"
-      [options]="users"
-      placeholder="Select a user"
-      showClear="true"
-      *ngIf="isVisible"
-      [autofocus]="isVisible"
-      (keyup.enter)="addUser()"
-    ></p-dropdown>
+    <p-multiSelect [options]="users" [(ngModel)]="selectedUser" defaultLabel="Select a user" optionLabel="name"
+      (onClick)="getUsers()" selectedItemsLabel="{0} items selected" (keyup.enter)="addUser()"></p-multiSelect>
   </div>
+  <!-- <div class="p-md-5">
+    <p-dropdown [(ngModel)]="selectedUser" filter="true" optionLabel="name" [options]="users"
+      placeholder="Select a user" showClear="true" *ngIf="isVisible" [autofocus]="isVisible" (onClick)="getUsers()"
+      (keyup.enter)="addUser()"></p-dropdown>
+  </div> -->
   <div class="p-md-1">
     <p-button [disabled]="!selectedUser" label="Add" (onClick)="addUser()"></p-button>
   </div>

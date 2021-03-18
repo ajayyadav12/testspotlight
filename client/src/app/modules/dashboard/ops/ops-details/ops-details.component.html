@@ -1,0 +1,239 @@
+<p-table
+	styleClass="p-datatable-striped p-datatable-sm"
+	#dt
+	[columns]="cols"
+	[value]="submissions"
+	[paginator]="true"
+	[rows]="5"
+>
+	<ng-template pTemplate="header" let-columns>
+		<tr>
+			<th *ngFor="let col of columns">
+				<div class="text-align">
+					{{ col.header }}
+				</div>
+			</th>
+		</tr>
+		<tr>
+			<th *ngFor="let col of columns" [ngSwitch]="col.field">
+				<div *ngSwitchCase="'year'">
+					Value > {{ yearFilter }}
+					<i
+						class="pi pi-times"
+						(click)="yearFilter = null; dt.filter(null, col.field, col.filterMatchMode)"
+						style="cursor: pointer"
+						*ngIf="yearFilter"
+					></i>
+					<p-slider
+						[style]="{ width: '100%', 'margin-top': '8px' }"
+						[(ngModel)]="yearFilter"
+						[min]="1970"
+						[max]="2010"
+						(onChange)="onYearChange($event, dt)"
+					></p-slider>
+				</div>
+				<p-dropdown
+					*ngSwitchCase="'brand'"
+					[options]="brands"
+					[style]="{ width: '100%' }"
+					(onChange)="dt.filter($event.value, col.field, 'equals')"
+				></p-dropdown>
+				<p-multiSelect
+					*ngSwitchCase="'color'"
+					[options]="colors"
+					defaultLabel="All Colors"
+					(onChange)="dt.filter($event.value, col.field, 'in')"
+				></p-multiSelect>
+				<input
+					*ngSwitchCase="'price'"
+					pInputText
+					type="text"
+					placeholder="Custom - Greater Than"
+					(input)="dt.filter($event.target.value, col.field, 'custom')"
+				/>
+			</th>
+		</tr>
+	</ng-template>
+	<ng-template pTemplate="body" let-rowData let-columns="columns">
+		<tr [pSelectableRow]="rowData">
+			<td>
+				<div class="text-align">
+					{{ rowData['id'] }}
+				</div>
+			</td>
+			<td>
+				{{ rowData['process'] }}
+			</td>
+			<td>
+				<div id="wrapper">
+					<div id="yourdiv">
+						<div
+							class="circle"
+							[ngStyle]="{
+								'background-color': submissionStatusColor(rowData['latest'])
+							}"
+							[ngClass]="{
+								'fail-circle': rowData['latest'] === 'failed'
+							}"
+						>
+							<span class="tooltiptext">
+								<b
+									><i> {{ rowData['process'] }} </i></b
+								>
+								<br />
+								Actual Start : {{ rowData['actualStart'] }} (scheduled Start :
+								{{ rowData['schedStart'] }})<br />
+								Actual End : {{ rowData['actualEnd'] }} (scheduled End : {{ rowData['schedEnd'] }})
+								<br />
+								Elapsed Time : {{ rowData['elapsed'] }}
+							</span>
+						</div>
+					</div>
+				</div>
+			</td>
+			<td>
+				<div id="wrapper">
+					<div id="yourdiv">
+						<div
+							class="circle"
+							[ngStyle]="{
+								'background-color': submissionStatusColor(rowData['prior'])
+							}"
+							[ngClass]="{
+								'fail-circle': rowData['prior'] === 'failed'
+							}"
+						>
+							<span class="tooltiptext">
+								<b
+									><i> {{ rowData['process'] }} </i></b
+								>
+								<br />
+								Actual Start : {{ rowData['actualStartPrior'] }} (scheduled Start :
+								{{ rowData['schedStartPrior'] }})<br />
+								Actual End : {{ rowData['actualEndPrior'] }} (scheduled End :
+								{{ rowData['schedEndPrior'] }}) <br />
+								Elapsed Time : {{ rowData['elapsedPrior'] }}
+							</span>
+						</div>
+					</div>
+				</div>
+			</td>
+			<td>
+				<div class="text-align">
+					{{ rowData['next'] }}
+				</div>
+			</td>
+			<td>
+				<div class="text-align">
+					{{ rowData['remaining'] }}
+				</div>
+			</td>
+			<td>
+				<table>
+					<tr>
+						<td>
+							<div class="last5" *ngIf="rowData['actualStart']">
+								<pre
+									class="rectangle"
+									[ngStyle]="{ 'background-color': submissionStatusColor(rowData['latest']) }"
+								><b>{{rowData[latest]}}</b>                                                                
+                                    
+                                </pre>
+								<span class="tooltiptext">
+									<b
+										><i> {{ rowData['process'] }} - Latest</i></b
+									>
+									<br />
+									Actual Start : {{ rowData['actualStart'] }} (scheduled Start :
+									{{ rowData['schedStart'] }})<br />
+									Actual End : {{ rowData['actualEnd'] }} (scheduled End : {{ rowData['schedEnd'] }})
+									<br />
+									Elapsed Time : {{ rowData['elapsed'] }}
+								</span>
+							</div>
+						</td>
+						<td>
+							<div class="last5" *ngIf="rowData['actualStartPrior']">
+								<pre
+									class="rectangle"
+									[ngStyle]="{ 'background-color': submissionStatusColor(rowData['second']) }"
+								><b>{{rowData[second]}}</b>
+                                   
+                                </pre>
+
+								<span class="tooltiptext">
+									<b
+										><i> {{ rowData['process'] }} - Second Before</i></b
+									>
+									<br />
+									Actual Start : {{ rowData['actualStartPrior'] }} (scheduled Start :
+									{{ rowData['schedStartPrior'] }})<br />
+									Actual End : {{ rowData['actualEndPrior'] }} (scheduled End :
+									{{ rowData['schedEndPrior'] }}) <br />
+									Elapsed Time : {{ rowData['elapsedPrior'] }}
+								</span>
+							</div>
+						</td>
+						<td>
+							<div class="last5" *ngIf="rowData['actualStartL3']">
+								<pre
+									class="rectangle"
+									[ngStyle]="{ 'background-color': submissionStatusColor(rowData['third']) }"
+								><b>{{rowData[third]}}</b></pre>
+								<span class="tooltiptext">
+									<b
+										><i> {{ rowData['process'] }} - Third Before</i></b
+									>
+									<br />
+									Actual Start : {{ rowData['actualStartL3'] }} (scheduled Start :
+									{{ rowData['schedStartL3'] }})<br />
+									Actual End : {{ rowData['actualEndL3'] }} (scheduled End :
+									{{ rowData['schedEndL3'] }}) <br />
+									Elapsed Time : {{ rowData['elapsedL3'] }}
+								</span>
+							</div>
+						</td>
+						<td>
+							<div class="last5" *ngIf="rowData['actualStartL4']">
+								<pre
+									class="rectangle"
+									[ngStyle]="{ 'background-color': submissionStatusColor(rowData['fourth']) }"
+								><b>{{rowData[fourth]}}</b></pre>
+								<span class="tooltiptext">
+									<b
+										><i> {{ rowData['process'] }} - Fourth Before</i></b
+									>
+									<br />
+									Actual Start : {{ rowData['actualStartL4'] }} (scheduled Start :
+									{{ rowData['schedStartL4'] }})<br />
+									Actual End : {{ rowData['actualEndL4'] }} (scheduled End :
+									{{ rowData['schedEndL4'] }}) <br />
+									Elapsed Time : {{ rowData['elapsedL4'] }}
+								</span>
+							</div>
+						</td>
+						<td>
+							<div class="last5" *ngIf="rowData['actualStartL5']">
+								<pre
+									class="rectangle"
+									[ngStyle]="{ 'background-color': submissionStatusColor(rowData['fifth']) }"
+								><b>{{rowData[fifth]}}</b></pre>
+								<span class="tooltiptext">
+									<b
+										><i> {{ rowData['process'] }} - Fifth Before</i></b
+									>
+									<br />
+									Actual Start : {{ rowData['actualStartL5'] }} (scheduled Start :
+									{{ rowData['schedStartL5'] }})<br />
+									Actual End : {{ rowData['actualEndL5'] }} (scheduled End :
+									{{ rowData['schedEndL5'] }}) <br />
+									Elapsed Time : {{ rowData['elapsedL5'] }}
+								</span>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</ng-template>
+</p-table>

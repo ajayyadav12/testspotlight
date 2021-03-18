@@ -1,46 +1,31 @@
-<div style="position: absolute; top: 15px; right: 25px">
-  <div style="display: inline-block">
-    <app-ge-views [_view]="view" navigate="/dashboard" moduleName="submission" [tParams]="params"> </app-ge-views>
-  </div>
-  <div style="margin-left:20px; display: inline-block">
-    <div class="ui-inputgroup">
-      <p-dropdown
-        [style]="{ 'min-width': '200px' }"
-        (onChange)="onChangeDays($event)"
-        [options]="daysOptions"
-        placeholder="Days"
-        [(ngModel)]="days"
-      ></p-dropdown>
-      <button
-        pButton
-        type="button"
-        icon="pi pi-refresh"
-        class="ui-button-secondary"
-        (click)="onClickRefresh()"
-      ></button>
-      <button
-        pButton
-        type="button"
-        icon="pi pi-filter"
-        class="ui-button-secondary"
-        (click)="displayFilters = true"
-      ></button>
-    </div>
-  </div>
+<div style="position: absolute; top: 72px; right: 32px; display: inline-flex">
+	<div style="display: inline-block; top: 55px">
+		<span style="font-size: 0.8em; text-align: left; display: inline-block"
+			>Auto Refresh: {{ timing !== 0 ? timing + ' min' : 'Off' }}</span
+		><br />
+		<i style="display: inline-block">
+			<p-slider
+				[(ngModel)]="timing"
+				[style]="{ width: '12.5em' }"
+				[step]="5"
+				[min]="0"
+				[max]="30"
+				(onChange)="onchangeTiming($event)"
+			>
+			</p-slider>
+		</i>
+	</div>
+	<button
+		style="margin-left: 8px; margin-right: 32px"
+		pButton
+		type="button"
+		icon="pi pi-refresh"
+		class="p-button-raised p-button-text p-button-plain"
+		(click)="onClickRefresh()"
+	></button>
+	<div style="display: inline-block">
+		<app-ge-views [_view]="view" navigate="/dashboard" moduleName="submission" [tParams]="params"> </app-ge-views>
+	</div>
 </div>
-<div *ngIf="existChipFilters" class="p-grid" [hidden]="chipFilters.length === 0">
-  <div class="p-md-12">
-    <p-chips (onRemove)="onRemoveFilter($event)" [(ngModel)]="chipFilters">
-      <ng-template let-item pTemplate="item">
-        <div style="margin-right: 1em; font-size: 1.2em;">{{ item.name }}</div>
-      </ng-template>
-    </p-chips>
-  </div>
-</div>
-<app-ge-filters
-  [filterSelection]="filterSelection"
-  (onHide)="displayFilters = false"
-  [displayFilters]="displayFilters"
-  [childParentRelationship]="false"
-  (onChangeParams)="onChangeParams($event)"
-></app-ge-filters>
+<br />
+<app-ge-filters #filter [filterSelection]="filterSelection" [childParentRelationship]="false"> </app-ge-filters>

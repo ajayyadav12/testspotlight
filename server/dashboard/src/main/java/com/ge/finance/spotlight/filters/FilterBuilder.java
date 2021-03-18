@@ -38,7 +38,11 @@ public class FilterBuilder<T> {
                 break;
             case "bu":
             case "altId":
+            case "notes":
                 newSpecification = new StringFilter<>(entry.getKey(), entry.getValue());
+                break;
+            case "scheduledSubmission":
+                newSpecification = new SchedExistsFilter<>(entry.getKey(), entry.getValue());
                 break;
             case "adHoc":
                 newSpecification = new AdHocFilter<>(entry.getKey(), entry.getValue());

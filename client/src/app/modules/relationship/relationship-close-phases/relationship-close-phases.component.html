@@ -1,0 +1,82 @@
+<div class="p-grid">
+    <div class="p-md-12">
+        <div class="instructions">
+            <div class="icon"><span class="pi pi-info"></span></div>
+            <div class="text">
+                Select an application to view the direct upstream and downstream
+                applications
+            </div>
+        </div>
+    </div>
+    <div class="p-md-12">
+        <div class="ge-ui-card">
+            <div class="card-banner">
+                <span class="title"><span class="step-number">1</span>Choose one area</span>
+            </div>
+            <div class="ge-ui-card-content">
+                <div [ngClass]="{ active: selectedClosePhaseid === 6 }"
+                    (click)="openSystemSelector(6)" class="option">
+                    <span class="icon"></span>
+                    <span class="title">Data Management</span>
+                </div>
+                <div [ngClass]="{ active: selectedClosePhaseid < 5 }"
+                    (click)="selectedClosePhaseid = 0" class="option">
+                    <span class="icon"></span>
+                    <span class="title">Finance</span>
+                </div>
+                <div [ngClass]="{ active: selectedClosePhaseid === 5 }"
+                    (click)="openSystemSelector(5)" class="option">
+                    <span class="icon"></span>
+                    <span class="title">Reporting</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="p-md-12">
+        <div *ngIf="selectedClosePhaseid < 5" class="ge-ui-card">
+            <div class="card-banner">
+                <span class="title">
+                    <span class="step-number">2</span>
+                    Choose one finance area</span>
+            </div>
+            <div class="ge-ui-card-content">
+                <div [ngClass]="{ active: selectedClosePhaseid === 1 }"
+                    (click)="openSystemSelector(1)" class="option">
+                    <span class="icon"></span>
+                    <span class="title">Subledger</span>
+                </div>
+                <div [ngClass]="{ active: selectedClosePhaseid === 3 }"
+                    (click)="openSystemSelector(3)" class="option">
+                    <span class="icon"></span>
+                    <span class="title">Business Consolidation</span>
+                </div>
+                <div [ngClass]="{ active: selectedClosePhaseid === 2 }"
+                    (click)="openSystemSelector(2)" class="option">
+                    <span class="icon"></span>
+                    <span class="title">ERP/GL</span>
+                </div>
+                <div [ngClass]="{ active: selectedClosePhaseid === 4 }"
+                    (click)="openSystemSelector(4)" class="option">
+                    <span class="icon"></span>
+                    <span class="title">TC Consolidation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="p-md-12">
+        <div class="ge-ui-card">
+            <div class="card-banner">
+                <span class="title"><span class="step-number">3</span>Select System to view the
+                    direct
+                    upstream and downstream applications</span>
+            </div>
+            <div class="ge-ui-card-content">
+                <p-dropdown [disabled]="selectedClosePhaseid < 1" [(ngModel)]="selectedSystem"
+                    [options]="systems" placeholder="Select System" [autofocus]="true"
+                    optionLabel="name" dataKey="id" filter="true"
+                    (onChange)="openClosePhaseRelationship()">
+                </p-dropdown>
+            </div>
+        </div>
+    </div>
+</div>

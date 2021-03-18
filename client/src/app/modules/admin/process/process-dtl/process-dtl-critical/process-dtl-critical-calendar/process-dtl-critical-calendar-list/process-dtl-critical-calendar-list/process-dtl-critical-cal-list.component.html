@@ -1,0 +1,10 @@
+<div>
+    <div style="display: inline-block">
+        <p-button label="New Critical Period" routerLink="0" [disabled]="!isAdmin && !canEdit"></p-button>
+    </div>
+</div>
+<p></p>
+<app-ge-table [value]="schedules" [columns]="columns" [loading]="loading" (deleteRecord)="onDeleteRecord($event)"
+    [customEdit]="false" (editRecord)="onEditRecord($event)" [readonly]="!isAdmin && !canEdit"></app-ge-table>
+
+<router-outlet></router-outlet>

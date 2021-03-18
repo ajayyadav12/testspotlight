@@ -1,0 +1,63 @@
+<br />
+<div class="p-grid">
+	<div class="p-md-12">
+		<app-ops-dashboard-filters></app-ops-dashboard-filters>
+	</div>
+
+	<div class="p-md-6 p-sm-12">
+		<div class="ge-ui-card">
+			<div class="card-banner">
+				Current Status
+				<i
+					style="color: lightgray"
+					class="ge-action pi pi-window-maximize"
+					(click)="expandModule('current')"
+					title="Expand/Collapse"
+				></i>
+			</div>
+			<div class="ge-ui-card-content" [style]="{ height: '280px' }">
+				<app-ops-current></app-ops-current>
+			</div>
+		</div>
+	</div>
+	<div class="p-md-6 p-sm-12">
+		<div class="ge-ui-card">
+			<div class="card-banner">
+				Upcoming Runs
+				<i
+					style="color: lightgray"
+					class="ge-action pi pi-window-maximize"
+					(click)="expandModule('upcoming')"
+					title="Expand/Collapse"
+				></i>
+			</div>
+			<div class="ge-ui-card-content" [style]="{ height: '280px', 'overflow-y': 'scroll' }">
+				<app-ops-upcoming></app-ops-upcoming>
+			</div>
+		</div>
+	</div>
+	<div class="p-md-12">
+		<div class="ge-ui-card">
+			<div class="card-banner">Details</div>
+			<div style="padding-top: 1em">
+				<app-ops-details></app-ops-details>
+			</div>
+		</div>
+	</div>
+</div>
+
+<p-dialog
+	[modal]="true"
+	[(visible)]="displayExpandModule"
+	*ngIf="displayExpandModule"
+	title="Expand/Collapse"
+	[style]="{ 'min-width': '100%' }"
+	[maximizable]="true"
+>
+	<p-header> Expanded view </p-header>
+	<section [ngSwitch]="expandedModule">
+		<app-ops-current uniqueId="exp" *ngSwitchCase="'current'"></app-ops-current>
+		<app-ops-upcoming uniqueId="exp" *ngSwitchCase="'upcoming'"></app-ops-upcoming>
+		<app-ops-details uniqueId="exp" *ngSwitchCase="'details'"></app-ops-details>
+	</section>
+</p-dialog>

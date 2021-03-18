@@ -11,7 +11,11 @@ import java.util.List;
 
 public class IdInFilter<T> implements Specification<T> {
 
-    private String paramName;
+    /**
+	 *
+	 */
+	private static final long serialVersionUID = -7579472131074095657L;
+	private String paramName;
     private String idList;
 
     public IdInFilter(String paramName, String idList) {

@@ -1,8 +1,5 @@
-import { Receiver } from './../../../receiver/Receiver';
 import { UserService } from './../../../user/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ReceiverService } from 'src/app/modules/admin/receiver/receiver.service';
-import { SenderService } from 'src/app/modules/admin/sender/sender.service';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Component, OnInit, Input } from '@angular/core';
 import { Subject } from 'rxjs';
@@ -10,237 +7,235 @@ import { ProcessService } from '../../process.service';
 import { MessageService } from 'primeng/api';
 import { SidebarService } from 'src/app/core/sidebar/sidebar.service';
 import { SessionService } from 'src/app/core/session/session.service';
+import { SystemService } from '../../../system/system.service';
+import { Process } from '../../Process';
 
 @Component({
-  selector: 'app-process-dtl-summary',
-  templateUrl: './process-dtl-summary.component.html',
-  styleUrls: ['./process-dtl-summary.component.scss']
+	selector: 'app-process-dtl-summary',
+	templateUrl: './process-dtl-summary.component.html',
+	styleUrls: ['./process-dtl-summary.component.scss'],
 })
 export class ProcessDtlSummaryComponent implements OnInit {
-  @Input() isVisible: boolean;
-  processForm: FormGroup;
+	@Input() isVisible: boolean = true;
+	processForm: FormGroup;
+	process: Process;
+	display = false;
 
-  // Dropdowns
-  senders = [];
-  users = [];
-  receivers = [];
-  processTypes = [];
-  feedTypes = [];
-  processes = [];
-  parents = [];
-  siblings = [];
+	// Dropdowns
+	systems = [];
+	users = [];
+	processTypes = [];
+	feedTypes = [];
 
-  processToken = '';
-  id: number;
+	processToken = '';
+	id: number;
 
-  combosObservable = new Subject<boolean>();
-  combosCount = 0;
+	combosObservable = new Subject<boolean>();
+	combosCount = 0;
 
-  get isAdmin() {
-    return this.sessionSvc.role === 'admin';
-  }
+	get isAdmin() {
+		return this.sessionSvc.role === 'admin';
+	}
 
-  get isApplication() {
-    return this.sessionSvc.role === 'application';
-  }
+	get isApplication() {
+		return this.sessionSvc.role === 'application';
+	}
 
-  get submitButtonLabel() {
-    if (this.id === 0) {
-      return this.isAdmin ? 'Save' : 'Submit for Approval';
-    } else {
-      return 'Save';
-    }
-  }
+	get isUser() {
+		return this.sessionSvc.role === 'user';
+	}
 
-  constructor(
-    private processSvc: ProcessService,
-    private senderSvc: SenderService,
-    private receiverSvc: ReceiverService,
-    private fb: FormBuilder,
-    private msgSvc: MessageService,
-    private route: ActivatedRoute,
-    private sidebarSvc: SidebarService,
-    private sessionSvc: SessionService,
-    private userSvc: UserService,
-    private router: Router
-  ) {
-    this.setupForm();
-    this.setupCombos();
-    this.id = Number.parseInt(this.route.snapshot.paramMap.get('id'));
-    if (this.id !== 0) {
-      this.combosObservable.subscribe(value => {
-        // Wait till all dropdowns are ready
-        this.combosCount++;
-        if (this.combosCount === 6) {
-          this.getProcess(this.id);
-        }
-      });
-    }
-  }
+	get canEdit() {
+		return this.id === 0 || this.sessionSvc.isUserOfProcess(this.id);
+	}
 
-  ngOnInit() {}
+	get submitButtonLabel() {
+		if (this.id === 0) {
+			return this.isAdmin ? 'Save' : 'Submit for Approval';
+		} else {
+			return 'Save';
+		}
+	}
 
-  ngOnDestroy() {
-    this.combosObservable.unsubscribe();
-  }
+	constructor(
+		private processSvc: ProcessService,
+		private systemSvc: SystemService,
+		private fb: FormBuilder,
+		private msgSvc: MessageService,
+		private route: ActivatedRoute,
+		private sidebarSvc: SidebarService,
+		private sessionSvc: SessionService,
+		private userSvc: UserService,
+		private router: Router
+	) {
+		this.route.parent.params.subscribe((params) => {
+			this.id = parseInt(params['id']) || 0;
+			if (this.id != 0) {
+				this.getProcess(this.id);
+			} else {
+				this.getAppOwner();
+				this.getAppOwner();
+				this.getSenderReceiver();
+				this.getFeedType();
+				this.getFeedType();
+			}
+		});
+		this.setupForm();
+	}
 
-  setupForm() {
-    this.processForm = this.fb.group({
-      approved: '0',
-      appOwner: null,
-      critical: false,
-      feedType: [null, Validators.required],
-      functionalOwner: null,
-      id: [{ value: null, disabled: true }],
-      isParent: false,
-      longRunningSubAlrt: null,
-      longRunningStepAlrt: null,
-      name: ['', Validators.required],
-      processType: [null, Validators.required],
-      processParent: null,
-      predecessor: null,
-      processLevel: null,
-      receiver: [null, Validators.required],
-      sender: [null, Validators.required],
-      submissionEscalationAlrt: null,
-      successor: null,
-      supportTeamEmail: ['', [Validators.email, Validators.required]],
-      technicalOwner: null,
-      maxRunTimeHours: [0, Validators.min(0)],
-      maxRunTimeMinutes: [0, Validators.min(0)]
-    });
-  }
+	ngOnInit() {}
 
-  copyToken() {
-    if (this.processForm.disabled) {
-      return;
-    }
-    const selBox = document.createElement('textarea');
-    selBox.style.position = 'fixed';
-    selBox.style.left = '0';
-    selBox.style.top = '0';
-    selBox.style.opacity = '0';
-    selBox.value = this.processToken;
-    document.body.appendChild(selBox);
-    selBox.focus();
-    selBox.select();
-    document.execCommand('copy');
-    document.body.removeChild(selBox);
-    this.msgSvc.add({
-      severity: 'success',
-      summary: 'Now you are ready!',
-      detail: `Token has been copied`
-    });
-  }
+	ngOnDestroy() {
+		this.combosObservable.unsubscribe();
+	}
 
-  setupCombos() {
-    this.senderSvc.getAllSenders().subscribe(value => {
-      this.senders = value;
-      this.combosObservable.next(true);
-    });
-    this.receiverSvc.getAllReceiver().subscribe((value: Receiver[]) => {
-      this.receivers = value;
-      this.combosObservable.next(true);
-    });
-    this.processSvc.getAllProcessTypes().subscribe((value: any[]) => {
-      this.processTypes = value;
-      this.combosObservable.next(true);
-    });
-    this.processSvc.getFeedTypes().subscribe((value: any[]) => {
-      this.feedTypes = value;
-      this.combosObservable.next(true);
-    });
-    this.processSvc.getAllProcesses().subscribe((value: any[]) => {
-      this.parents = value.filter(v => v.isParent);
-      this.processes = value.filter(v => !v.isParent);
-      this.combosObservable.next(true);
-    });
-    this.userSvc.getUsers().subscribe(value => {
-      this.users = value;
-      this.combosObservable.next(true);
-    });
-  }
+	setupForm() {
+		this.processForm = this.fb.group({
+			approved: '0',
+			appOwner: null,
+			critical: false,
+			feedType: [null, Validators.required],
+			functionalOwner: null,
+			id: [{ value: null, disabled: true }],
+			isParent: false,
+			longRunningSubAlrt: null,
+			longRunningStepAlrt: null,
+			name: ['', Validators.required],
+			processType: [null, Validators.required],
+			processParent: [null],
+			processLevel: null,
+			receiver: [null, Validators.required],
+			sender: [null, Validators.required],
+			submissionEscalationAlrt: null,
+			supportTeamEmail: ['', [Validators.email, Validators.required]],
+			technicalOwner: null,
+			maxRunTimeHours: [12, Validators.min(0)],
+			maxRunTimeMinutes: [0, Validators.min(0)],
+			submissionDelayedEscalationAlrt: null,
+			requiredStepAlrt: null,
+			ignoreChildSequence: null,
+		});
+		if (!this.isAdmin && !this.canEdit) {
+			this.processForm.disable();
+		}
+	}
 
-  getProcess(id: number) {
-    this.processSvc.getProcess(id).subscribe((process: any) => {
-      if (process.processParent) {
-        this.onChangeProcessParent({ value: process.processParent });
-      }
-      this.siblings.push(process.successor);
-      this.siblings.push(process.predecessor);
-      this.sidebarSvc.title = 'Process: ' + process.name;
-      this.processApprovalStatusAction(process.approved);
-      this.processForm.setValue(process);
-    });
-  }
+	copyToken() {
+		if (this.processForm.disabled) {
+			return;
+		}
+		const selBox = document.createElement('textarea');
+		selBox.style.position = 'fixed';
+		selBox.style.left = '0';
+		selBox.style.top = '0';
+		selBox.style.opacity = '0';
+		selBox.value = this.processToken;
+		document.body.appendChild(selBox);
+		selBox.focus();
+		selBox.select();
+		document.execCommand('copy');
+		document.body.removeChild(selBox);
+		this.msgSvc.add({
+			severity: 'success',
+			summary: 'Now you are ready!',
+			detail: `Token has been copied`,
+		});
+	}
 
-  processApprovalStatusAction(approved) {
-    if (approved === '0') {
-      this.processForm.disable();
-      this.msgSvc.add({
-        severity: 'warn',
-        summary: 'Patience is a virtue...',
-        detail: 'Spotlight Admin Team is reviewing this process',
-        key: 'persist'
-      });
-    } else if (approved === 'N') {
-      this.processForm.disable();
-      this.msgSvc.add({
-        severity: 'error',
-        summary: 'Sorry not sorry',
-        detail: 'Spotlight Admin Team rejected this process',
-        key: 'persist'
-      });
-    }
-  }
+	getFeedType() {
+		this.processSvc.getFeedTypes().subscribe((value: any[]) => {
+			this.feedTypes = value;
+		});
+	}
 
-  onChangeProcessParent(event) {
-    this.processSvc.getChildren(event.value.id).subscribe((values: any[]) => {
-      this.siblings = values;
-      this.siblings = this.siblings.filter(s => {
-        return s.id !== this.processForm.getRawValue().id;
-      });
-    });
-  }
+	getSenderReceiver() {
+		this.systemSvc.getAllSystems().subscribe((value) => {
+			this.systems = value;
+		});
+	}
 
-  onChangeIsParent(event) {
-    if (event) {
-      this.processForm.get('processParent').setValue(null);
-      this.processForm.get('processParent').disable();
-    } else {
-      this.processForm.get('processParent').enable();
-      this.processForm.get('processParent').setValue(null);
-    }
-  }
+	getAppOwner() {
+		this.userSvc.getUsers().subscribe((value) => {
+			this.users = value;
+		});
+	}
 
-  save() {
-    if (this.id !== 0) {
-      this.processSvc.updateProcess(this.id, this.processForm.getRawValue()).subscribe(value => {
-        this.msgSvc.add({
-          severity: 'success',
-          summary: 'All set!',
-          detail: `Process '${value.name}' was updated`
-        });
-        this.router.navigate(['/process']);
-      });
-    } else {
-      this.processSvc.newProcess(this.processForm.getRawValue()).subscribe(value => {
-        this.msgSvc.add({
-          severity: 'success',
-          summary: 'Congrats! A new process was added!',
-          detail: `Process '${value.name}' created`
-        });
-        this.router.navigate(['/process']);
-      });
-    }
-  }
+	getProcessTypes() {
+		this.processSvc.getAllProcessTypes().subscribe((value: any[]) => {
+			this.processTypes = value;
+		});
+	}
 
-  getProcessToken() {
-    if (this.processForm.disabled) {
-      return;
-    }
-    this.processSvc.getToken(this.processForm.getRawValue().id).subscribe(value => {
-      this.processToken = value.token;
-    });
-  }
+	getProcess(id: number) {
+		this.processSvc.getProcess(id).subscribe((process: any) => {
+			this.process = process;
+			this.sidebarSvc.title = 'Process: ' + process.name;
+			this.sessionSvc.globalProcessName = process.name;
+			this.processApprovalStatusAction(process.approved);
+			this.populateDropDowns(process);
+			this.processForm.setValue(process);
+		});
+	}
+
+	populateDropDowns(process) {
+		this.systems = [process.sender, process.receiver];
+		this.feedTypes = [process.feedType];
+		this.processTypes = [process.processType];
+		this.users = [process.appOwner];
+	}
+
+	processApprovalStatusAction(approved) {
+		if (approved === '0') {
+			this.processForm.disable();
+			this.msgSvc.add({
+				severity: 'warn',
+				summary: 'Patience is a virtue...',
+				detail: 'Spotlight Admin Team is reviewing this process',
+				key: 'persist',
+			});
+		} else if (approved === 'N') {
+			this.processForm.disable();
+			this.msgSvc.add({
+				severity: 'error',
+				summary: 'Sorry not sorry',
+				detail: 'Spotlight Admin Team rejected this process',
+				key: 'persist',
+			});
+		}
+	}
+
+	onCopy(): void {
+		this.display = true;
+	}
+
+	save() {
+		if (this.id !== 0) {
+			this.processSvc.updateProcess(this.id, this.processForm.getRawValue()).subscribe((value) => {
+				this.msgSvc.add({
+					severity: 'success',
+					summary: 'All set!',
+					detail: `Process '${value.name}' was updated`,
+				});
+				location.assign(`process/${value.id}`);
+			});
+		} else {
+			this.processSvc.newProcess(this.processForm.getRawValue()).subscribe((value) => {
+				this.msgSvc.add({
+					severity: 'success',
+					summary: 'Congrats! A new process was added!',
+					detail: `Process '${value.name}' created`,
+				});
+				location.assign(`process/${value.id}`);
+			});
+		}
+	}
+
+	getProcessToken() {
+		if (this.processForm.disabled) {
+			return;
+		}
+		this.processSvc.getToken(this.processForm.getRawValue().id).subscribe((value) => {
+			this.processToken = value.token;
+		});
+	}
 }

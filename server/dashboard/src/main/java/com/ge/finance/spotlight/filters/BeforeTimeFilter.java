@@ -12,7 +12,12 @@ import java.util.Date;
 
 public class BeforeTimeFilter<T> implements Specification<T> {
 
-    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    /**
+	 *
+	 */
+	private static final long serialVersionUID = -2468571321630467088L;
+
+	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
     private String paramName;
     private Date time;

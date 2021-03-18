@@ -1,0 +1,36 @@
+<section [formGroup]="reportForm">
+	<div class="p-grid">
+		<div class="container">
+			<input
+				*ngIf="isPeriod"
+				type="text"
+				pInputText
+				placeholder="From"
+				formControlName="from"
+				showButtonBar="true"
+				size="6"
+				onkeyup="this.value = this.value.toUpperCase();"
+			/><span style="margin-left: 5px; margin-right: 5px"></span>
+			<input
+				*ngIf="isPeriod"
+				type="text"
+				pInputText
+				placeholder="To"
+				formControlName="to"
+				showButtonBar="true"
+				size="6"
+				onkeyup="this.value = this.value.toUpperCase();"
+			/><span style="margin-left: 5px; margin-right: 5px"></span>
+			<p-dropdown placeholder="Business" [options]="businesses" formControlName="bu" [showClear]="true">
+			</p-dropdown>
+		</div>
+		<!-- 	<div class="p-md-12" *ngIf="isPeriod">
+			<font color="red"
+				><small
+					>Please enter a valid format (Hint: Quarterly : Q20-(1-4), Yearly : Y2020 ,Monthly : M20-03/MMM-YY)</small
+				></font
+			>
+		</div> -->
+	</div>
+	<!-- <p-dropdown placeholder="Business" [options]="businesses" formControlName="bu" [showClear]="true"> </p-dropdown> -->
+</section>

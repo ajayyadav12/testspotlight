@@ -6,7 +6,7 @@ import com.ge.finance.spotlight.models.ModuleFilter;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ModuleFilterRepository extends JpaRepository<ModuleFilter, Long> {
+public interface ModuleFilterRepository extends JpaRepository<ModuleFilter, Long>, ModuleFilterRepositoryExtension {
 
-    List<ModuleFilter> findByUserIdAndModuleName(Long userId, String moduleName);
+    List<ModuleFilter> findByUserIdAndModuleNameAndSettingsIsNotNull(Long userId, String moduleName);
 }

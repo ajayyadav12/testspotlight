@@ -1,5 +1,59 @@
-<div style="text-align: right; padding: 1em">
-  <p-selectButton [options]="groups" [(ngModel)]="loadDefault" (onChange)="toggleChartData()"></p-selectButton>
+<div class="p-md-12" style="display: flex">
+	<div style="width: 70%">
+		<div id="chartTrend"></div>
+		<div class="p-grid">
+			<div class="p-md-11">
+				<app-submissions-steps *ngIf="submissionId > 0" [processId]="submissionId"></app-submissions-steps>
+			</div>
+		</div>
+	</div>
+	<div class="filters" style="width: 300px; height: 200px; float: right; position: absolute; margin-left: 1000px">
+		<div class="content" style="display: contents">
+			<div style="text-align: center; padding: 1em">
+				<p-selectButton
+					[options]="groups"
+					[(ngModel)]="loadDefault"
+					(onChange)="toggleChartData()"
+				></p-selectButton>
+			</div>
+			<div class="ui-g" style="text-align: left; padding: 1em">
+				<div class="ui-g-12">
+					<p-radioButton
+						name="group1"
+						value="0"
+						label="Exclude All outliers"
+						[(ngModel)]="outlinerOption"
+						inputId="opt1"
+						(onClick)="generateOutliners(0)"
+					>
+					</p-radioButton>
+				</div>
+				<br />
+				<div class="ui-g-12">
+					<p-radioButton
+						name="group1"
+						value="1"
+						label="Exclude Major outliers"
+						[(ngModel)]="outlinerOption"
+						inputId="opt2"
+						(onClick)="generateOutliners(1)"
+					>
+					</p-radioButton>
+				</div>
+				<br />
+				<div class="ui-g-12">
+					<p-radioButton
+						name="group1"
+						value="2"
+						label="All"
+						[(ngModel)]="outlinerOption"
+						inputId="opt3"
+						(countValue)="(countValue)"
+						(onClick)="generateOutliners(2)"
+					>
+					</p-radioButton>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
-<div style="height: 15px"></div>
-<div id="chartTrend"></div>

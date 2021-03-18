@@ -12,7 +12,12 @@ import java.util.Date;
 
 public class AfterTimeFilter<T> implements Specification<T> {
 
-    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+    /**
+	 *
+	 */
+	private static final long serialVersionUID = -7726481996855962899L;
+
+	private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
     private String paramName;
     private Date time;

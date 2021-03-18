@@ -20,10 +20,7 @@ public class ChildSubmission {
     private Date startTime;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "end_time")
-    private Date endTime;
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "update_time")
-    private Date updateTime;
+    private Date endTime;    
     private int warnings;
     private int records;
     @Column(name = "fatal_errors")
@@ -77,14 +74,6 @@ public class ChildSubmission {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
     }
 
     public int getWarnings() {

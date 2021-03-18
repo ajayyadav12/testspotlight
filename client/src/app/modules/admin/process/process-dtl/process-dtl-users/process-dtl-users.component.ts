@@ -10,9 +10,11 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./process-dtl-users.component.scss']
 })
 export class ProcessDtlUsersComponent implements OnInit {
-  @Input() isVisible: boolean;
+  @Input() isVisible: boolean = true;
 
-  selectedUser;
+  selectedUser = [];
+  selectedIds = [];
+  selectUser = [];
   users = [];
   processUsers = [];
   columns = [{ field: 'name', header: 'name' }, { field: 'sso', header: 'SSO' }];
@@ -22,29 +24,45 @@ export class ProcessDtlUsersComponent implements OnInit {
     private processSvc: ProcessService,
     private msgSvc: MessageService,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
-    this.processId = Number.parseInt(this.route.snapshot.paramMap.get('id'), 10);
-    if (this.processId !== 0) {
-      this.getUsers();
-      this.getProcessUsers();
-    }
+    this.route.parent.params.subscribe(params => {
+      this.processId = params['id'] || 0;
+      if (this.processId != 0) {
+        this.getProcessUsers();
+      }
+    });
   }
 
   addUser() {
-    this.processSvc.newProcessUser(this.processId, this.selectedUser.id).subscribe(value => {
-      this.msgSvc.add({
-        severity: 'success',
-        summary: 'New user!',
-        detail: `User '${value.user.name}' was added`
+    if (this.selectedUser !== null) {
+      this.selectedUser.forEach((element) => {
+        this.selectedIds.push(element.id);
       });
-      this.selectedUser = null;
-      value.name = value.user.name;
-      value.sso = value.user.sso;
-      value.id = value.user.id;
-      this.processUsers.push(value);
-    });
+      this.processSvc.newProcessUser(this.processId, this.selectedIds).subscribe(value => {
+        this.msgSvc.add({
+          severity: 'success',
+          summary: 'New users added!',
+          // detail: `User '${value.user.name}' was added`
+        });
+        this.selectedUser = null;
+        this.selectedIds = [];
+        for (let i = 0; i < value.length; i++) {
+          value[i].name = value[i].user.name;
+          value[i].sso = value[i].user.sso;
+          value[i].id = value[i].user.id;
+          this.processUsers.push(value[i]);
+          //s this.selectUser.push(value[i]);s
+        }
+
+      });
+      const session = JSON.parse(localStorage.getItem("session"));
+      if (session) {
+        session.processes.push(this.processId);
+        localStorage.setItem("session", JSON.stringify(session));
+      }
+    }
   }
 
   getUsers() {
@@ -69,6 +87,11 @@ export class ProcessDtlUsersComponent implements OnInit {
       this.processUsers = this.processUsers.filter(p => {
         return p.id !== id;
       });
+      const session = JSON.parse(localStorage.getItem("session"));
+      if (session) {
+        session.processes.pop(this.processId);
+        localStorage.setItem("session", JSON.stringify(session));
+      }
       this.msgSvc.add({
         severity: 'error',
         summary: `It's not me, it's you!`,

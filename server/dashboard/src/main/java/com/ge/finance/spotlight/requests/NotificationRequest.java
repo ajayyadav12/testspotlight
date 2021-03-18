@@ -4,8 +4,9 @@ public class NotificationRequest {
 
     private Long processStepId;
     private Long statusId;
-    private Long distributionListId;
-    private Long notificationTemplateId;
+    private Boolean enableTextMessaging;
+    private String escalationType;
+    private String submissionType;
 
     public Long getProcessStepId() {
         return processStepId;
@@ -23,20 +24,28 @@ public class NotificationRequest {
         this.statusId = statusId;
     }
 
-    public Long getDistributionListId() {
-        return distributionListId;
+    public Boolean getEnableTextMessaging() {
+        return enableTextMessaging;
     }
 
-    public void setDistributionListId(Long distributionListId) {
-        this.distributionListId = distributionListId;
+    public void setEnableTextMessaging(Boolean enableTextMessaging) {
+        this.enableTextMessaging = enableTextMessaging;
     }
 
-    public Long getNotificationTemplateId() {
-        return notificationTemplateId;
+    public String getEscalationType() {
+        return escalationType;
     }
 
-    public void setNotificationTemplateId(Long notificationTemplateId) {
-        this.notificationTemplateId = notificationTemplateId;
+    public void setEscalationType(String escalationType) {
+        this.escalationType = escalationType;
+    }
+
+    public String getSubmissionType() {
+        return submissionType;
+    }
+
+    public void setSubmissionType(String submissionType) {
+        this.submissionType = submissionType;
     }
 
 }

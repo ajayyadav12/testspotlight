@@ -18,6 +18,7 @@ public class ModuleFilter {
     private String settings;
     private String chipFilters;
     private char global = 'N';
+    private String columnFilters;
 
     public Long getId() {
         return id;
@@ -59,20 +60,28 @@ public class ModuleFilter {
         this.settings = settings;
     }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getChipFilters() {
-		return chipFilters;
-	}
+    public String getChipFilters() {
+        return chipFilters;
+    }
 
-	public void setChipFilters(String chipFilters) {
-		this.chipFilters = chipFilters;
-	}
+    public void setChipFilters(String chipFilters) {
+        this.chipFilters = chipFilters;
+    }
+
+    public String getColumnFilters() {
+        return this.columnFilters;
+    }
+
+    public void setColumnFilters(String columnFilters) {
+        this.columnFilters = columnFilters;
+    }
 
 }

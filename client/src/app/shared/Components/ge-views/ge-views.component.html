@@ -1,0 +1,64 @@
+<div style="display: inline-block">
+	<div class="ui-inputgroup" *ngIf="!showNewViewName">
+		<p-dropdown
+			[style]="{ 'min-width': '200px' }"
+			[options]="views"
+			[(ngModel)]="view"
+			placeholder="Select a View"
+			optionLabel="name"
+			[showClear]="true"
+			(onChange)="onSelectView($event)"
+		></p-dropdown>
+		<button
+			*ngIf="showStar"
+			pButton
+			[pTooltip]="starTooltip"
+			type="button"
+			[icon]="starIcon"
+			class="p-button-raised p-button-text p-button-plain"
+			(click)="onStarView()"
+		></button>
+		<button
+			pButton
+			type="button"
+			icon="pi pi-save"
+			class="p-button-raised p-button-text p-button-plain"
+			(click)="showNewViewInput()"
+			title="Save current filters and sorting"
+		></button>
+		<button
+			*ngIf="showTrash"
+			pButton
+			pTooltip="Delete view"
+			type="button"
+			icon="pi pi-trash"
+			class="p-button-raised p-button-text p-button-plain"
+			(click)="deleteView()"
+		></button>
+	</div>
+	<div class="ui-inputgroup" *ngIf="showNewViewName">
+		<input
+			pTextInput
+			(keyup.enter)="onSaveView()"
+			[(ngModel)]="newViewName"
+			placeholder="Name your view"
+			autofocus
+			[autofocus]
+		/>
+		<button
+			[disabled]="newViewName === ''"
+			pButton
+			type="button"
+			icon="pi pi-check"
+			class="ui-button-success"
+			(click)="onSaveView()"
+		></button>
+		<button
+			pButton
+			type="button"
+			icon="pi pi-times"
+			class="p-button-raised p-button-text p-button-plain"
+			(click)="cancelNewView()"
+		></button>
+	</div>
+</div>

@@ -2,7 +2,6 @@ import { ProcessDtlApproveComponent } from './process-dtl/process-dtl-approve/pr
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { ProcessListComponent } from './process-list/process-list.component';
-import { ProcessDtlComponent } from './process-dtl/process-dtl.component';
 import { ProcessComponent } from './process.component';
 
 const routes: Routes = [
@@ -11,10 +10,7 @@ const routes: Routes = [
     component: ProcessComponent,
     children: [
       { path: '', component: ProcessListComponent },
-      {
-        path: ':id',
-        component: ProcessDtlComponent
-      },
+      { path: ':id', loadChildren: () => import('./process-dtl/process-dtl.module').then(m => m.ProcessDtlModule) },
       { path: ':id/approve', component: ProcessDtlApproveComponent }
     ]
   }
@@ -24,4 +20,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class ProcessRoutingModule {}
+export class ProcessRoutingModule { }

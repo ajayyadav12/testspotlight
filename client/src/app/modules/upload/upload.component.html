@@ -1,0 +1,66 @@
+<p-card [style]="{ 'max-width': '900px', margin: 'auto' }">
+	<form [formGroup]="form">
+		<div class="p-grid p-fluid">
+			<div class="p-md-12">
+				<span class="p-float-label">
+					<input formControlName="name" pInputText type="text" name="name" id="name" />
+					<label for="float-input">Name</label>
+				</span>
+			</div>
+			<div class="p-md-12">
+				<span class="p-float-label">
+					<input formControlName="comments" pInputText type="text" name="comments" id="comments" />
+					<label for="float-input">Comments</label>
+				</span>
+			</div>
+			<div class="p-md-12">
+				<p-dropdown
+					optionLabel="name"
+					formControlName="process"
+					[options]="processes"
+					(click)="getProcesses()"
+					placeholder="Select process"
+					showClear="true"
+				></p-dropdown>
+			</div>
+			<div class="p-md-12">
+				<p-dropdown
+					optionLabel="name"
+					formControlName="sender"
+					[options]="systems"
+					(click)="getSystems()"
+					placeholder="Select sender"
+					showClear="true"
+				></p-dropdown>
+			</div>
+			<div class="p-md-12">
+				<p-dropdown
+					optionLabel="name"
+					formControlName="receiver"
+					[options]="systems"
+					(click)="getSystems()"
+					placeholder="Select receiver"
+					showClear="true"
+				></p-dropdown>
+			</div>
+			<div class="p-md-12">
+				<p-fileUpload
+					#uploader
+					name="files[]"
+					[class.spinner]="loading"
+					[disabled]="!form.valid || form.pristine || loading"
+					customUpload="true"
+					(uploadHandler)="onUpload($event, uploader)"
+					multiple="multiple"
+					accept=".csv"
+				>
+					<ng-template pTemplate="content">
+						<ul *ngIf="files.length">
+							<li *ngIf="let file of files">{{ file.name }} - {{ file.size }} bytes</li>
+						</ul>
+					</ng-template>
+				</p-fileUpload>
+			</div>
+		</div>
+	</form>
+</p-card>

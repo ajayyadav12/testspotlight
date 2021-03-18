@@ -1,0 +1,10 @@
+{
+	"environment": "local",
+	"apiURL": "http://localhost:4200/dashapi/v1",
+	"appsApiUrl": "http://localhost:9001/appsapi/v1/submissions/steps/",
+	"oidcOauthUri": "https://fssfed.ge.com/fss/as/authorization.oauth2",
+	"oidcClientId": "GECORP_Spotlight_Dev_Client",
+	"logoutUrl": "https://ssologin.ssogen2.corporate.ge.com/logoff/logoff.jsp",
+	"version": "-dev",
+	"instrumentationKey": ""
+}

@@ -14,6 +14,29 @@ export class SubmissionsChildrenComponent implements OnInit {
   @Input() showGrouped;
   @Output() changeView = new EventEmitter();
 
+  responsiveOptions = [
+    {
+      breakpoint: '1500px',
+      numVisible: 4,
+      numScroll: 4
+    },
+    {
+      breakpoint: '1350px',
+      numVisible: 3,
+      numScroll: 3
+    },
+    {
+      breakpoint: '1200px',
+      numVisible: 2,
+      numScroll: 2
+    },
+    {
+      breakpoint: '800px',
+      numVisible: 1,
+      numScroll: 1
+    }
+  ];
+
   displayCustomCarousel = false;
   dataGroup: any = [];
 
@@ -28,9 +51,9 @@ export class SubmissionsChildrenComponent implements OnInit {
     return this.parent ? this.parent.children : null;
   }
 
-  constructor(private msgSvc: MessageService) {}
+  constructor(private msgSvc: MessageService) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   openNotesDialog(submission) {
     if (!this.isLightVersion) {

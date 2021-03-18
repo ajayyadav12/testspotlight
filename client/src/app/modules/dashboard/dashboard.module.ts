@@ -10,6 +10,7 @@ import { DashboardSubmissionDrillDownModule } from './dashboard-submission-banne
 import { DashboardActivityModule } from './dashboard-activity/dashboard-activity.module';
 import { DashboardFiltersModule } from './dashboard-filters/dashboard-filters.module';
 import { FormsModule } from '@angular/forms';
+import { DashboardOpsModule } from './ops/dashboard-ops.module';
 
 @NgModule({
   declarations: [DashboardComponent],
@@ -23,7 +24,8 @@ import { FormsModule } from '@angular/forms';
     DashboardSubmissionDrillDownModule,
     DashboardTrendingChartModule,
     DashboardActivityModule,
-    DashboardFiltersModule
+    DashboardFiltersModule,
+    DashboardOpsModule
   ]
 })
 export class DashboardModule { }

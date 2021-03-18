@@ -1,56 +1,102 @@
 <div *ngIf="scheduleForm" [formGroup]="scheduleForm" class="p-grid">
-  <div formGroupName="dailyRecurrence" class="p-grid">
-    <div class="p-md-12">
-      <div class="p-grid">
-        <div class="p-md-2">
-          <p-radioButton
-            (onClick)="onClickDailyOption()"
-            name="Option"
-            value="daily"
-            label="Daily"
-            formControlName="option"
-          ></p-radioButton>
-        </div>
-        <div class="p-md-4">
-          <span class="ui-float-label">
-            <input formControlName="recurEvery" name="recurEvery" id="float-input" type="number" size="30" pInputText />
-            <label for="float-input"
-              >Every
-              {{ scheduleForm.value.dailyRecurrence.recurEvery ? scheduleForm.value.dailyRecurrence.recurEvery : 0 }}
-              day(s)</label
-            >
-          </span>
-        </div>
-        <div class="p-md-4">
-          <p-checkbox
-            (onChange)="onChangeIsEveryWeekday($event)"
-            formControlName="isEveryWeekday"
-            name="isEveryWeekday"
-            binary="true"
-            label="Every weekday"
-          ></p-checkbox>
-        </div>
-      </div>
-    </div>
-    <div class="p-md-12">
-      <div class="p-grid">
-        <div class="p-md-2">
-          <p-radioButton
-            (onClick)="onClickDailyOption()"
-            name="Option"
-            value="hourly"
-            label="Hourly"
-            formControlName="option"
-          >
-          </p-radioButton>
-        </div>
-        <div class="p-md-10">
-          <span class="ui-float-label">
-            <p-dropdown formControlName="timeRecurrence" [options]="timeRecurrences" id="float-time"></p-dropdown>
-            <label for="float-time">Time Recurrence</label>
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
+	<div formGroupName="dailyRecurrence" class="p-grid">
+		<div class="p-md-12">
+			<div class="p-grid">
+				<div class="p-md-2">
+					<p-radioButton
+						(onClick)="onClickDailyOption()"
+						name="Option"
+						value="daily"
+						label="Daily"
+						formControlName="option"
+					></p-radioButton>
+				</div>
+				<div class="p-md-4">
+					<span class="p-float-label">
+						<input
+							formControlName="recurEvery"
+							name="recurEvery"
+							id="float-input"
+							type="number"
+							size="30"
+							pInputText
+						/>
+						<label for="float-input"
+							>Every
+							{{
+								scheduleForm.value.dailyRecurrence.recurEvery
+									? scheduleForm.value.dailyRecurrence.recurEvery
+									: 0
+							}}
+							day(s)</label
+						>
+					</span>
+				</div>
+				<div class="p-md-4">
+					<p-checkbox
+						(onChange)="onChangeIsEveryWeekday($event)"
+						formControlName="isEveryWeekday"
+						name="isEveryWeekday"
+						binary="true"
+						label="Every weekday"
+					></p-checkbox>
+				</div>
+			</div>
+		</div>
+		<div class="p-md-12">
+			<div class="p-grid">
+				<div class="p-md-2">
+					<p-radioButton
+						(onClick)="onClickDailyOption()"
+						name="Option"
+						value="hourly"
+						label="Hourly"
+						formControlName="option"
+					>
+					</p-radioButton>
+				</div>
+				<div class="p-md-10">
+					<span class="p-float-label">
+						<p-dropdown
+							formControlName="timeRecurrence"
+							[options]="timeRecurrences"
+							id="float-time"
+						></p-dropdown>
+						<label for="float-time">Time Recurrence</label>
+					</span>
+				</div>
+				<div class="p-md-2"></div>
+				<div class="p-md-2">
+					<span class="p-float-label">
+						<p-calendar
+							formControlName="hourlyStartTime"
+							id="hourlyStartTime"
+							hourFormat="12"
+							[timeOnly]="true"
+							required
+						>
+						</p-calendar>
+						<label for="hourlyStartTime">Start Time</label>
+					</span>
+				</div>
+				<div class="p-md-2">
+					<span class="p-float-label">
+						<p-calendar
+							formControlName="hourlyEndTime"
+							id="hourlyStartTime"
+							hourFormat="12"
+							[timeOnly]="true"
+							required
+						>
+						</p-calendar>
+						<label for="hourlyEndTime">End Time</label>
+					</span>
+				</div>
+				<div class="p-md-2">
+					<p-spinner placeholder="(In Min)" [min]="0" [max]="10000" formControlName="hourlyDuration" required>
+					</p-spinner>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

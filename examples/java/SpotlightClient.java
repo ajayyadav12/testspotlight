@@ -9,8 +9,8 @@ import java.util.regex.Pattern;
 
 public class SpotlightClient {
 	
-	private static final String API_URL = "http://localhost:9001/appsapi/v1/submissions/steps/";
-	private static final String JWT = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0In0.EIj6NR5thaI0csLwc2PGEimHnS67tnaw9B9GUAYGdVgytlFUOZnXrwEkEXPjtppn6G-RmlzczlsLRZzbax7cgw";
+	private static final String API_URL = "<spotlight_url>";
+	private static final String JWT = "<your_application_token>";
 	private static final String BODY_START = "{\"processStepName\": \"start\", \"time\": \"%s\"}";
 	private static final String BODY_STEP = "{\"processStepName\": \"%s\", \"time\": \"%s\"}";
 	private static final String BODY_STEP_WITH_STATUS = "{\"processStepName\": \"%s\", \"time\": \"%s\", \"status\": \"%s\"}";
@@ -98,7 +98,7 @@ public class SpotlightClient {
 		// you can also attach a status to be added to the previous step
 		client.addStepToSubmissionWithStatus("sending", "warning");
 		Thread.sleep(5000);
-		client.addStepToSubmissionWithStatus("end");
+		client.addStepToSubmission("end");
 	}
 
 }

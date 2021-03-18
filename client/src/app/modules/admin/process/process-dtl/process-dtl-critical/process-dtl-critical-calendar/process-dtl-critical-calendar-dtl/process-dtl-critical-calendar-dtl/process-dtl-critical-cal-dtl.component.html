@@ -1,0 +1,79 @@
+<!-- <p-tabMenu #hey [model]="scheduleMenu" [activeItem]="scheduleMenu[0]"> </p-tabMenu> -->
+<br /><br />
+<section>
+    <div class="warning">
+        <i>All times are in ET</i>
+    </div>
+    <form [formGroup]="scheduleForm">
+        <div class="p-grid">
+            <div class="p-md-6">
+                <h3></h3>
+                <div class="p-grid">
+
+                    <div class="p-md-4">
+                        <span class="ui-float-label">
+                            <p-calendar formControlName="scheduleStartDate" id="scheduleStartDate"
+                                [maxDate]="scheduleForm.value.scheduleEndDate"></p-calendar>
+                            <label for="scheduleStartDate">Start Date</label>
+                        </span>
+                    </div>
+                    <div class="p-md-4">
+                        <span class="ui-float-label">
+                            <p-calendar formControlName="scheduleEndDate" id="scheduleEndDate"
+                                [minDate]="scheduleForm.value.scheduleStartDate">
+                            </p-calendar>
+                            <label for="scheduleEndDate">End Date</label>
+                        </span>
+                    </div>
+                    <div class="p-md-4">
+                        <p-checkbox (onChange)="onOneYearAheadEndDate($event)" value="incomingEndDate" name="noEndDate"
+                            binary="true" label="Ends in 1 Year"></p-checkbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="p-grid">
+            <div class="p-md-3">
+                <h3>Recurrence Pattern</h3>
+                <div class="p-grid" style="width:250px;margin-bottom:10px">
+
+                    <div class="p-md-12">
+                        <p-radioButton (onClick)="onClickRecurrencePattern()" name="recurrenceGroup" value="W"
+                            label="Weekly" formControlName="recurrencePattern" inputId="opt2"></p-radioButton>
+                    </div>
+                    <div class="p-md-12">
+                        <p-radioButton (onClick)="onClickRecurrencePattern()" name="recurrenceGroup" value="M"
+                            label="Monthly / Quarterly" formControlName="recurrencePattern" inputId="opt3">
+                        </p-radioButton>
+                    </div>
+                    <div class="p-md-12">
+                        <p-radioButton (onClick)="onClickRecurrencePattern()" name="recurrenceGroup" value="C"
+                            label="Custom" formControlName="recurrencePattern" inputId="opt5"></p-radioButton>
+                    </div>
+                    <div class="p-md-12">
+                        <p-button [disabled]="scheduleForm.pristine" label="Save" (onClick)="save()">
+                        </p-button>
+                    </div>
+                </div>
+            </div>
+            <div [ngSwitch]="scheduleForm.value.recurrencePattern" class="p-md-9">
+
+                <section *ngSwitchCase="'W'">
+                    <h3>Weekly</h3>
+                    <app-schedule-dtl-weekly [scheduleForm]="scheduleForm" [days]="days"></app-schedule-dtl-weekly>
+                </section>
+                <section *ngSwitchCase="'M'">
+                    <h3>Monthly</h3>
+                    <app-schedule-dtl-monthly [scheduleForm]="scheduleForm"
+                        (monthOptionChanged)="onMonthOptionChanged()">
+                    </app-schedule-dtl-monthly>
+                </section>
+                <section *ngSwitchCase="'C'">
+                    <h3>Custom</h3>
+                    <app-schedule-dtl-custom [scheduleForm]="scheduleForm" [incomingDates]="incomingRecurrence">
+                    </app-schedule-dtl-custom>
+                </section>
+            </div>
+        </div>
+    </form>
+</section>

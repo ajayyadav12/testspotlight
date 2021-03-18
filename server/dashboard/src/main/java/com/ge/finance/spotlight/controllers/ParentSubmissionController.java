@@ -68,8 +68,7 @@ public class ParentSubmissionController {
                 int page = Integer.valueOf(filters.get("page") == null ? "0" : filters.get("page"));
                 int pageSize = Integer.valueOf(filters.get("size") == null ? "10" : filters.get("size"));
                 String sortField = filters.get("sortField") == null ? "id" : filters.get("sortField");
-                int sortOrder = Integer
-                        .valueOf(filters.get("sortOrder") == null ? "1" : filters.get("sortOrder"));
+                int sortOrder = Integer.valueOf(filters.get("sortOrder") == null ? "1" : filters.get("sortOrder"));
 
                 if (sortOrder != 1) {
                         pageList = PageRequest.of(page, pageSize, Sort.by(sortField).descending());
@@ -115,9 +114,7 @@ public class ParentSubmissionController {
                         toDate.setTime(to);
                         toDate.add(Calendar.DATE, 1);
                         to = toDate.getTime();
-                } catch (ParseException e) {
-                        Calendar c = new GregorianCalendar();
-                        // to=c.getTime();
+                } catch (ParseException e) {                                                
                         to = new Date();
                 }
                 processId = Long.valueOf(

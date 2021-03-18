@@ -1,2 +1,37 @@
 <p-fullCalendar [events]="calendarSubmission" [options]="options" defaultView="dayGridPlugin">
+  <p-menu
+    #menu
+    [popup]="true"
+    [model]="items"
+    appendTo="body"
+    [style]="{ top: eventYPosition + 'px', left: eventXPosition + 'px' }"
+  >
+  </p-menu>
 </p-fullCalendar>
+<p-dialog
+  [modal]="true"
+  [(visible)]="displayAcknowledgmentDialog"
+  *ngIf="acknowledgementData"
+  (onHide)="acknowledgementData = null"
+  [style]="{ 'min-width': '500px', 'max-width': '800px' }"
+  [maximizable]="true"
+>
+  <p-header> Acknowledgment Note </p-header>
+  <app-ge-notes-dialog [noteData]="acknowledgementData" (submitNote)="setAcknowledgementFlag($event)">
+  </app-ge-notes-dialog>
+</p-dialog>
+<p-dialog
+  [modal]="true"
+  [(visible)]="displayDisabledDialog"
+  *ngIf="disableNoteData"
+  (onHide)="disableNoteData = null"
+  [style]="{ 'min-width': '500px', 'max-width': '800px' }"
+  [maximizable]="true"
+>
+  <p-header> Disabled Note </p-header>
+  <app-ge-notes-dialog [noteData]="disableNoteData" (submitNote)="onSubmitDisabledNote($event)"> </app-ge-notes-dialog>
+</p-dialog>
+<app-ge-update-scheduled-submission
+  #updateScheduledSubmission
+  (onUpdateSubmission)="onUpdateSubmission($event)"
+></app-ge-update-scheduled-submission>

@@ -1,0 +1,129 @@
+<div class="filters">
+	<div class="icon"><span class="pi pi-filter"></span></div>
+	<div class="content">
+		<form [formGroup]="filterForm">
+			<div class="p-grid">
+				<div class="p-md-12">
+					<p-radioButton
+						(onClick)="onChangeDateOption(dateOption)"
+						[(ngModel)]="dateOption"
+						[ngModelOptions]="{ standalone: true }"
+						name="dateOption"
+						value="dateRange"
+					>
+					</p-radioButton>
+
+					<p-calendar
+						dateFormat="mm/dd/yy"
+						(onSelect)="onBlurComponent()"
+						formControlName="dateRange"
+						placeholder="Date Range"
+						selectionMode="range"
+						[numberOfMonths]="2"
+					>
+					</p-calendar>
+					<p-radioButton
+						style="margin-left: 20px"
+						(onClick)="onChangeDateOption(dateOption)"
+						[(ngModel)]="dateOption"
+						[ngModelOptions]="{ standalone: true }"
+						name="dateOption"
+						value="period"
+					>
+					</p-radioButton>
+					<input
+						(onBlur)="onBlurComponent()"
+						style="width: 110px !important"
+						type="text"
+						pInputText
+						placeholder="Period"
+						showButtonBar="true"
+						size="6"
+						onkeyup="this.value = this.value.toUpperCase();"
+						formControlName="period"
+					/>
+					<p-radioButton
+						(onClick)="onChangeDateOption(dateOption); onBlurComponent()"
+						[(ngModel)]="dateOption"
+						[ngModelOptions]="{ standalone: true }"
+						name="dateOption"
+						value="last30Days"
+						label="Last 30 Days"
+						style="margin-left: 20px"
+					>
+					</p-radioButton>
+					<span class="bar"></span>
+					<span style="margin-left: 20px; margin-right: 20px"></span>
+					<p-radioButton
+						(onClick)="onChangeProcessOption(processOption)"
+						[(ngModel)]="processOption"
+						[ngModelOptions]="{ standalone: true }"
+						name="processOption"
+						value="child"
+					>
+					</p-radioButton>
+					<div style="margin-right: 10px; display: inline-block; position: relative">
+						<span *ngIf="process.errors?.required" class="error-msg">Required</span>
+						<p-dropdown
+							(onChange)="onBlurComponent()"
+							dataKey="id"
+							optionLabel="name"
+							filterPlaceHolder="Search"
+							placeholder="Process"
+							[options]="processes"
+							formControlName="process"
+							[panelStyle]="{ minWidth: '12em' }"
+							[showClear]="true"
+							filter="true"
+							filterPlaceholder="Search"
+						>
+						</p-dropdown>
+					</div>
+					<p-radioButton
+						(onClick)="onChangeProcessOption(processOption)"
+						[(ngModel)]="processOption"
+						[ngModelOptions]="{ standalone: true }"
+						name="processOption"
+						value="parent"
+					>
+					</p-radioButton>
+					<div style="margin-right: 10px; display: inline-block; position: relative">
+						<span *ngIf="parent.errors?.required" class="error-msg">Required</span>
+						<p-dropdown
+							(onChange)="onBlurComponent()"
+							dataKey="id"
+							optionLabel="name"
+							filterPlaceHolder="Search"
+							placeholder="Parents"
+							[options]="parentProcesses"
+							formControlName="parent"
+							[panelStyle]="{ minWidth: '12em' }"
+							[showClear]="true"
+							filter="true"
+							filterPlaceholder="Search"
+						>
+						</p-dropdown>
+					</div>
+					<div style="margin-right: 10px; display: inline-block">
+						<p-dropdown
+							(onChange)="onBlurComponent()"
+							placeholder="Business"
+							[options]="businesses"
+							formControlName="bu"
+							[showClear]="true"
+						>
+						</p-dropdown>
+					</div>
+					<button
+						pButton
+						type="button"
+						label="Clear"
+						(click)="resetFilters()"
+						style="float: right; margin-right: 20px"
+						class="p-button-text p-button-plain"
+					></button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

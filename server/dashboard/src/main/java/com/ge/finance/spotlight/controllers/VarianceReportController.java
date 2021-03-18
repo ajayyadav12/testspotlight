@@ -26,7 +26,7 @@ public class VarianceReportController {
 
     private SubmissionRepository submissionRepository;
 
-    private List<String> allowedSubmissionFilters = Arrays.asList("processId", "from", "to");
+    private List<String> allowedSubmissionFilters = Arrays.asList("processId", "from", "to", "bu");
 
     public VarianceReportController(SubmissionRepository submissionRepository) {
         this.submissionRepository = submissionRepository;
@@ -35,6 +35,7 @@ public class VarianceReportController {
     @GetMapping("/")
     public List<VarianceReport> index(@RequestParam Map<String, String> filters, Authentication authentication) {
         Long processId = null;
+        String businessUnit = null;
         Calendar fromDate = Calendar.getInstance();
         Calendar toDate = Calendar.getInstance();
         Date from = null;
@@ -50,7 +51,7 @@ public class VarianceReportController {
             from = fromDate.getTime();
 
         } catch (ParseException e) {
-            Calendar c = new GregorianCalendar();
+            Calendar c = Calendar.getInstance();
             c.add(Calendar.DATE, -30);
             from = c.getTime();
         }
@@ -61,14 +62,13 @@ public class VarianceReportController {
             toDate.add(Calendar.DATE, 1);
             to = toDate.getTime();
         } catch (ParseException e) {
-            Calendar c = new GregorianCalendar();
-            // to=c.getTime();
             to = new Date();
         }
         processId = Long.valueOf(submissionFilters.get("processId") == null ? "0" : submissionFilters.get("processId"));
+        businessUnit = submissionFilters.get("bu") == null ? "" : submissionFilters.get("bu");
 
-        List<Submission> submissions = submissionRepository
-                .findByProcessIdAndStartTimeIsBetweenOrderByStartTimeAsc(processId, from, to);
+        List<Submission> submissions = submissionRepository.findByProcessIdAndBu(processId, businessUnit, from, to);
+
         List<VarianceReport> recordsList = new ArrayList<VarianceReport>();
 
         Iterator<Submission> it = submissions.iterator();

@@ -1,130 +1,31 @@
-.ui-inputtext {
-  border: none !important;
-  border-bottom: 1px solid #c8c8c8 !important;
-  width: 100% !important;
-  max-width: 600px !important;
-  &:focus {
-    animation: shadow-drop-bottom 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-
-    @keyframes shadow-drop-bottom {
-      0% {
-        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
-      }
-      100% {
-        box-shadow: 0 12px 15px -12px rgba(58, 125, 226, 0.35);
-      }
-    }
-  }
+.p-datatable .p-datatable-tbody > tr > td {
+	border: none;
 }
 
-.ui-dropdown {
-  border: none !important;
-  width: 100% !important;
-  max-width: 600px !important;
+.p-selectbutton .p-button.p-highlight {
+	background: #3f51b5;
+	border-color: #3f51b5;
+	color: #fff;
 }
 
-.ui-state-focus {
-  animation: shadow-drop-bottom 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-
-  @keyframes shadow-drop-bottom {
-    0% {
-      box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
-    }
-    100% {
-      box-shadow: 0 12px 15px -12px rgba(58, 125, 226, 0.35);
-    }
-  }
+.p-multiselect .p-multiselect-label,
+.p-inputtext {
+	padding: 0.5rem 0.5rem;
 }
 
-.ui-multiselect {
-  border: none !important;
-  border-bottom: 1px solid #c8c8c8 !important;
-  width: 100% !important;
-  max-width: 600px !important;
+.p-paginator .p-paginator-pages .p-paginator-page {
+	min-width: 1.5rem;
+	height: 1.5rem;
 }
 
-.ui-paginator {
-  background-color: #fff !important;
-  border: none !important;
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-last {
+	min-width: 1.5rem;
+	height: 1.5rem;
 }
 
-// TABLE
-body .ui-table .ui-table-thead > tr > th {
-  border: none;
-  border-bottom: 1px solid #c8c8c8;
-  background-color: #fff;
-}
-
-body .ui-table .ui-table-tbody > tr > td {
-  border: none;
-}
-
-body .ui-table .ui-table-thead > tr > th {
-  text-align: left;
-}
-
-body .ui-table .ui-table-tbody > tr > td {
-  padding: 0.271em 0.557em;
-}
-
-body .ui-table .ui-sortable-column.ui-state-highlight {
-  background-color: #fff;
-  color: #333333;
-}
-
-body .ui-table .ui-sortable-column.ui-state-highlight .ui-sortable-column-icon {
-  color: #333333;
-}
-
-// END TABLE
-
-.p-sm-1,
-.p-sm-2,
-.p-sm-3,
-.p-sm-4,
-.p-sm-5,
-.p-sm-6,
-.p-sm-7,
-.p-sm-8,
-.p-sm-9,
-.p-sm-10,
-.p-sm-11,
-.p-sm-12,
-.p-md-1,
-.p-md-2,
-.p-md-3,
-.p-md-4,
-.p-md-5,
-.p-md-6,
-.p-md-7,
-.p-md-8,
-.p-md-9,
-.p-md-10,
-.p-md-11,
-.p-md-12,
-.p-lg-1,
-.p-lg-2,
-.p-lg-3,
-.p-lg-4,
-.p-lg-5,
-.p-lg-6,
-.p-lg-7,
-.p-lg-8,
-.p-lg-9,
-.p-lg-10,
-.p-lg-11,
-.p-lg-12,
-.p-xl-1,
-.p-xl-2,
-.p-xl-3,
-.p-xl-4,
-.p-xl-5,
-.p-xl-6,
-.p-xl-7,
-.p-xl-8,
-.p-xl-9,
-.p-xl-10,
-.p-xl-11,
-.p-xl-12 {
-  padding: 0.7em;
+.p-paginator .p-dropdown {
+	height: 2rem;
 }

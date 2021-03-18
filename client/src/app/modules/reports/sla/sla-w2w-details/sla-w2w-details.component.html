@@ -1,0 +1,6 @@
+<div class="p-grid">
+    <div class="p-col-12">
+        <h3 *ngIf="!stackedChart">Select a row to see the chart</h3>
+        <canvas id="{{'w2w_scatter_chart'+uniqueId}}" height="{{uniqueId ? 600 :200}}"></canvas>
+    </div>
+</div>

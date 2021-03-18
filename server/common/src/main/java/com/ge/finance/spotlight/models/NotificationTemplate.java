@@ -12,8 +12,9 @@ public class NotificationTemplate {
     public final static long DELAYED_SUBMISSION = 3;
     public final static long ESCALATION_FAILED = 999;
     public final static long ESCALATION_DELAYED = 998;
+    public final static long ESCALATION_FAILED_ACK = 994;
     public final static long LONG_RUN_SUBMISSION = 997;
-    public final static long SUBMISSION_STEP_DELAYED = 996;
+    public final static long LONG_RUN_SUBMISSION_STEP_DELAYED = 996;
     public final static long LONG_RUN_ADHOC_SUBMISSION = 995;
     public final static long PROCESS_APPROVAL = 900;
     public final static long PROCESS_APPROVAL_RESULT = 901;
@@ -22,6 +23,13 @@ public class NotificationTemplate {
     public final static long MISSING_NOTIFICATION = 777;
     public final static long REQUIRED_STEP_NOTIFICATION = 111;
     public final static long SUBMISSION_STEP_INCOMPLETE = 222;
+    public final static long DISABLED_SUBMISSION = 801;
+    public final static long EDITED_SUBMISSION = 802;
+    public final static long ACKNOWLEDGED_SUBMISSION = 803;
+    public final static long PROCESS_EXPORT_REQUEST = 1100;
+    public final static long PROCESS_EXPORT_DECISION = 1101;
+    public final static long PROCESS_IMPORTED = 1102;
+    public final static long WARNING_MANUAL_UPLOAD = 1103;
 
     @Id
     private Long id;

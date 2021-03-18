@@ -15,25 +15,33 @@ import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
+import { TopbarComponent } from './topbar/topbar.component';
+import { UploadModule } from './modules/upload/upload.module';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { ListboxModule } from 'primeng/listbox';
+import { GoogleAnalyticsService } from './google-analytics.service';
 
 @NgModule({
-  declarations: [AppComponent, SidebarComponent],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    AppRoutingModule,
-    AdminModule,
-    ReportsModule,
-    HttpClientModule,
-    CoreModule,
-    ToastModule,
-    LoginModule,
-    MessagesModule,
-    MessageModule,
-    TooltipModule,
-    MenuModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+	declarations: [AppComponent, SidebarComponent, TopbarComponent],
+	imports: [
+		BrowserModule,
+		BrowserAnimationsModule,
+		AppRoutingModule,
+		AdminModule,
+		ReportsModule,
+		HttpClientModule,
+		CoreModule,
+		ToastModule,
+		LoginModule,
+		MessagesModule,
+		MessageModule,
+		TooltipModule,
+		MenuModule,
+		UploadModule,
+		OverlayPanelModule,
+		ListboxModule
+	],
+	providers: [GoogleAnalyticsService],
+	bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

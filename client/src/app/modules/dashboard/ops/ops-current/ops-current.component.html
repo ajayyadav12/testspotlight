@@ -1,0 +1,68 @@
+<table>
+	<tr>
+		<td style="width: 70%">
+			<div class="container">
+				<div class="vertical-center">
+					<p-table
+						styleClass="p-datatable-striped p-datatable-sm"
+						[columns]="cols"
+						[value]="submissions"
+						[scrollable]="true"
+						[rows]="100"
+						[scrollHeight]="!uniqueId ? '240px' : '800px'"
+						[virtualScroll]="true"
+						[virtualRowHeight]="34"
+					>
+						<ng-template pTemplate="body" let-rowData let-columns="columns">
+							<tr style="height: 34px">
+								<td style="text-align: left; width: 70%">
+									{{ rowData['processname'] }}
+								</td>
+								<td style="width: 30%">
+									<div class="p-grid p-nogutter p-align-center">
+										<div
+											class="circle"
+											[ngStyle]="{
+												'background-color': submissionStatusColor(rowData['status'])
+											}"
+											[ngClass]="{
+												'fail-circle': rowData[status] === 'failed'
+											}"
+										></div>
+									</div>
+								</td>
+							</tr>
+						</ng-template>
+					</p-table>
+				</div>
+			</div>
+		</td>
+		<td valign="top" style="width: 30%">
+			<div class="statuses">
+				<p-table styleClass="p-datatable-striped p-datatable-sm" [columns]="cols" [value]="statuses" [rows]="4">
+					<ng-template pTemplate="body" let-rowData let-columns="columns">
+						<tr style="height: 34px">
+							<td style="width: 30%">
+								<div class="p-grid p-nogutter p-align-center">
+									<div
+										class="circle"
+										[ngStyle]="{
+											'background-color': submissionStatusColor(rowData['status'])
+										}"
+										[ngClass]="{
+											'fail-circle': rowData[status] === 'failed'
+										}"
+									></div>
+								</div>
+							</td>
+							<td style="text-align: left; width: 70%">
+								{{ rowData['id'] }}
+							</td>
+						</tr>
+					</ng-template>
+				</p-table>
+			</div>
+		</td>
+	</tr>
+	<table></table>
+</table>

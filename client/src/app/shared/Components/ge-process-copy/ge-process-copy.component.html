@@ -1,0 +1,12 @@
+<p-dialog [header]="headerLabel" [visible]="display" (visibleChange)="onDisplay($event)" [modal]="true" [draggable]="false" [resizable]="false">
+    <div class="p-grid p-dir-col" style="color: #525252; font-size: 87%">
+        <input type="text" class="p-col" pInputText [(ngModel)]="name" placeholder="New name" />
+        <p-checkbox class="p-col" binary="true" label="Steps"         [(ngModel)]="steps"></p-checkbox>
+        <p-checkbox class="p-col" binary="true" label="Notifications" [(ngModel)]="notifications"></p-checkbox>
+        <p-checkbox class="p-col" binary="true" label="Users"         [(ngModel)]="users"></p-checkbox>
+        <p-checkbox class="p-col" binary="true" label="Schedules"     [(ngModel)]="schedules"></p-checkbox>
+    </div>
+    <p-footer>
+        <p-button (click)="onCopy()" label="Copy"></p-button>
+    </p-footer>
+</p-dialog>

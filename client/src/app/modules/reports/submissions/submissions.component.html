@@ -1,378 +1,542 @@
-<div class="p-grid p-nogutter">
-  <div #top class="p-col-12">
-    <div class="p-grid">
-      <div class="p-col p-col-align-center" [ngStyle]="{ 'text-align': isLightVersion ? 'right' : 'left' }">
-        <p-selectButton [options]="types" [(ngModel)]="displayType" (onChange)="updateTitle($event)"></p-selectButton>
-      </div>
-      <div class="p-col-3 p-col-align-end" *ngIf="!isLightVersion">
-        <div class="p-grid p-nogutter" style="width:275px;float:right;">
-          <div class="p-col-12" style="text-align: left;float: left;overflow: hidden;width: 275px;">
-            <span style="font-size: 0.8em;text-align: left;display: inline-block"
-              >Auto Refresh: {{ timing !== 0 ? timing + ' secs' : 'Off' }}</span
-            >
-            <i style="display: inline-block">
-              <p-slider
-                [(ngModel)]="timing"
-                [style]="{ width: '14em' }"
-                [step]="10"
-                [min]="0"
-                [max]="120"
-                (onChange)="onchangeTiming($event)"
-              >
-              </p-slider>
-            </i>
-            <i
-              style="display: inline-block"
-              [ngClass]="{ 'active-filters': areFiltersActive }"
-              (click)="displayFilters = !displayFilters"
-              class="pi pi-filter input"
-              style="font-size: 1.4em"
-            ></i>
-            <i
-              style="display: inline-block"
-              *ngIf="areFiltersActive"
-              routerLink="/submissions"
-              class="pi pi-times input"
-              style="font-size: 1em"
-            ></i>
-            <i
-              style="display: inline-block"
-              (click)="onClickRefresh()"
-              class="pi pi-refresh input"
-              style="font-size: 1.4em"
-              pTooltip="Last Updated: {{ lastUpdatedTime | date: 'medium' }}"
-              tooltipPosition="bottom"
-            ></i>
-          </div>
+<div class="p-grid">
+	<div #top class="p-col-12">
+		<div class="p-grid p-nogutter">
+			<div class="p-md-4 p-col-align-center" [ngStyle]="{ 'text-align': 'left', 'min-width': '260px' }">
+				<p-selectButton
+					(onChange)="onChangeView($event)"
+					[options]="views"
+					[(ngModel)]="displayType"
+				></p-selectButton>
+			</div>
+			<div class="p-md-8 p-col-align-end">
+				<div style="float: right">
+					<div style="display: inline-block">
+						<span style="font-size: 0.8em; text-align: left; display: inline-block; vertical-align: super">
+							Auto Refresh: {{ timing !== 0 ? timing + ' secs' : 'Off' }}
+						</span>
+						<p-slider
+							[(ngModel)]="timing"
+							[style]="{ width: '12.5em' }"
+							[step]="10"
+							[min]="0"
+							[max]="120"
+							(onChange)="onchangeTiming($event)"
+						>
+						</p-slider>
+					</div>
+					<button
+						style="margin-left: 8px; margin-right: 32px"
+						pButton
+						type="button"
+						icon="pi pi-refresh"
+						class="p-button-raised p-button-text p-button-plain"
+						(click)="onClickRefresh()"
+						pTooltip="Last Updated: {{ lastUpdatedTime | date: 'medium' }}"
+						tooltipPosition="bottom"
+					></button>
+					<div style="display: inline-block">
+						<app-ge-views
+							moduleName="submission"
+							navigate="/submissions"
+							[columnFilters]="columnFilters"
+							(updateColumnsSelection)="updateColumnsSelection($event)"
+							[tParams]="tParams"
+						>
+						</app-ge-views>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<app-ge-filters [filterSelection]="filterSelection" #filter></app-ge-filters>
+<p></p>
 
-          <div class="p-col-12 p-col-align-end" style="padding-top: .5em;">
-            <app-ge-views
-              moduleName="submission"
-              navigate="/submissions"
-              style="margin: inherit; float: right"
-              [tParams]="tParams"
-            ></app-ge-views>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div #middle class="p-col-12">
-    <app-submissions-parents
-      [hidden]="displayType !== 0"
-      [autoRefreshOn]="autoRefreshOn"
-      [clickRefresh]="clickRefresh"
-      (changeView)="changeView($event)"
-    ></app-submissions-parents>
+<section id="card">
+	<p-card>
+		<i class="pi pi-window-maximize expand-icon" (click)="fullscreen('card')" title="Expand/Collapse"></i>
+		<div class="p-grid p-nogutter">
+			<div #middle class="p-col-12">
+				<app-submissions-parents
+					[hidden]="displayType !== 0"
+					[autoRefreshOn]="autoRefreshOn"
+					[clickRefresh]="clickRefresh"
+					(changeView)="($event)"
+				></app-submissions-parents>
 
-    <p-table
-      #dt
-      [hidden]="displayType !== 1"
-      [value]="submissions"
-      dataKey="id"
-      autoLayout="true"
-      [paginator]="true"
-      [rows]="size"
-      (onLazyLoad)="loadSubmissions($event)"
-      [lazy]="true"
-      [totalRecords]="totalRecords"
-      [loading]="loading"
-      [scrollable]="true"
-      [scrollHeight]="isLightVersion ? '360px' : '540px'"
-    >
-      <ng-template pTemplate="colgroup">
-        <colgroup>
-          <col [style.width]="'2%'" #status />
-          <col [style.width]="'2%'" #expand *ngIf="!isLightVersion" />
-          <col [style.width]="'3%'" #id />
-          <col [style.width]="'12%'" #process />
-          <col [style.width]="'9%'" #start />
-          <col [style.width]="'9%'" #end />
-          <col [style.width]="'2.5%'" #r *ngIf="!isLightVersion" />
-          <col [style.width]="'2.5%'" #w *ngIf="!isLightVersion" />
-          <col [style.width]="'2.5%'" #e />
-          <col [style.width]="'5%'" #period *ngIf="!isLightVersion" />
-          <col [style.width]="'3.5%'" #adHoc *ngIf="!isLightVersion" />
-          <col [style.width]="'3.5%'" #parent *ngIf="!isLightVersion" />
-          <col [style.width]="'3%'" #isolate />
-        </colgroup>
-      </ng-template>
-      <ng-template pTemplate="header">
-        <tr>
-          <th [pSortableColumn]="'status'" style="width: 3em">
-            <p-sortIcon *ngIf="dt.sortField && dt.sortField === 'status'" [field]="'status'"></p-sortIcon>
-          </th>
-          <th style="width: 3em" *ngIf="!isLightVersion"></th>
-          <th [pSortableColumn]="'id'">
-            ID<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'id'" [field]="'id'"></p-sortIcon>
-          </th>
-          <th [pSortableColumn]="'process.name'">
-            Process<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'process.name'" [field]="'process.name'">
-            </p-sortIcon>
-          </th>
-          <th [pSortableColumn]="'startTime'">
-            Start Time<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'startTime'" [field]="'startTime'">
-            </p-sortIcon>
-          </th>
-          <th [pSortableColumn]="'endTime'">
-            End Time<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'endTime'" [field]="'endTime'"></p-sortIcon>
-          </th>
-          <th [pSortableColumn]="'records'" *ngIf="!isLightVersion" pTooltip="Records" tooltipPosition="bottom">
-            R<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'records'" [field]="'records'"></p-sortIcon>
-          </th>
-          <th [pSortableColumn]="'warnings'" *ngIf="!isLightVersion" pTooltip="Warnings" tooltipPosition="bottom">
-            W<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'warnings'" [field]="'warnings'"></p-sortIcon>
-          </th>
-          <th [pSortableColumn]="'errors'" pTooltip="Errors" tooltipPosition="bottom">
-            E<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'errors'" [field]="'errors'"></p-sortIcon>
-          </th>
-          <th [pSortableColumn]="'period'" *ngIf="!isLightVersion">
-            Period<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'period'" [field]="'period'"></p-sortIcon>
-          </th>
-          <th [pSortableColumn]="'adHoc'" *ngIf="!isLightVersion">
-            Ad Hoc<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'adHoc'" [field]="'adHoc'"></p-sortIcon>
-          </th>
-          <th [pSortableColumn]="'parentId'" *ngIf="!isLightVersion">
-            Parent<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'parentId'" [field]="'parentId'"></p-sortIcon>
-          </th>
-          <th></th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-submission let-expanded="expanded" let-rowIndex="rowIndex">
-        <tr
-          [ngClass]="{ 'fail-row': submission.status === 'failed' && !submission.acknowledgementFlag }"
-          (mouseenter)="showIcons = rowIndex"
-          (mouseleave)="showIcons = -1"
-        >
-          <td>
-            <div class="p-grid p-nogutter p-align-center">
-              <div class="p-col-6" (mouseenter)="status.toggle($event)" (mouseleave)="status.hide()">
-                <div
-                  (click)="openSubmissionDialog(submission)"
-                  class="circle"
-                  [ngStyle]="{
-                    'background-color': submissionStatusColor(submission.status)
-                  }"
-                  [ngClass]="{
-                    'fail-circle': submission.status === 'failed' && !submission.acknowledgementFlag,
-                    'open-submission': submission.endTime === null
-                  }"
-                >
-                  <i
-                    *ngIf="submission.status === 'failed' && submission.acknowledgementFlag"
-                    class="pi pi-check"
-                    style="font-size: 2em; color: lightgreen"
-                  ></i>
-                </div>
-                <p-overlayPanel #status appendTo="body" [style]="{ 'background-color': '#fffffff5' }">
-                  <div style="color: #686868">
-                    <p>
-                      <span
-                        *ngIf="submission.endTime"
-                        class="pi pi-check-circle"
-                        style="font-size: 150%; color: #97e5b7"
-                        ><br
-                      /></span>
-                    </p>
-                    <p>
-                      <b>Status: </b>
-                      <span>{{ submission.status }}</span>
-                    </p>
-                    <p *ngIf="submission.status === 'in progress'">
-                      <b>Current Step: </b>{{ getLatestStepName(submission.steps) }}
-                    </p>
-                    <p><b>Elapsed Time: </b> {{ submission.elapsedTime }}</p>
-                  </div>
-                </p-overlayPanel>
-              </div>
-              <div
-                class="p-col-6"
-                *ngIf="submission.notes && submission.notes !== 'null' && !isLightVersion"
-                (click)="openNotesDialog(submission)"
-              >
-                <i class="pi pi-file note-icon-sub"></i>
-              </div>
-            </div>
-          </td>
-          <td *ngIf="!isLightVersion">
-            <i
-              style="cursor:pointer"
-              [pRowToggler]="submission"
-              [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-            ></i>
-          </td>
-          <td>{{ submission.id }}</td>
-          <td>
-            <span>{{ submission.bu ? submission.bu + ' - ' : '' }}{{ submission['process.name'] }}</span>
-            <span *ngIf="submission.altId" class="altId">{{ submission.altId }}</span>
-          </td>
-          <td>{{ submission.startTime | date: 'short' }}</td>
-          <td>{{ submission.endTime | date: 'short' }}</td>
-          <td *ngIf="!isLightVersion">{{ submission.records }}</td>
-          <td *ngIf="!isLightVersion">{{ submission.warnings }}</td>
-          <td>{{ submission.errors }}</td>
-          <td *ngIf="!isLightVersion">
-            {{ submission.period }}
-          </td>
-          <td *ngIf="!isLightVersion">
-            <span
-              *ngIf="submission.adHoc"
-              class="pi pi-calendar-times"
-              style="font-size: 150%; color: grey; padding: none"
-              pTooltip="AdHoc: true"
-              showDelay="225"
-              tooltipPosition="bottom"
-            ></span>
-          </td>
-          <td *ngIf="!isLightVersion">
-            <button
-              pButton
-              *ngIf="submission.parentId"
-              class="ui-button-secondary"
-              (click)="changeView(submission)"
-              label="{{ submission.parentId }}"
-              style="font-size: 90%"
-            ></button>
-          </td>
-          <td>
-            <span
-              *ngIf="showIcons === rowIndex"
-              class="pi pi-window-maximize"
-              style="cursor: pointer"
-              (click)="openIsolationMode(submission)"
-            ></span>
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="rowexpansion" let-submission>
-        <tr style="background-color: white">
-          <td colspan="11">
-            <app-submissions-steps
-              [autoRefreshOn]="autoRefreshOn"
-              [processId]="submission.id"
-              (stepsRefresh)="refreshStatus($event)"
-            ></app-submissions-steps>
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="paginatorleft" *ngIf="!isLightVersion">
-        <div class="footer" style="text-align: left">
-          <br />
-          <p style="margin-left: .2em">
-            <span class="status-circle" style="background-color:#00bf6fa8"></span> Success
-            <span class="status-circle" style="background-color:#0278d9b7"></span> Progress
-            <span class="status-circle" style="background-color:#ffa500a8"></span> Warning
-            <span class="status-circle" style="background-color:#f44336a8"></span> Failed
-          </p>
-        </div>
-      </ng-template>
-      <ng-template pTemplate="paginatorright" *ngIf="!isLightVersion">
-        <br />
-        <span class="footer">
-          <span *ngIf="totalRecords">
-            Showing {{ dt.first + 1 }} to {{ totalRecords > dt.first + size ? dt.first + size : totalRecords }} of
-          </span>
-          {{ totalRecords }} records
-          <span *ngIf="!totalRecords"> to show</span>
-        </span>
-      </ng-template>
-    </p-table>
+				<p-table
+					styleClass="p-datatable-striped p-datatable-sm"
+					#dt
+					[hidden]="displayType !== 1"
+					[value]="submissions"
+					dataKey="id"
+					autoLayout="true"
+					[paginator]="true"
+					[rows]="size"
+					(onLazyLoad)="loadSubmissions($event)"
+					[lazy]="true"
+					[totalRecords]="totalRecords"
+					[loading]="loading"
+					[scrollable]="true"
+					[scrollHeight]="'440px'"
+				>
+					<ng-template pTemplate="colgroup">
+						<colgroup>
+							<col [style.width]="'2%'" #status />
+							<col [style.width]="'2%'" #expand />
+							<col [style.width]="'3%'" #id [hidden]="!showFilter('id')" />
+							<col [style.width]="'15%'" #process [hidden]="!showFilter('process')" />
+							<col [style.width]="'9%'" #stat [hidden]="!showFilter('stat')" class="col-md-hide" />
+							<col [style.width]="'9%'" #start [hidden]="!showFilter('startTime')" />
+							<col [style.width]="'9%'" #end [hidden]="!showFilter('endTime')" />
+							<col
+								[style.width]="'9%'"
+								#totalTime
+								[hidden]="!showFilter('totalTime')"
+								class="col-md-hide"
+							/>
+							<col [style.width]="'3%'" #r [hidden]="!showFilter('records')" class="col-sm-hide" />
+							<col [style.width]="'3%'" #w [hidden]="!showFilter('warnings')" class="col-sm-hide" />
+							<col [style.width]="'3%'" #e [hidden]="!showFilter('errors')" class="col-sm-hide" />
+							<col [style.width]="'5%'" #period [hidden]="!showFilter('period')" class="col-sm-hide" />
+							<col [style.width]="'3.5%'" #adHoc [hidden]="!showFilter('adHoc')" class="col-sm-hide" />
+							<col [style.width]="'3.5%'" #parent [hidden]="!showFilter('parent')" class="col-sm-hide" />
+							<col [style.width]="'4%'" #action [hidden]="!showFilter('action')" class="col-sm-hide" />
+							<col [style.width]="'3%'" #isolate />
+						</colgroup>
+					</ng-template>
+					<ng-template pTemplate="header">
+						<div
+							class="icon"
+							(click)="fields.toggle($event)"
+							style="white-space: nowrap; display: inline-flex; cursor: pointer"
+						>
+							<span class="pi pi-cog" style="font-size: 1.2em"></span>&nbsp;<span
+								style="font-weight: 500; font-size: 0.875em"
+								>Show/Hide Columns</span
+							>
+						</div>
+						<tr>
+							<th [pSortableColumn]="'status'" style="width: 3em">
+								<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'status'" [field]="'status'">
+								</p-sortIcon>
+							</th>
+							<th style="width: 3em"></th>
 
-    <app-submissions-calendar [submissions]="submissions" *ngIf="displayType === 2"></app-submissions-calendar>
-  </div>
+							<th [pSortableColumn]="'id'" [hidden]="!showFilter('id')">
+								ID<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'id'" [field]="'id'">
+								</p-sortIcon>
+							</th>
+							<th [pSortableColumn]="'process.name'" [hidden]="!showFilter('process')">
+								Process<p-sortIcon
+									*ngIf="dt.sortField && dt.sortField === 'process.name'"
+									[field]="'process.name'"
+								>
+								</p-sortIcon>
+							</th>
+							<th class="col-md-hide" [pSortableColumn]="'stat'" [hidden]="!showFilter('stat')">
+								Status
+								<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'stat'" [field]="'stat'">
+								</p-sortIcon>
+							</th>
+							<th [pSortableColumn]="'startTime'" [hidden]="!showFilter('startTime')">
+								Start Time (EST)<p-sortIcon
+									*ngIf="dt.sortField && dt.sortField === 'startTime'"
+									[field]="'startTime'"
+								>
+								</p-sortIcon>
+							</th>
+							<th [pSortableColumn]="'endTime'" [hidden]="!showFilter('endTime')">
+								End Time (EST)<p-sortIcon
+									*ngIf="dt.sortField && dt.sortField === 'endTime'"
+									[field]="'endTime'"
+								>
+								</p-sortIcon>
+							</th>
+							<th class="col-md-hide" [pSortableColumn]="'totalTime'" [hidden]="!showFilter('totalTime')">
+								Total Time<p-sortIcon
+									*ngIf="dt.sortField && dt.sortField === 'totalTime'"
+									[field]="'totalTime'"
+								>
+								</p-sortIcon>
+							</th>
+							<th
+								class="col-sm-hide"
+								[pSortableColumn]="'records'"
+								pTooltip="Records"
+								tooltipPosition="bottom"
+								[hidden]="!showFilter('records')"
+							>
+								R<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'records'" [field]="'records'">
+								</p-sortIcon>
+							</th>
+							<th
+								class="col-sm-hide"
+								[pSortableColumn]="'warnings'"
+								pTooltip="Warnings"
+								tooltipPosition="bottom"
+								[hidden]="!showFilter('warnings')"
+							>
+								W<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'warnings'" [field]="'warnings'">
+								</p-sortIcon>
+							</th>
+							<th
+								class="col-sm-hide"
+								[pSortableColumn]="'errors'"
+								pTooltip="Errors"
+								tooltipPosition="bottom"
+								[hidden]="!showFilter('errors')"
+							>
+								E<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'errors'" [field]="'errors'">
+								</p-sortIcon>
+							</th>
+							<th class="col-sm-hide" [pSortableColumn]="'period'" [hidden]="!showFilter('period')">
+								Period<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'period'" [field]="'period'">
+								</p-sortIcon>
+							</th>
+							<th class="col-sm-hide" [pSortableColumn]="'adHoc'" [hidden]="!showFilter('adHoc')">
+								Ad Hoc<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'adHoc'" [field]="'adHoc'">
+								</p-sortIcon>
+							</th>
+							<th [pSortableColumn]="'parentId'" [hidden]="!showFilter('parent')" class="col-sm-hide">
+								Parent<p-sortIcon
+									*ngIf="dt.sortField && dt.sortField === 'parentId'"
+									[field]="'parentId'"
+								>
+								</p-sortIcon>
+							</th>
+							<th [pSortableColumn]="'action'" [hidden]="!showFilter('action')" class="col-sm-hide">
+								Action<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'action'" [field]="'action'">
+								</p-sortIcon>
+							</th>
+							<th></th>
+						</tr>
+					</ng-template>
+					<ng-template pTemplate="body" let-submission let-expanded="expanded" let-rowIndex="rowIndex">
+						<tr
+							[ngClass]="{
+								'fail-row': submission.status === 'failed' && !submission.acknowledgementFlag
+							}"
+							(mouseenter)="showIcons = rowIndex"
+							(mouseleave)="showIcons = -1"
+						>
+							<td>
+								<div class="p-grid p-nogutter p-align-center">
+									<div
+										class="p-col-6"
+										(mouseenter)="status.toggle($event)"
+										(mouseleave)="status.hide()"
+									>
+										<div
+											(click)="openSubmissionDialog(submission)"
+											class="circle"
+											[ngStyle]="{
+												'background-color': submissionStatusColor(submission.status)
+											}"
+											[ngClass]="{
+												'fail-circle':
+													submission.status === 'failed' && !submission.acknowledgementFlag,
+												'open-submission': submission.endTime === null
+											}"
+										>
+											<i
+												*ngIf="submission.status === 'failed' && submission.acknowledgementFlag"
+												class="pi pi-check"
+												style="font-size: 2em; color: lightgreen"
+											></i>
+										</div>
+										<p-overlayPanel
+											#status
+											appendTo="body"
+											[style]="{ 'background-color': '#fffffff5' }"
+										>
+											<div style="color: #686868">
+												<p>
+													<span
+														*ngIf="submission.endTime"
+														class="pi pi-check-circle"
+														style="font-size: 150%; color: #97e5b7"
+														><br
+													/></span>
+												</p>
+												<p>
+													<b>Status: </b>
+													<span>{{ submission.status }}</span>
+												</p>
+												<p *ngIf="submission.status === 'in progress'">
+													<b>Current Step: </b>{{ submission.latestStepname }}
+												</p>
+												<p><b>Elapsed Time: </b> {{ submission.elapsedTime }}</p>
+											</div>
+										</p-overlayPanel>
+									</div>
+									<div
+										class="p-col-6"
+										*ngIf="submission.notes && submission.notes !== 'null'"
+										(click)="openNotesDialog(submission)"
+									>
+										<i class="pi pi-file note-icon-sub"></i>
+									</div>
+								</div>
+							</td>
+							<td>
+								<i
+									style="cursor: pointer"
+									[pRowToggler]="submission"
+									[ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+								></i>
+							</td>
+							<td [hidden]="!showFilter('id')">{{ submission.id }}</td>
+							<td [hidden]="!showFilter('process')">
+								<span
+									>{{ submission.bu ? submission.bu + ' - ' : ''
+									}}{{ submission['process.name'] }}</span
+								>
+								<span *ngIf="submission.altId" class="altId">{{ submission.altId }}</span>
+							</td>
+							<td class="col-md-hide" [hidden]="!showFilter('stat')">
+								<pre
+									class="rectangle"
+									[ngStyle]="{
+										'background-color': submissionStatusColorCode(submission.status)
+									}"
+								><b>{{submission.statusValue}}</b></pre>
+							</td>
+							<td [hidden]="!showFilter('startTime')">
+								{{ submission.startTime | date: 'short' }}
+							</td>
+							<td [hidden]="!showFilter('endTime')">
+								{{ submission.endTime | date: 'short' }}
+							</td>
+							<td class="col-md-hide" [hidden]="!showFilter('totalTime')">
+								{{ submission.totalTime }}
+							</td>
+							<td class="col-sm-hide" [hidden]="!showFilter('records')">{{ submission.records }}</td>
+							<td class="col-sm-hide" [hidden]="!showFilter('warnings')">
+								{{ submission.warnings }}
+							</td>
+							<td class="col-sm-hide" [hidden]="!showFilter('errors')">{{ submission.errors }}</td>
+							<td class="col-sm-hide" [hidden]="!showFilter('period')">
+								{{ submission.period }}
+							</td>
+							<td class="col-sm-hide" [hidden]="!showFilter('adHoc')">
+								<span
+									*ngIf="submission.adHoc"
+									class="pi pi-calendar-times"
+									style="font-size: 125%; color: grey; padding: 0"
+									pTooltip="AdHoc: true"
+									showDelay="225"
+									tooltipPosition="bottom"
+								></span>
+							</td>
+							<td [hidden]="!showFilter('parent')" class="col-sm-hide">
+								<button
+									pButton
+									*ngIf="submission.parentId"
+									class="p-button-raised p-button-text p-button-plain"
+									(click)="changeView(submission)"
+									label="{{ submission.parentId }}"
+									style="font-size: 90%"
+								></button>
+							</td>
+							<td>
+								<i
+									class="pi pi-file-o"
+									style="font-size: 2em"
+									title="Display Data"
+									(click)="showDataFileDialog(submission.id, 'D')"
+									*ngIf="submission.dataFileUrl"
+								></i>
+								<!-- <i class="pi pi-chart-bar" style="font-size: 2em" title=" Display Report"
+                (click)="showDataFileDialog(submission.id,'R')" *ngIf="submission.reportFileUrl"></i> -->
+								<i
+									class="pi pi-chart-bar"
+									style="font-size: 2em"
+									title=" Display Report"
+									(click)="showDataFileDialog(submission.id, 'R')"
+									*ngIf="submission.reportFileUrl"
+								></i>
+							</td>
+							<td [hidden]="!showFilter('action')" class="col-sm-hide">
+								<span
+									*ngIf="showIcons === rowIndex"
+									class="pi pi-window-maximize"
+									style="cursor: pointer"
+									title="Expand"
+									(click)="openIsolationMode(submission)"
+								></span>
+							</td>
+						</tr>
+					</ng-template>
+					<ng-template pTemplate="rowexpansion" let-submission>
+						<tr style="background-color: white">
+							<td colspan="11">
+								<app-submissions-steps
+									[scheduledSubmission]="submission.scheduledSubmission"
+									[autoRefreshOn]="autoRefreshOn"
+									[processId]="submission.id"
+									(stepsRefresh)="refreshStatus($event)"
+								>
+								</app-submissions-steps>
+							</td>
+						</tr>
+					</ng-template>
+					<ng-template pTemplate="paginatorleft">
+						<div class="footer" style="text-align: left">
+							<p style="margin-left: 0.2em">
+								<app-ge-status-legend></app-ge-status-legend>
+							</p>
+						</div>
+					</ng-template>
+					<ng-template pTemplate="paginatorright">
+						<p-dropdown
+							(onChange)="getSubmissions(false)"
+							[options]="sizeOptions"
+							[(ngModel)]="size"
+						></p-dropdown>
+						<span class="footer">
+							<span *ngIf="totalRecords">
+								Showing {{ dt.first + 1 }} to
+								{{ totalRecords > dt.first + size ? dt.first + size : totalRecords }}
+								of
+							</span>
+							{{ totalRecords }} records
+							<span *ngIf="!totalRecords"> to show</span>
+						</span>
+					</ng-template>
+				</p-table>
+
+				<app-submissions-calendar [submissions]="submissions" *ngIf="displayType === 2">
+				</app-submissions-calendar>
+			</div>
+		</div>
+	</p-card>
+</section>
+<div *ngIf="!displayAckUserDialog">
+	<p-dialog
+		[modal]="true"
+		[(visible)]="displayAcknowledgmentDialog"
+		*ngIf="acknowledgementData"
+		(onHide)="acknowledgementData = null"
+		[style]="{ 'min-width': '500px', 'max-width': '800px' }"
+		[maximizable]="true"
+		title="Expand/Collapse"
+	>
+		<p-header> Acknowledgment Note </p-header>
+		<app-ge-notes-dialog [noteData]="acknowledgementData" (submitNote)="setAcknowledgementFlag($event)">
+		</app-ge-notes-dialog>
+	</p-dialog>
+</div>
+<div *ngIf="displayAckUserDialog">
+	<p-dialog
+		[modal]="true"
+		[(visible)]="displayAcknowledgmentDialog"
+		(onHide)="acknowledgementData = null"
+		[style]="{ 'min-width': '500px', 'max-width': '800px' }"
+		[maximizable]="true"
+		title="Expand/Collapse"
+	>
+		<p-header> Acknowledgment Note </p-header>
+		<font color="red"><b>You must have application access to acknowledge a failed submission.</b> </font>
+	</p-dialog>
 </div>
 
-<app-ge-filters (onHide)="displayFilters = false" [displayFilters]="displayFilters"></app-ge-filters>
-
 <p-dialog
-  [modal]="true"
-  [(visible)]="displayAcknowledgmentDialog"
-  *ngIf="acknowledgementData"
-  (onHide)="acknowledgementData = null"
-  [style]="{ 'min-width': '500px', 'max-width': '800px' }"
-  [maximizable]="true"
+	[modal]="true"
+	[(visible)]="displayManualSubmissionClosing"
+	*ngIf="displayManualSubmissionClosing"
+	[style]="{ 'min-width': '500px', 'max-width': '800px' }"
+	[maximizable]="true"
+	title="Expand/Collapse"
 >
-  <p-header> Acknowledgment Note </p-header>
-  <app-ge-notes-dialog [noteData]="acknowledgementData" (submitNote)="setAcknowledgementFlag($event)">
-  </app-ge-notes-dialog>
+	<p-header>
+		Manual Submission Closing
+		<b>{{ 'ID: ' + selectedSubmission.submissionId }}</b>
+	</p-header>
+	<div *ngIf="!displayUserDialog">
+		<app-submissions-manual-closing (submissionClose)="onSubmissionClose($event)" [submission]="selectedSubmission">
+		</app-submissions-manual-closing>
+	</div>
+	<div *ngIf="displayUserDialog">
+		<font color="red"><b>You must have application access to manually close this submission.</b> </font>
+	</div>
 </p-dialog>
 
 <p-dialog
-  [modal]="true"
-  [(visible)]="displayManualSubmissionClosing"
-  *ngIf="displayManualSubmissionClosing"
-  [style]="{ 'min-width': '500px', 'max-width': '800px' }"
-  [maximizable]="true"
+	[modal]="true"
+	*ngIf="displayNotesDialog"
+	[(visible)]="displayNotesDialog"
+	[dismissableMask]="true"
+	[style]="{ 'min-width': '500px', 'max-width': '800px' }"
+	[maximizable]="true"
+	title="Expand/Collapse"
 >
-  <p-header>
-    Manual Submission Closing <b>{{ 'ID: ' + selectedSubmission.submissionId }}</b>
-  </p-header>
-  <app-submissions-manual-closing (submissionClose)="onSubmissionClose($event)" [submission]="selectedSubmission">
-  </app-submissions-manual-closing>
+	<p-header> Submission Notes </p-header>
+	<div [innerHTML]="notesData" class="note"></div>
 </p-dialog>
 
 <p-dialog
-  [modal]="true"
-  *ngIf="displayNotesDialog"
-  [(visible)]="displayNotesDialog"
-  [dismissableMask]="true"
-  [style]="{ 'min-width': '500px', 'max-width': '800px' }"
-  [maximizable]="true"
+	[(visible)]="displayPopup.value"
+	[modal]="true"
+	dismissableMask="true"
+	(onHide)="changeView()"
+	[style]="{ 'min-width': '700px' }"
+	[maximizable]="true"
+	title="Expand/Collapse"
 >
-  <p-header> Submission Notes </p-header>
-  <div [innerHTML]="notesData" class="note"></div>
-</p-dialog>
-
-<p-dialog
-  [(visible)]="displayPopup.value"
-  [modal]="true"
-  dismissableMask="true"
-  (onHide)="changeView()"
-  [style]="{ 'min-width': '700px' }"
-  [maximizable]="true"
->
-  <p-header *ngIf="displayType !== 2 && displayPopup.value">{{ displayPopup.submission['process.name'] }}</p-header>
-  <app-submissions-children
-    *ngIf="displayType !== 0 && displayPopup.value"
-    [parent]="displayPopup.submission"
-    [isLightVersion]="true"
-  ></app-submissions-children>
-  <app-submissions-steps
-    *ngIf="displayType === 0 && displayPopup.value"
-    [autoRefreshOn]="autoRefreshOn"
-    [processId]="displayPopup.submission.id"
-    [isLightVersion]="true"
-  ></app-submissions-steps>
+	<p-header *ngIf="displayType !== 2 && displayPopup.value"> {{ displayPopup.submission['process.name'] }}</p-header>
+	<app-submissions-children
+		*ngIf="displayType !== 0 && displayPopup.value"
+		[parent]="displayPopup.submission"
+		[isLightVersion]="true"
+	></app-submissions-children>
+	<app-submissions-steps
+		*ngIf="displayType === 0 && displayPopup.value"
+		[autoRefreshOn]="autoRefreshOn"
+		[processId]="displayPopup.submission.id"
+	>
+	</app-submissions-steps>
 </p-dialog>
 
 <p-sidebar
-  *ngIf="showIsolation"
-  [(visible)]="showIsolation"
-  [fullScreen]="true"
-  [style]="{ 'background-color': '#eeefef' }"
+	*ngIf="showIsolation"
+	[(visible)]="showIsolation"
+	[fullScreen]="true"
+	[style]="{ 'background-color': '#eeefef' }"
 >
-  <div style="padding: 1.5em">
-    <app-submissions-isolation [incomingSubmission]="isolatedSubmission" [previousUpdatedTime]="lastUpdatedTime">
-    </app-submissions-isolation>
-  </div>
-  <div style="width: 30px; display: inline-block">
-    <img
-      src="../../../../assets/ge-logo.svg"
-      alt=""
-      class="isolation-logo"
-      pTooltip="GE Corporate"
-      tooltipPosition="right"
-      showDelay="225"
-    />
-  </div>
-  <div style="width: 30px; display: inline-block">
-    <img
-      src="../../../../assets/spotlight-logo-gray.png"
-      alt=""
-      class="isolation-logo"
-      pTooltip="Spotlight"
-      tooltipPosition="right"
-      showDelay="225"
-    />
-  </div>
+	<div style="padding: 1.5em">
+		<app-submissions-isolation [incomingSubmission]="isolatedSubmission" [previousUpdatedTime]="lastUpdatedTime">
+		</app-submissions-isolation>
+	</div>
 </p-sidebar>
+
+<p-dialog
+	header="Data File"
+	[modal]="true"
+	[(visible)]="displayDataFileDialog"
+	[style]="{ 'min-width': '500px', 'max-width': '1200px' }"
+	[maximizable]="true"
+	title="Expand/Collapse"
+>
+	<table style="table-layout: fixed; width: 300px">
+		<tr *ngFor="let record of records; let i = index">
+			<td style="width: 200px" *ngFor="let col of record; let j = index">
+				<span style="width: 100px">{{ col }}</span>
+			</td>
+		</tr>
+	</table>
+</p-dialog>
+
+<div [hidden]="hide" class="content">
+	<p-overlayPanel #fields>
+		<p-listbox
+			[options]="submissionFieldOptions"
+			[(ngModel)]="columnFilters"
+			[multiple]="true"
+			[checkbox]="true"
+			[filter]="true"
+			[showToggleAll]="false"
+		>
+		</p-listbox>
+	</p-overlayPanel>
+</div>

@@ -1,16 +1,17 @@
 import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { EnvConfigurationService } from './env-configuration.service';
 
 @Injectable({
-    providedIn: 'root'
+	providedIn: 'root',
 })
 export class AuditLogService {
-    constructor(private http: HttpClient) { }
+	constructor(private envSvc: EnvConfigurationService, private http: HttpClient) {}
 
-    newAuditLog(moduleName: String): Observable<any> {
-        const url = `${environment.apiUrl}/auditlog/${moduleName}`;
-        return this.http.post(url, moduleName);
-    }
+	newAuditLog(moduleName: String): Observable<any> {
+		const url = `${this.envSvc.appConfig.apiURL}/auditlog/${moduleName}`;
+		return this.http.post(url, moduleName);
+	}
 }

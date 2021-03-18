@@ -1,12 +1,11 @@
 <p-carousel
-  [headerText]="customGroup ? 'Group of ' + customGroup[0].process.name : 'Children'"
   [value]="customGroup ? customGroup : showGrouped ? processes : children"
-  numVisible="4"
-  pageLinks="5"
-  [style]="{ margin: '30px', 'max-width': '920px' }"
+  [numVisible]="5" 
+  [numScroll]="5"
+  [responsiveOptions]="responsiveOptions"  
 >
   <ng-template let-child pTemplate="child">
-    <div class="p-grid" style="margin: 1px" [ngClass]="{ adhoc: parent.adHoc }">
+    <div class="p-grid" style="max-width: 350px; margin: 10px; box-shadow: 0px 0px 1px 0px black" [ngClass]="{ adhoc: parent.adHoc }">
       <div class="p-md-12" style="margin: none">
         <div class="p-grid p-justify-between">
           <div
@@ -247,6 +246,7 @@
   [(visible)]="displayCustomCarousel"
   [dismissableMask]="true"
   [maximizable]="true"
+   [style]="{ 'min-width': '500px', 'max-width': '1100px' }"
 >
   <p-header> Submission Group </p-header>
   <app-submissions-children

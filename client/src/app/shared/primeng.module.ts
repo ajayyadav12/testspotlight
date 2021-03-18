@@ -29,6 +29,9 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { SliderModule } from 'primeng/slider';
 import { ListboxModule } from 'primeng/listbox';
 import { ChipsModule } from 'primeng/chips';
+import { MessagesModule } from 'primeng/messages';
+import { MessageModule } from 'primeng/message';
+import { SpinnerModule } from 'primeng/spinner';
 
 @NgModule({
   declarations: [],
@@ -62,7 +65,10 @@ import { ChipsModule } from 'primeng/chips';
     InputTextareaModule,
     SliderModule,
     ListboxModule,
-    ChipsModule
+    ChipsModule,
+    MessagesModule,
+    MessageModule,
+    SpinnerModule
   ],
   exports: [
     TableModule,
@@ -94,7 +100,10 @@ import { ChipsModule } from 'primeng/chips';
     InputTextareaModule,
     SliderModule,
     ListboxModule,
-    ChipsModule
+    ChipsModule,
+    MessagesModule,
+    MessageModule,
+    SpinnerModule
   ]
 })
-export class PrimengModule {}
+export class PrimengModule { }

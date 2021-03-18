@@ -2,6 +2,8 @@ package com.ge.finance.spotlight.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
+import com.ge.finance.spotlight.exceptions.UnauthorizedException;
 import com.ge.finance.spotlight.models.User;
 import com.ge.finance.spotlight.repositories.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
@@ -27,6 +28,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     public JWTAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository, String secret) {
         super(authenticationManager);
+
         this.userRepository = userRepository;
         this.secret = secret;
     }
@@ -37,26 +39,29 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             chain.doFilter(req, res);
             return;
         }
-        Optional<UsernamePasswordAuthenticationToken> authenticationToken = getAuthentication(req);
-        if (authenticationToken.isPresent()) {
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken.get());
-        }
+        SecurityContextHolder.getContext().setAuthentication(getAuthentication(req));
         chain.doFilter(req, res);
     }
 
-    private Optional<UsernamePasswordAuthenticationToken> getAuthentication(HttpServletRequest request) {           
+    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
         String token = request.getHeader(Constants.HEADER);
-        if (token != null) {            
-            String sso = JWT.require(Algorithm.HMAC512(secret.getBytes())).build().verify(token.replace("Bearer ", "")).getSubject();            
-            if (sso != null) {                                
-                User user = userRepository.findFirstBySso(Long.parseLong(sso));
-                if(user != null){                                        
-                    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().getDescription()));                    
-                    return Optional.of(new UsernamePasswordAuthenticationToken(user.getSso(), null, authorities));                
-                }                
+        if (token != null) {
+            try {
+                String sso = JWT.require(Algorithm.HMAC512(secret.getBytes())).build().verify(token.replace("Bearer ", "")).getSubject();
+                if (sso != null) {
+                    User user = userRepository.findFirstBySso(Long.parseLong(sso));
+                    if (user != null) {
+                        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().getDescription()));
+                        return new UsernamePasswordAuthenticationToken(user.getSso(), null, authorities);
+                    }
+                }
+            } catch (SignatureVerificationException e) {
+                e.printStackTrace();
             }
         }
-        return Optional.empty();                                
+        UsernamePasswordAuthenticationToken unauthenticated = new UsernamePasswordAuthenticationToken(null, null);
+        unauthenticated.setAuthenticated(false);
+        return unauthenticated;
     }
 
 }

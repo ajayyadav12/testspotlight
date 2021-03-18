@@ -1,145 +1,224 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+
+import { ProcessExportRequest } from './process-dtl/process-dtl-export/ProcessExportRequest';
+import { Process } from './Process';
+import { NotificationRequest } from './process-dtl/process-dtl-notifications/NotificationRequest';
+import { EnvConfigurationService } from 'src/app/core/services/env-configuration.service';
 
 @Injectable({
-  providedIn: 'root'
+	providedIn: 'root',
 })
 export class ProcessService {
-  constructor(private http: HttpClient) { }
+	constructor(private envSvc: EnvConfigurationService, private http: HttpClient) {}
 
-  approveProcess(id, check: boolean): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id + '/approve';
-    return this.http.post(url, { check: check });
-  }
+	approveProcess(id, check: boolean): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id + '/approve';
+		return this.http.post(url, { check: check });
+	}
 
-  deleteProcess(id): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id;
-    return this.http.delete(url);
-  }
+	deleteProcess(id): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id;
+		return this.http.delete(url);
+	}
 
-  deleteProcessNotification(processId, notificationId): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + processId + '/notifications/' + notificationId;
-    return this.http.delete(url);
-  }
+	deleteProcessNotification(processId, notificationId): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + processId + '/notifications/' + notificationId;
+		return this.http.delete(url);
+	}
 
-  deleteProcessStep(processId, stepId): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + processId + '/steps/' + stepId;
-    return this.http.delete(url);
-  }
+	deleteProcessMyNotification(processId, notificationId): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + processId + '/my-notifications/' + notificationId;
+		return this.http.delete(url);
+	}
 
-  deleteProcessUser(processId, userId): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + processId + '/users/' + userId;
-    return this.http.delete(url);
-  }
+	deleteProcessStep(processId, stepId): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + processId + '/steps/' + stepId;
+		return this.http.delete(url);
+	}
 
-  newProcess(process: any): Observable<any> {
-    const url = environment.apiUrl + '/processes/';
-    return this.http.post(url, process);
-  }
+	deleteProcessUser(processId, userId): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + processId + '/users/' + userId;
+		return this.http.delete(url);
+	}
 
-  newProcessStep(id: any, stepName: string, stepRequired: boolean, stepParallel: boolean): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id + '/steps';
-    return this.http.post(url, {
-      name: stepName,
-      required: stepRequired,
-      parallel: stepParallel,
-      duration: 0
-    });
-  }
+	newProcess(process: any): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/';
+		return this.http.post(url, process);
+	}
 
-  newProcessNotification(id, processNotification): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id + '/notifications';
-    return this.http.post(url, processNotification);
-  }
+	newProcessStep(id: any, step: any): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id + '/steps';
+		return this.http.post(url, step);
+	}
 
-  newProcessUser(id, userId): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id + '/users';
-    return this.http.post(url, {
-      userId: userId
-    });
-  }
+	updateProcessStep(processId: any, processStepId: any, step: any): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + processId + '/steps/' + processStepId;
+		return this.http.put(url, step);
+	}
 
-  getAllProcesses(bypassAccess?: boolean): Observable<any> {
-    const include = bypassAccess ? 'all' : '';
-    const url = environment.apiUrl + '/processes/' + include;
-    return this.http.get(url);
-  }
+	newProcessNotification(id, processNotification): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id + '/notifications';
+		return this.http.post(url, processNotification);
+	}
 
-  getProcessList(): Observable<any> {
-    const url = environment.apiUrl + '/processes/list';
-    return this.http.get(url);
-  }
+	newProcessMyNotification(processId: number, myNotification: NotificationRequest): Observable<any> {
+		const url = `${this.envSvc.appConfig.apiURL}/processes/${processId}/my-notifications`;
+		return this.http.post(url, myNotification);
+	}
 
-  getProcessChildren(id): Observable<any> {
-    const url = `${environment.apiUrl}/processes/${id}/children-map`;
-    return this.http.get(url);
-  }
+	newProcessUser(id, userId): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id + '/users';
+		return this.http.post(url, {
+			userId: userId,
+		});
+	}
 
-  updateProcessMap(id, process): Observable<any> {
-    const url = `${environment.apiUrl}/processes/${id}/children-map`;
-    return this.http.post(url, process);
-  }
+	getAllProcesses(bypassAccess?: boolean): Observable<any> {
+		const include = bypassAccess ? 'all' : '';
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + include;
+		return this.http.get(url);
+	}
 
-  deleteProcessMap(id, childId): Observable<any> {
-    const url = `${environment.apiUrl}/processes/${id}/children-map/${childId}`;
-    return this.http.delete(url, {});
-  }
+	getAssignableProcesses(): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/assignable';
+		return this.http.get(url);
+	}
 
-  getProcess(id): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id;
-    return this.http.get(url);
-  }
+	getProcessList(): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/list';
+		return this.http.get(url);
+	}
 
-  updateProcess(id, process): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id;
-    return this.http.put(url, process);
-  }
+	getProcessChildren(id): Observable<any> {
+		const url = `${this.envSvc.appConfig.apiURL}/processes/${id}/children-map`;
+		return this.http.get(url);
+	}
 
-  updateProcessAlerts(id, longRunningSub, escalatedEmails, longRunningStep): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id + '/alerts/';
-    return this.http.put(url, {
-      processId: id,
-      longRunningSubmission: longRunningSub,
-      failedEscalation: escalatedEmails,
-      longRunningStep: longRunningStep
-    });
-  }
+	updateProcessMap(id, process): Observable<any> {
+		const url = `${this.envSvc.appConfig.apiURL}/processes/${id}/children-map`;
+		return this.http.post(url, process);
+	}
 
-  getAllProcessTypes(): Observable<any> {
-    const url = environment.apiUrl + '/process-types/';
-    return this.http.get(url);
-  }
+	deleteProcessMap(id, childId): Observable<any> {
+		const url = `${this.envSvc.appConfig.apiURL}/processes/${id}/children-map/${childId}`;
+		return this.http.delete(url, {});
+	}
 
-  getFeedTypes(): Observable<any> {
-    const url = environment.apiUrl + '/feed-types/';
-    return this.http.get(url);
-  }
+	getProcess(id): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id;
+		return this.http.get(url);
+	}
 
-  getAllProcessSteps(id, bypassAccess?: boolean): Observable<any> {
-    const include = bypassAccess ? '/all' : '';
-    const url = environment.apiUrl + '/processes/' + id + '/steps' + include;
-    return this.http.get(url);
-  }
+	updateProcess(id, process): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id;
+		return this.http.put(url, process);
+	}
 
-  getProcessNotifications(id): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id + '/notifications';
-    return this.http.get(url);
-  }
+	updateProcessAlerts(id, alertSettings): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id + '/alerts/';
+		return this.http.put(url, alertSettings);
+	}
 
-  getProcessUsers(id): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id + '/users';
-    return this.http.get(url);
-  }
+	updateProcessNotification(processId: number, notificationId: number, notificationPayload): Observable<any> {
+		const url = `${this.envSvc.appConfig.apiURL}/processes/${processId}/notifications/${notificationId}`;
+		return this.http.put(url, notificationPayload);
+	}
 
-  getToken(id): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id + '/token';
-    return this.http.post(url, {});
-  }
+	updateProcessMyNotification(
+		processId: number,
+		notificationId: number,
+		notificationPayload: NotificationRequest
+	): Observable<any> {
+		const url = `${this.envSvc.appConfig.apiURL}/processes/${processId}/my-notifications/${notificationId}`;
+		return this.http.patch(url, notificationPayload);
+	}
 
-  getChildren(id): Observable<any> {
-    const url = environment.apiUrl + '/processes/' + id + '/children';
-    return this.http.get(url);
-  }
+	getAllProcessTypes(): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/process-types/';
+		return this.http.get(url);
+	}
+
+	getFeedTypes(): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/feed-types/';
+		return this.http.get(url);
+	}
+
+	getAllProcessSteps(id, bypassAccess?: boolean): Observable<any> {
+		const include = bypassAccess ? '/all' : '';
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id + '/steps' + include;
+		return this.http.get(url);
+	}
+
+	getProcessNotifications(id): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id + '/my-notifications';
+		return this.http.get(url);
+	}
+
+	getProcessUsers(id): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id + '/users';
+		return this.http.get(url);
+	}
+
+	getToken(id): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id + '/token';
+		return this.http.post(url, {});
+	}
+
+	getChildren(id): Observable<any> {
+		const url = this.envSvc.appConfig.apiURL + '/processes/' + id + '/children';
+		return this.http.get(url);
+	}
+
+	getExportRequests(processId: number): Observable<Array<ProcessExportRequest>> {
+		return this.http.get<Array<ProcessExportRequest>>(
+			`${this.envSvc.appConfig.apiURL}/processes/${processId}/exports`
+		);
+	}
+
+	createExportRequest(processId: number, settings: String[]): Observable<ProcessExportRequest> {
+		return this.http.post<ProcessExportRequest>(`${this.envSvc.appConfig.apiURL}/processes/${processId}/exports`, {
+			settings,
+		});
+	}
+
+	approveExportRequest(processId: number, exportRequestId: number, notes: string): Observable<ProcessExportRequest> {
+		return this.http.patch<ProcessExportRequest>(
+			`${this.envSvc.appConfig.apiURL}/processes/${processId}/exports/${exportRequestId}/approve`,
+			{ notes }
+		);
+	}
+
+	declineExportRequest(processId: number, exportRequestId: number, notes: string): Observable<ProcessExportRequest> {
+		return this.http.patch<ProcessExportRequest>(
+			`${this.envSvc.appConfig.apiURL}/processes/${processId}/exports/${exportRequestId}/decline`,
+			{ notes }
+		);
+	}
+
+	downloadExport(processId: number, exportRequestId: number): Observable<any> {
+		return this.http.get(
+			`${this.envSvc.appConfig.apiURL}/processes/${processId}/exports/${exportRequestId}/export`
+		);
+	}
+
+	uploadImport(processId: number, importFile: any): Observable<Process> {
+		return this.http.post<Process>(`${this.envSvc.appConfig.apiURL}/processes/${processId}/import`, importFile);
+	}
+
+	copyProcess(processId: number, name: string, settings: String[]): Observable<Process> {
+		return this.http.post<Process>(`${this.envSvc.appConfig.apiURL}/processes/${processId}/copy`, {
+			name,
+			settings,
+		});
+	}
+
+	myProcesses(): Observable<Array<number>> {
+		return this.http.get<Array<number>>(`${this.envSvc.appConfig.apiURL}/my-processes/`);
+	}
+
+	getProcessSubmitPermission(): Observable<Array<Process>> {
+		return this.http.get<Array<Process>>(`${this.envSvc.appConfig.apiURL}/processes/submit-permission`);
+	}
 }

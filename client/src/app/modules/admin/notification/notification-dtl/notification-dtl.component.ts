@@ -33,6 +33,7 @@ export class NotificationDtlComponent implements OnInit {
       body: ['', Validators.required]
     });
     this.id = Number.parseInt(this.route.snapshot.paramMap.get('id'), 10);
+    this.id = this.id ? this.id : 0;
     if (this.id !== 0) {
       this.getNotificationTemplate(this.id);
     }
@@ -68,7 +69,7 @@ export class NotificationDtlComponent implements OnInit {
           summary: 'New template!',
           detail: `Template '${value.name}' created`
         });
-        this.router.navigate(['/notification']);
+        this.router.navigate(['/notification', value.id]);
       });
     }
   }

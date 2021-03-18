@@ -14,6 +14,8 @@ export class DashboardComponent implements OnInit {
   drillDownData: GENotes;
   displayDisabledDialog = false;
   displayTypeDrillDown = 3;
+  types=[{label: 'Ops Dashboard', value: 0}, {label: 'Summary', value: 1}];
+  displayType = 0;
 
   columns = [
     { header: 'ID', field: 'id', width: '4%' },

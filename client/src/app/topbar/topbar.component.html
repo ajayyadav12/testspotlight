@@ -1,0 +1,141 @@
+<div class="topbar-container">
+	<span class="page-title">
+		<a routerLink="{{ listPage }}">
+			<i *ngIf="isDtlPage" class="pi pi-arrow-left back-arrow"></i>
+		</a>
+		{{ sidebarSvc.title }}
+	</span>
+
+	<div class="profile" *ngIf="isLoggedIn">
+		<div class="icons">
+			<div class="notification">
+				<span
+					(click)="menu.toggle($event)"
+					class="pi pi-ticket"
+					pTooltip="Raise a ticket"
+					tooltipPosition="bottom"
+				></span>
+			</div>
+			<div class="notification">
+				<span
+					(click)="menuHelp.toggle($event)"
+					class="pi pi-question-circle"
+					pTooltip="Help"
+					tooltipPosition="bottom"
+				></span>
+			</div>
+			<div class="notification">
+				<span
+					class="pi pi-bell"
+					pTooltip="Notifications"
+					(click)="delayed.toggle($event)"
+					tooltipPosition="bottom"
+				></span>
+				<span [ngClass]="delayedListCount == null || delayedListCount == '' ? 'onloadwhite' : 'badge'">
+					{{ delayedListCount }}</span
+				>
+			</div>
+			<div class="logout">
+				<span (click)="logOut()" class="pi pi-sign-out" pTooltip="Log Out" tooltipPosition="bottom"></span>
+			</div>
+		</div>
+		<img
+			onerror="this.src='../assets/user.png'"
+			src="https://supportcentral.ge.com/images/person/temp/{{ sso }}.jpg"
+			pTooltip="{{ name }}"
+		/>
+		<div class="profile-data">
+			<div class="name">{{ name }}</div>
+			<div>{{ role }}</div>
+		</div>
+	</div>
+</div>
+<p-overlayPanel #delayed>
+	<div *ngIf="delayedListCount != ''" style="background: #8497b0; color: white; font-size: 20px">
+		<b style="margin-left: 8px">Notifications</b>
+	</div>
+	<div class="icons">
+		<table class="table-1" *ngIf="delayedListCount != ''">
+			<tr
+				[ngStyle]="{
+					background: table.status == 'UnRead' ? 'rgba(128, 128, 128, 0.070)' : 'white',
+					'border-radius': '15%'
+				}"
+				id="{{ table.uniqueId }}"
+				class="notification-item"
+				*ngFor="let table of delayedListNotification"
+			>
+				<td style="height: 50px" *ngIf="table.processtype == 'ReleaseNotes'">
+					<span
+						(mouseenter)="status.toggle($event)"
+						(mouseleave)="status.hide()"
+						class="icon"
+						[ngClass]="['pi pi-info-circle']"
+						[ngStyle]="{ color: 'grey', 'font-size': '1.8em' }"
+					>
+					</span>
+				</td>
+				<td colspan="3" *ngIf="table.processtype == 'ReleaseNotes'" style="max-width: 300px">
+					<span class="name" style="cursor: auto"
+						>Spotlight has now been updated with a new release!  To see the new features
+						<a
+							href="https://devcloud.swcoe.ge.com/devspace/display/ULBSP/Release+Notes"
+							(click)="
+								delayed.hide();
+								notificationValue(table.id, table.processtype, table.scheduleDefID, table.uniqueId);
+								saveNotification(table.uniqueId, table.status)
+							"
+							target="_blank"
+							><u>click here</u></a
+						>
+					</span>
+				</td>
+
+				<td style="height: 50px" *ngIf="table.processtype != 'ReleaseNotes'">
+					<span
+						(mouseenter)="status.toggle($event)"
+						(mouseleave)="status.hide()"
+						class="icon"
+						[ngClass]="['pi pi-info-circle']"
+						[ngStyle]="{ color: 'grey', 'font-size': '1.8em' }"
+					>
+					</span>
+				</td>
+				<td *ngIf="table.processtype != 'ReleaseNotes'">
+					<span
+						style="cursor: pointer"
+						class="name"
+						(click)="
+							delayed.hide();
+							notificationValue(table.id, table.processtype, table.scheduleDefID, table.uniqueId);
+							saveNotification(table.uniqueId, table.status)
+						"
+						>{{ table.processname }}
+					</span>
+				</td>
+				<td *ngIf="table.processtype != 'ReleaseNotes'">
+					<span class="type">{{ table.processtype }}</span>
+				</td>
+				<td *ngIf="table.processtype != 'ReleaseNotes'">
+					<span class="date">&#8986;&nbsp;&nbsp;{{ table.notificationDate }}</span>
+				</td>
+				<p-overlayPanel #status appendTo="body" [style]="{ 'background-color': '#fffffff5' }">
+					<div style="color: #686868" *ngIf="table.processtype != 'ReleaseNotes'">
+						<p><b> Id: </b>{{ table.uniqueId }}</p>
+
+						<p><b>Start Time: </b>{{ table.startTime }}</p>
+						<p><b>End Time: </b> {{ table.endTime }}</p>
+					</div>
+
+					<div style="color: #686868" *ngIf="table.processtype == 'ReleaseNotes'">
+						<p>New ReleaseNotes</p>
+					</div>
+				</p-overlayPanel>
+			</tr>
+		</table>
+	</div>
+</p-overlayPanel>
+
+<p-menu #menu [popup]="true" [model]="items"></p-menu>
+<!-- <p-tieredMenu #menuHelp [model]="helpItems" [popup]="true"></p-tieredMenu> -->
+<!-- <p-menu #helpmenu [popup]="true" [model]="helpItems"></p-menu> -->

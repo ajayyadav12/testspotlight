@@ -7,11 +7,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ge.finance.spotlight.dto.EmailModel;
+import com.ge.finance.spotlight.dto.ProcessDTO;
 import com.ge.finance.spotlight.exceptions.NotFoundException;
 import com.ge.finance.spotlight.libs.GEOneHRConnection;
 import com.ge.finance.spotlight.models.AnalyticsReport;
 import com.ge.finance.spotlight.models.MessageGateway;
 import com.ge.finance.spotlight.models.Notification;
+import com.ge.finance.spotlight.models.NotificationMobile;
 import com.ge.finance.spotlight.models.NotificationTemplate;
 import com.ge.finance.spotlight.models.Process;
 import com.ge.finance.spotlight.models.ProcessStep;
@@ -19,10 +25,11 @@ import com.ge.finance.spotlight.models.ProcessUser;
 import com.ge.finance.spotlight.models.ScheduleDefinition;
 import com.ge.finance.spotlight.models.ScheduleReport;
 import com.ge.finance.spotlight.models.ScheduledSubmission;
+import com.ge.finance.spotlight.models.Status;
 import com.ge.finance.spotlight.models.Submission;
+import com.ge.finance.spotlight.models.SubmissionRequest;
 import com.ge.finance.spotlight.models.SubmissionStep;
 import com.ge.finance.spotlight.models.User;
-import com.ge.finance.spotlight.models.NotificationLog;
 import com.ge.finance.spotlight.repositories.AnalyticsReportRepository;
 import com.ge.finance.spotlight.repositories.MessageGatewayRepository;
 import com.ge.finance.spotlight.repositories.NotificationLogRepository;
@@ -33,11 +40,14 @@ import com.ge.finance.spotlight.repositories.ProcessUserRepository;
 import com.ge.finance.spotlight.repositories.ScheduleDefinitionRepository;
 import com.ge.finance.spotlight.repositories.ScheduleReportRepository;
 import com.ge.finance.spotlight.repositories.ScheduledSubmissionRepository;
+import com.ge.finance.spotlight.repositories.StatusRepository;
 import com.ge.finance.spotlight.repositories.SubmissionRepository;
+import com.ge.finance.spotlight.repositories.SubmissionRequestRepository;
 import com.ge.finance.spotlight.repositories.SubmissionStepRepository;
-
-import com.ge.finance.spotlight.repositories.UserRepository;
+import com.ge.finance.spotlight.requests.SubmissionStepRequest;
+import com.ge.finance.spotlight.security.Constants;
 import com.ge.finance.spotlight.services.SpotlightEmailService;
+import com.ge.finance.spotlight.services.SubmissionStepService;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -46,6 +56,7 @@ import org.springframework.stereotype.Component;
 public class SubmissionCronJob {
 
     private static final long MINUTES_1 = 60_000;
+    private static final long MINUTES_2 = 120_000;
     private static final long MINUTES_5 = 300_000;
     private static final long MINUTES_15 = 900_000;
     private static final long MINUTES_30 = 1_800_000;
@@ -67,10 +78,10 @@ public class SubmissionCronJob {
     private ProcessUserRepository processUserRepository;
     private SubmissionStepRepository submissionStepRepository;
     private MessageGatewayRepository messageGatewayRepository;
-    private UserRepository userRepository;
     private NotificationLogRepository notificationLogRepository;
-
-    private ScheduledSubmission scheduledSubmission;
+    private StatusRepository statusRepository;
+    private SubmissionRequestRepository submissionRequestRepository;
+    private SubmissionStepService submissionStepService;
 
     public SubmissionCronJob(ScheduledSubmissionRepository scheduledSubmissionRepository,
             NotificationRepository notificationRepository, SpotlightEmailService spotlightEmailService,
@@ -78,8 +89,9 @@ public class SubmissionCronJob {
             AnalyticsReportRepository analyticsReportRepository, ScheduleReportRepository scheduleReportRepository,
             ScheduleDefinitionRepository scheduleDefinitionRepository, ProcessUserRepository processUserRepository,
             SubmissionStepRepository submissionStepRepository, ProcessStepRepository processStepRepository,
-            MessageGatewayRepository messageGatewayRepository, UserRepository userRepository,
-            NotificationLogRepository notificationLogRepository) {
+            MessageGatewayRepository messageGatewayRepository, NotificationLogRepository notificationLogRepository,
+            StatusRepository statusRepository, SubmissionRequestRepository submissionRequestRepository,
+            SubmissionStepService submissionStepService) {
         this.scheduledSubmissionRepository = scheduledSubmissionRepository;
         this.notificationRepository = notificationRepository;
         this.spotlightEmailService = spotlightEmailService;
@@ -92,56 +104,135 @@ public class SubmissionCronJob {
         this.submissionStepRepository = submissionStepRepository;
         this.processStepRepository = processStepRepository;
         this.messageGatewayRepository = messageGatewayRepository;
-        this.userRepository = userRepository;
         this.notificationLogRepository = notificationLogRepository;
+        this.statusRepository = statusRepository;
+        this.submissionRequestRepository = submissionRequestRepository;
+        this.submissionStepService = submissionStepService;
     }
 
-    private Optional<Notification> getNotificationForProcess(Long processId) {
-        List<Notification> notifications = notificationRepository
-                .findByProcessIdAndProcessStepIdIsNullAndStatusIdIsNull(processId);
+    private Optional<Notification> getSMSNotificationForProcess(Long processId) {
+        Optional<Notification> notifications = notificationRepository
+                .findFirstByProcessIdAndSubmissionTypeAndEnableTextMessagingIsNotNull(processId,
+                        Constants.DELAYED_SUBMISSION);
         if (notifications.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(notifications.get(0));
+            return notifications;
         }
     }
 
-    private Optional<List<Notification>> getSMSNotificationForProcess(Long processId) {
-        List<Notification> notifications = notificationRepository
-                .findByProcessIdAndProcessStepIdIsNullAndStatusIdIsNullAndEnableTextMessagingIsNotNull(processId);
+    private Optional<Notification> getSMSNotificationForProcessEscalation(Long processId, String escalationType) {
+        Optional<Notification> notifications = notificationRepository
+                .findByProcessIdAndEscalationTypeAndProcessStepIdIsNullAndStatusIdIsNullAndEnableTextMessagingIsNotNull(
+                        processId, escalationType);
         if (notifications.isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(notifications);
+            return notifications;
         }
     }
 
-    private void sendEmail(Notification notification) {
+    /*
+     * private Optional<SubmissionRequest> getSubmissionRequests(Date now, String
+     * state) { Optional<SubmissionRequest> submissionRequests =
+     * submissionRequestRepository
+     * .findByStartTimeAndStateAndStartTimeGreaterThanOrderByStartTimeAsc(now,
+     * Constants.QUEUED); if (submissionRequests.isEmpty()) { return
+     * Optional.empty(); } else { return submissionRequests; } }
+     */
+
+    private void sendEmail(Notification notification, ScheduledSubmission scheduledSubmission) {
         String emailList = notification.getAdditionalEmails().trim() + " "
-                + this.scheduledSubmission.getProcess().getSupportTeamEmail().trim();
-        emailList = emailList.trim();
+                + scheduledSubmission.getProcess().getSupportTeamEmail().trim();
+        emailList = emailList.strip();
         if (!emailList.isEmpty()) {
-            spotlightEmailService.genericSend(notification.getNotificationTemplateID(), emailList,
-                    this.scheduledSubmission, null, null, null, null, null, null);
+            EmailModel emailModel = new EmailModel(notification.getNotificationTemplateID(), emailList, false);
+            emailModel.schedSubmission = scheduledSubmission;
+            spotlightEmailService.genericSend(emailModel);
         }
     }
 
-    private void sendSMS(List<Notification> notificationList) {
-        for (Notification notification : notificationList) {
-            if (notification.getCreatedFor() != null) {
-                User user = userRepository.findFirstBySso(notification.getCreatedFor().getSso());
+    private void sendEmails(Notification notification, Submission submission, SubmissionStep submissionStep) {
+        String emailList = notification.getAdditionalEmails().strip();
+        Iterator<NotificationMobile> iNotificationMobile = notification.getUserMobiles().iterator();
+        while (iNotificationMobile.hasNext()) {
+            NotificationMobile tempNotificationMobile = iNotificationMobile.next();
+            emailList += " " + tempNotificationMobile.getUser().getEmail();
+        }
+        emailList = emailList.strip();
+        if (!emailList.isEmpty()) {
+            EmailModel emailModel = new EmailModel(notification.getNotificationTemplateID(), emailList, false);
+            emailModel.submission = submission;
+            emailModel.submissionStep = submissionStep;
+            emailModel.process = submission.getProcess();
+
+            spotlightEmailService.genericSend(emailModel);
+
+        }
+    }
+
+    private void sendSMS(Notification notification, ScheduledSubmission scheduledSubmission, Submission submission,
+            SubmissionStep submissionStep) {
+
+        if (!notification.getSubmissionType().isEmpty() && notification.getEscalationType().isEmpty()) {
+            Iterator<NotificationMobile> iNotificationMobile = notification.getUserMobiles().iterator();
+            while (iNotificationMobile.hasNext()) {
+                NotificationMobile tempNotificationMobile = iNotificationMobile.next();
+                User user = tempNotificationMobile.getUser();
                 MessageGateway messageGateway = messageGatewayRepository.findById(user.getCarrier().getId())
                         .orElseThrow(NotFoundException::new);
-                String smsGateway = notification.getCreatedFor().getPhoneNumber() + messageGateway.getGateway();
+                String smsGateway = user.getPhoneNumber() + messageGateway.getGateway();
                 if (!smsGateway.isEmpty()) {
-                    spotlightEmailService.genericSMSSend(notification.getNotificationTemplateID(), smsGateway,
-                            this.scheduledSubmission, null, null, null, null, null);
+                    EmailModel emailModel = new EmailModel(notification.getNotificationTemplateID(), smsGateway, true);
+                    emailModel.submission = submission;
+                    emailModel.submissionStep = submissionStep;
+                    emailModel.schedSubmission = scheduledSubmission;
+                    spotlightEmailService.genericSend(emailModel);
                 }
-                if (!notification.getAdditionalEmails().isEmpty()) {
-                    spotlightEmailService.genericSMSSend(notification.getNotificationTemplateID(),
-                            notification.getAdditionalEmails().trim(), this.scheduledSubmission, null, null, null, null,
-                            null);
+            }
+        } else if (!notification.getEscalationType().isEmpty()) {
+            Long templateId = (notification.getEscalationType().equalsIgnoreCase(Constants.DELAYED_ESCALATION)
+                    ? NotificationTemplate.ESCALATION_DELAYED
+                    : NotificationTemplate.ESCALATION_FAILED);
+            Process process = (submission == null) ? scheduledSubmission.getProcess() : submission.getProcess();
+            User appOwner = getAppOwner(process);
+            String toEmails = (appOwner != null) ? (appOwner.getEmail()) : "";
+            toEmails += " " + getManagerEmail(appOwner);
+            EmailModel emailModel = new EmailModel(templateId, toEmails, false);
+            emailModel.submission = submission;
+            emailModel.schedSubmission = scheduledSubmission;
+
+            Iterator<NotificationMobile> iNotificationMobile = notification.getUserMobiles().iterator();
+            while (iNotificationMobile.hasNext()) {
+                NotificationMobile tempNotificationMobile = iNotificationMobile.next();
+                User user = tempNotificationMobile.getUser();
+                MessageGateway messageGateway = messageGatewayRepository.findById(user.getCarrier().getId())
+                        .orElseThrow(NotFoundException::new);
+                String smsGateway = user.getPhoneNumber() + messageGateway.getGateway();
+
+                if (!smsGateway.isEmpty()) {
+                    emailModel.to = smsGateway;
+                    emailModel.sms = true;
+                    spotlightEmailService.genericSend(emailModel);
                 }
+            }
+
+            String combinedToEmails = "";
+
+            if (!notification.getAdditionalEmails().isEmpty()) {
+                combinedToEmails = notification.getAdditionalEmails().trim();
+            }
+
+            if (templateId != NotificationTemplate.ESCALATION_DELAYED) {
+                if (!toEmails.isEmpty()) {
+                    combinedToEmails = combinedToEmails + " " + toEmails.trim();
+                }
+            }
+
+            if (!combinedToEmails.isEmpty()) {
+                emailModel.to = combinedToEmails.strip();
+                emailModel.sms = false;
+                spotlightEmailService.genericSend(emailModel);
             }
         }
     }
@@ -158,49 +249,60 @@ public class SubmissionCronJob {
         Date now = new Date(); // to right now
         System.out.println("Compare Submissions");
         List<ScheduledSubmission> scheduledSubmissions = scheduledSubmissionRepository
-                .findByStartTimeIsBetweenOrderByStartTimeAsc(start, now);
+                .findByStartTimeIsBetweenAndSubmissionIdIsNullOrderByStartTimeAsc(start, now);
 
         for (ScheduledSubmission scheduledSubmission : scheduledSubmissions) {
-            if (scheduledSubmission.getSubmission() == null) { // submission has not yet started
-                List<NotificationLog> optNotification = notificationLogRepository
-                        .findByScheduledSubmissionIdAndNotificationTemplateAndProcessIdIsNotNull(
-                                scheduledSubmission.getId(), NotificationTemplate.DELAYED_SUBMISSION);
-                long startDiff = now.getTime() - scheduledSubmission.getStartTime().getTime();
-                User appOwner = getAppOwner(scheduledSubmission.getProcess());
-                boolean skipEmail = false;
-                String toEmails = (appOwner != null) ? (appOwner.getEmail()) : "";
-                if (startDiff > MINUTES_15) {
-                    System.out.println(String.format("WARNING: Scheduled submission %d has not yet started",
-                            scheduledSubmission.getId()));
-                    this.scheduledSubmission = scheduledSubmission;
-                    if (optNotification.size() <= 0) {
-                        getNotificationForProcess(scheduledSubmission.getProcess().getId()).ifPresent(this::sendEmail);
-                        getSMSNotificationForProcess(scheduledSubmission.getProcess().getId()).ifPresent(this::sendSMS);
-                    }
-                    if (scheduledSubmission.getAckDelayedEmailStatus() == 'A'
-                            || scheduledSubmission.getAckDelayedEmailStatus() == 'B') {
-                        skipEmail = true;
-                    } else {
-                        scheduledSubmission.setAckDelayedEmailStatus('A');
-                    }
-                } else {
-                    continue;
-                }
-                if (startDiff > MINUTES_30 && scheduledSubmission.getAckDelayedEmailStatus() != 'B'
-                        && appOwner != null) {
-                    System.out.println("Delayed > 30 minutes");
-                    toEmails += " " + getManagerEmail(appOwner);
-                    skipEmail = false;
-                    scheduledSubmission.setAckDelayedEmailStatus('B');
-                }
 
-                if (!scheduledSubmission.getAcknowledgementFlag() && !skipEmail && appOwner != null) {
-                    System.out.println("Delayed submission for " + toEmails);
-                    spotlightEmailService.genericSend(NotificationTemplate.ESCALATION_DELAYED, toEmails,
-                            scheduledSubmission, null, null, null, null, null, null);
-                    scheduledSubmissionRepository.save(scheduledSubmission);
+            boolean optNotification = notificationLogRepository
+                    .existsByScheduledSubmissionIdAndNotificationTemplateAndProcessIdIsNotNull(
+                            scheduledSubmission.getId(), NotificationTemplate.DELAYED_SUBMISSION);
+            long startDiff = now.getTime() - scheduledSubmission.getStartTime().getTime();
+            User appOwner = getAppOwner(scheduledSubmission.getProcess());
+            boolean skipEmail = false;
+            String toEmails = (appOwner != null) ? (appOwner.getEmail()) : "";
+            if (startDiff > MINUTES_15) {
+                System.out.println(String.format("WARNING: Scheduled submission %d has not yet started",
+                        scheduledSubmission.getId()));
+                if (!optNotification) {
+                    notificationRepository
+                            .findFirstByProcessIdAndSubmissionType(scheduledSubmission.getProcess().getId(),
+                                    Constants.DELAYED_ESCALATION)
+                            .ifPresent(notification -> {
+                                sendEmail(notification, scheduledSubmission);
+                            });
+                    ;
+                    getSMSNotificationForProcess(scheduledSubmission.getProcess().getId()).ifPresent(notifications -> {
+                        sendSMS(notifications, scheduledSubmission, null, null);
+                    });
                 }
-            } /* */
+                if (scheduledSubmission.getAckDelayedEmailStatus() == 'A'
+                        || scheduledSubmission.getAckDelayedEmailStatus() == 'B') {
+                    skipEmail = true;
+                } else {
+                    scheduledSubmission.setAckDelayedEmailStatus('A');
+                }
+            } else {
+                continue;
+            }
+            if (startDiff > MINUTES_30 && scheduledSubmission.getAckDelayedEmailStatus() != 'B' && appOwner != null) {
+                System.out.println("Delayed > 30 minutes");
+                toEmails += " " + getManagerEmail(appOwner);
+                skipEmail = false;
+                scheduledSubmission.setAckDelayedEmailStatus('B');
+            }
+
+            if (scheduledSubmission.getProcess().getSubmissionDelayedEscalationAlrt()
+                    && !scheduledSubmission.getAcknowledgementFlag() && !skipEmail && appOwner != null) {
+                System.out.println("Delayed submission for " + toEmails);                
+                EmailModel emailModel = new EmailModel(NotificationTemplate.ESCALATION_DELAYED, toEmails, false);
+                emailModel.schedSubmission = scheduledSubmission;
+                spotlightEmailService.genericSend(emailModel);
+                getSMSNotificationForProcessEscalation(scheduledSubmission.getProcess().getId(),
+                        Constants.DELAYED_ESCALATION).ifPresent(notifications -> {
+                            this.sendSMS(notifications, scheduledSubmission, null, null);
+                        });
+                scheduledSubmissionRepository.save(scheduledSubmission);
+            }
         }
     }
 
@@ -231,13 +333,20 @@ public class SubmissionCronJob {
         }
     }
 
-    @Scheduled(initialDelay = MINUTES_15, fixedRate = MINUTES_15) // 15 m
+    @Scheduled(initialDelay = MINUTES_2, fixedRate = MINUTES_15)
     public void failedSubmissions() {
+        Calendar yesterday = Calendar.getInstance();
+        yesterday.set(Calendar.DAY_OF_MONTH, yesterday.get(Calendar.DAY_OF_MONTH) - 1); // starting yesterday
+        yesterday.set(Calendar.HOUR_OF_DAY, 0);
+        yesterday.set(Calendar.MINUTE, 0);
+        yesterday.set(Calendar.SECOND, 0);
+        yesterday.set(Calendar.MILLISECOND, 0);
         List<Submission> failedSubmissions = submissionRepository
-                .findByStatusIdAndAcknowledgementFlagAndAckFailedEmailStatusIsNot(FAILED_STATUS, false, 'B');
+                .findByProcessSubmissionEscalationAlrtAndStatusIdAndAcknowledgementFlagAndAckFailedEmailStatusIsNot('Y', FAILED_STATUS, false, 'B', yesterday.getTime());
         System.out.println("Failed Submission found " + failedSubmissions.size());
         Date now = new Date(); // to right now
-        for (Submission failedSubmission : failedSubmissions) {
+        for (Submission failedSubmission : failedSubmissions) {        
+
             System.out.println("Submission id: " + failedSubmission.getId());
             User appOwner = getAppOwner(failedSubmission.getProcess());
 
@@ -275,9 +384,14 @@ public class SubmissionCronJob {
                 continue;
             }
 
-            System.out.println(toEmails);
-            spotlightEmailService.genericSend(NotificationTemplate.ESCALATION_FAILED, toEmails, null, failedSubmission,
-                    null, null, null, null, null);
+            System.out.println(toEmails);            
+            EmailModel emailModel = new EmailModel(NotificationTemplate.ESCALATION_FAILED, toEmails, false);
+            emailModel.submission = failedSubmission;
+            spotlightEmailService.genericSend(emailModel);
+            getSMSNotificationForProcessEscalation(failedSubmission.getProcess().getId(), Constants.FAILED_ESCALATION)
+                    .ifPresent(notifications -> {
+                        sendSMS(notifications, null, failedSubmission, null);
+                    });
         }
     }
 
@@ -302,11 +416,9 @@ public class SubmissionCronJob {
 
     @Scheduled(initialDelay = MINUTES_15, fixedRate = MINUTES_15) // 15 m
     public void failedAcknowledgedSubmissions() {
-        List<Process> processes = processRepository.findAll();
+        List<ProcessDTO> processes = processRepository.findBySubmissionEscalationAlrt('Y');
         Date now = new Date();
-        for (Process process : processes) {
-            if (!process.getSubmissionEscalationAlrt())
-                continue;
+        for (ProcessDTO process : processes) {
 
             Submission failedAcknowledgedSubmission = submissionRepository
                     .findFirstByProcessIdAndStatusIdAndAckFailedEmailStatusIsNotAndAcknowledgementFlagTrueOrderByIdDesc(
@@ -340,16 +452,17 @@ public class SubmissionCronJob {
                     toEmails += " " + getManagerEmail(appOwner);
                     failedAcknowledgedSubmission.setAckfailedEmailStatus('D');
                     submissionRepository.save(failedAcknowledgedSubmission);
-                } else if (diff > MINUTES_60) {
+                } else if (diff > MINUTES_60 && failedAcknowledgedSubmission.getAckfailedEmailStatus() != 'C') {
                     System.out.println("> 60 minutes");
                     failedAcknowledgedSubmission.setAckfailedEmailStatus('C');
                     submissionRepository.save(failedAcknowledgedSubmission);
                 } else {
                     continue;
                 }
-                System.out.println(toEmails);
-                spotlightEmailService.genericSend(NotificationTemplate.ESCALATION_FAILED, toEmails, null,
-                        failedAcknowledgedSubmission, null, null, null, null, null);
+                System.out.println(toEmails);                
+                EmailModel emailModel = new EmailModel(NotificationTemplate.ESCALATION_FAILED_ACK, toEmails, false);
+                emailModel.submission = failedAcknowledgedSubmission;
+                spotlightEmailService.genericSend(emailModel);
             } else {
                 System.out.println("New non-failed submissions submitted");
             }
@@ -381,8 +494,10 @@ public class SubmissionCronJob {
                                 if (proUserList != null) {
                                     toEmails = (proUserList.getUser() != null) ? (proUserList.getUser().getEmail())
                                             : "";
-                                    spotlightEmailService.genericSend(NotificationTemplate.MISSING_NOTIFICATION,
-                                            toEmails, null, null, process, null, null, null, null);
+                                    EmailModel emailModel = new EmailModel(NotificationTemplate.MISSING_NOTIFICATION,
+                                            toEmails, false);
+                                    emailModel.process = process;
+                                    spotlightEmailService.genericSend(emailModel);
                                 } else {
                                     continue;
                                 }
@@ -393,8 +508,10 @@ public class SubmissionCronJob {
                     } else if (scheduleEndPlusTenDate.equals(now)) { // Notification for last 10 days missing schedules
                         User appOwner = getAppOwner(process);
                         toEmails = (appOwner != null) ? (appOwner.getEmail()) : "";
-                        spotlightEmailService.genericSend(NotificationTemplate.MISSING_NOTIFICATION, toEmails, null,
-                                null, process, null, null, null, null);
+                        EmailModel emailModel = new EmailModel(NotificationTemplate.MISSING_NOTIFICATION, toEmails,
+                                false);
+                        emailModel.process = process;
+                        spotlightEmailService.genericSend(emailModel);
                     } else {
                         continue;
                     }
@@ -411,8 +528,10 @@ public class SubmissionCronJob {
                         if (!processUser.isEmpty()) {
                             for (ProcessUser proUserList : processUser) {
                                 toEmails = (proUserList.getUser() != null) ? (proUserList.getUser().getEmail()) : "";
-                                spotlightEmailService.genericSend(NotificationTemplate.MISSING_NOTIFICATION, toEmails,
-                                        null, null, process, null, null, null, null);
+                                EmailModel emailModel = new EmailModel(NotificationTemplate.MISSING_NOTIFICATION,
+                                        toEmails, false);
+                                emailModel.process = process;
+                                spotlightEmailService.genericSend(emailModel);
                             }
                         } else {
                             continue;
@@ -420,8 +539,10 @@ public class SubmissionCronJob {
                     } else if (scheduleEndPlusThreeDate.equals(now)) { // if last occurance is within next 3 days
                         User appOwner = getAppOwner(process);
                         toEmails = (appOwner != null) ? (appOwner.getEmail()) : "";
-                        spotlightEmailService.genericSend(NotificationTemplate.MISSING_NOTIFICATION, toEmails, null,
-                                null, process, null, null, null, null);
+                        EmailModel emailModel = new EmailModel(NotificationTemplate.MISSING_NOTIFICATION, toEmails,
+                                false);
+                        emailModel.process = process;
+                        spotlightEmailService.genericSend(emailModel);
                     } else {
                         continue;
                     }
@@ -431,24 +552,25 @@ public class SubmissionCronJob {
         }
     }
 
-    @Scheduled(initialDelay = MINUTES_1, fixedRate = MINUTES_1) // 5 minutes
+    @Scheduled(initialDelay = MINUTES_1, fixedRate = MINUTES_1)
     public void longRunSubmissions() {
         Date now = new Date();
         Date oneMonth = new Date();
 
         Calendar c = new GregorianCalendar();
-        c.add(Calendar.DATE, -30);
+        c.add(Calendar.DATE, -2);
         oneMonth = c.getTime();
 
+        StringBuilder submissionList = new StringBuilder();
         List<Submission> runningSubmissions = submissionRepository
                 .findByEndTimeIsNullAndStartTimeGreaterThanOrderByStartTimeDesc(oneMonth);
         for (Submission submission : runningSubmissions) {
-            System.out.println("Long Running Submission - Submission #" + submission.getId());
-            List<NotificationLog> optNotification = notificationLogRepository
-                    .findBySubmissionIdAndProcessStepIdIsNull(submission.getId());
+            submissionList.append(submission.getId().toString() + ", ");
+            boolean optNotification = notificationLogRepository
+                    .existsBySubmissionIdAndProcessStepIdIsNull(submission.getId());
             Process process = submission.getProcess();
 
-            if ((optNotification.size() == 0) && process.getLongRunningSubAlrt()) {
+            if (!optNotification && process.getLongRunningSubAlrt()) {
                 Optional<ScheduledSubmission> optScheduledSubmission = scheduledSubmissionRepository
                         .findBySubmissionId(submission.getId());
 
@@ -456,49 +578,64 @@ public class SubmissionCronJob {
                     ScheduledSubmission scheduledSubmission = optScheduledSubmission.get();
 
                     long scheduledDuration = (scheduledSubmission.getEndTime().getTime()
-                            - scheduledSubmission.getStartTime().getTime()) + scheduledSubmission.getTolerance();
+                            - scheduledSubmission.getStartTime().getTime())
+                            + (scheduledSubmission.getTolerance() * MINUTES_1);
                     long actualDuration = now.getTime() - submission.getStartTime().getTime();
 
                     if (scheduledDuration > 0 && actualDuration > scheduledDuration) {
-                        User appOwner = this.getAppOwner(submission.getProcess());
-                        String toEmails = (appOwner != null) ? (appOwner.getEmail()) : "";
 
-                        toEmails = toEmails + " " + submission.getProcess().getSupportTeamEmail();
+                        String toEmails = this.getToEmails(submission.getProcess());
 
-                        spotlightEmailService.genericSend(NotificationTemplate.LONG_RUN_SUBMISSION, toEmails, null,
-                                submission, null, null, null, null, null);
+                        EmailModel emailModel = new EmailModel(NotificationTemplate.LONG_RUN_SUBMISSION, toEmails,
+                                false);
+                        emailModel.submission = submission;
+
+                        spotlightEmailService.genericSend(emailModel);
+
+                        getToEmailsSubmissionTypeAlerts(submission.getProcess().getId(),
+                                Constants.LONG_RUNNING_SUBMISSION).ifPresent(notifications -> {
+                                    sendEmails(notifications, submission, null);
+                                    sendSMS(notifications, null, submission, null);
+                                });
                     }
                 } else {
                     long actualDuration = now.getTime() - submission.getStartTime().getTime();
 
                     if (actualDuration > MINUTES_1_DAY) { // Submission running more than one entire day
-                        User appOwner = this.getAppOwner(submission.getProcess());
-                        String toEmails = (appOwner != null) ? appOwner.getEmail() : "";
+                        String toEmails = this.getToEmails(submission.getProcess());
 
-                        toEmails = toEmails + " " + submission.getProcess().getSupportTeamEmail();
+                        EmailModel emailModel = new EmailModel(NotificationTemplate.LONG_RUN_SUBMISSION, toEmails,
+                                false);
+                        emailModel.submission = submission;
+                        emailModel.process = submission.getProcess();
+                        spotlightEmailService.genericSend(emailModel);
 
-                        spotlightEmailService.genericSend(NotificationTemplate.LONG_RUN_SUBMISSION, toEmails, null,
-                                submission, submission.getProcess(), appOwner, null, null, null);                                           
+                        getToEmailsSubmissionTypeAlerts(submission.getProcess().getId(),
+                                Constants.LONG_RUNNING_SUBMISSION).ifPresent(notifications -> {
+                                    sendEmails(notifications, submission, null);
+                                    sendSMS(notifications, null, submission, null);
+                                });
                     }
                 }
             }
-            
-            if (submission.getAdHoc() && (process.getMaxRunTimeHours() > 0 || process.getMaxRunTimeMinutes() > 0)) {                
-                long totalMaxDuration = (process.getMaxRunTimeHours() * 3600000) + (process.getMaxRunTimeMinutes() * 60000);
+
+            if (submission.getAdHoc() && (process.getMaxRunTimeHours() > 0 || process.getMaxRunTimeMinutes() > 0)) {
+                long totalMaxDuration = (process.getMaxRunTimeHours() * 3600000)
+                        + (process.getMaxRunTimeMinutes() * 60000);
                 long submissionStartTime = submission.getStartTime().getTime();
 
                 if (now.getTime() - submissionStartTime > totalMaxDuration) {
                     System.out.println("==LONG RUN ADHOC== for submission: " + submission.getId());
                     // Check if notification was already send
-                    boolean wasNotificationSend = notificationLogRepository.existsBySubmissionIdAndNotificationTemplate(submission.getId(), NotificationTemplate.LONG_RUN_ADHOC_SUBMISSION);
+                    boolean wasNotificationSend = notificationLogRepository.existsBySubmissionIdAndNotificationTemplate(
+                            submission.getId(), NotificationTemplate.LONG_RUN_ADHOC_SUBMISSION);
                     if (!wasNotificationSend) {
-                        User appOwner = this.getAppOwner(submission.getProcess());
-                        String toEmails = (appOwner != null) ? (appOwner.getEmail()) : "";
-
-                        toEmails = toEmails + " " + submission.getProcess().getSupportTeamEmail();
-
-                        spotlightEmailService.genericSend(NotificationTemplate.LONG_RUN_ADHOC_SUBMISSION, toEmails, null,
-                                submission, submission.getProcess(), appOwner, null, null, null);
+                        String toEmails = this.getToEmails(submission.getProcess());
+                        EmailModel emailModel = new EmailModel(NotificationTemplate.LONG_RUN_ADHOC_SUBMISSION, toEmails,
+                                false);
+                        emailModel.submission = submission;
+                        emailModel.process = submission.getProcess();
+                        spotlightEmailService.genericSend(emailModel);
                     }
                 }
             }
@@ -510,29 +647,35 @@ public class SubmissionCronJob {
                 // Review Submission steps per Submission
                 for (SubmissionStep submissionStep : submissionSteps) {
 
-                    List<NotificationLog> optNotificationStep = notificationLogRepository
-                            .findBySubmissionIdAndProcessStepId(submission.getId(),
-                                    submissionStep.getProcessStep().getId());
+                    boolean optNotificationStep = notificationLogRepository.existsBySubmissionIdAndProcessStepId(
+                            submission.getId(), submissionStep.getProcessStep().getId());
 
-                    if (optNotificationStep.size() == 0) {
+                    if (!optNotificationStep) {
                         if (submissionStep.getStatus().getName().equalsIgnoreCase("in progress")) {
 
                             long actualDuration = now.getTime() - submissionStep.getStartTime().getTime();
 
-                            if (submissionStep.getProcessStep().getDuration() > 0
-                                    && actualDuration > (submissionStep.getProcessStep().getDuration() * MINUTES_1)) { // Step
-                                                                                                                       // running
-                                // more than
-                                // one
-                                // entire day
-                                User appOwner = this.getAppOwner(submission.getProcess());
-                                String toEmails = (appOwner != null) ? (appOwner.getEmail()) : "";
+                            Long duration = (submissionStep.getProcessStep().getManualDuration() == null)
+                                    ? submissionStep.getProcessStep().getDuration()
+                                    : submissionStep.getProcessStep().getManualDuration();
 
-                                toEmails = toEmails + " " + submission.getProcess().getSupportTeamEmail();
+                            if (duration > 0 && actualDuration > (duration * MINUTES_1)) { // Step
+                                                                                           // running
+                                // more than one entire day
+                                String toEmails = this.getToEmails(submission.getProcess());
 
-                                spotlightEmailService.genericSend(NotificationTemplate.SUBMISSION_STEP_DELAYED,
-                                        toEmails, null, submission, submission.getProcess(), appOwner, submissionStep,
-                                        null, null);
+                                EmailModel emailModel = new EmailModel(
+                                        NotificationTemplate.LONG_RUN_SUBMISSION_STEP_DELAYED, toEmails, false);
+                                emailModel.submission = submission;
+                                emailModel.process = submission.getProcess();
+                                emailModel.submissionStep = submissionStep;
+                                spotlightEmailService.genericSend(emailModel);
+
+                                getToEmailsSubmissionTypeAlerts(submission.getProcess().getId(),
+                                        Constants.LONG_RUNNING_STEPS).ifPresent(notifications -> {
+                                            sendEmails(notifications, submission, submissionStep);
+                                            sendSMS(notifications, null, submission, submissionStep);
+                                        });
                             }
                         }
 
@@ -541,6 +684,53 @@ public class SubmissionCronJob {
 
             }
         }
+        System.out.println("Long Running Submission - Submissions #" + submissionList);
+    }
+
+    @Scheduled(initialDelay = MINUTES_1, fixedRate = MINUTES_1)
+    public void maxRunlongRunningSubmission() {
+
+        Date now = new Date();
+        List<Process> processList = processRepository.findAll();
+        for (Process process : processList) {
+            if ((process.getMaxRunTimeHours() != null && process.getMaxRunTimeHours() > 0)
+                    || (process.getMaxRunTimeMinutes() != null && process.getMaxRunTimeMinutes() > 0)) {
+                List<Submission> runningSubmissions = submissionRepository.findByProcessIdAndStatusId(process.getId(),
+                        Status.IN_PROGRESS);
+                if (!runningSubmissions.isEmpty()) {
+                    for (Submission submission : runningSubmissions) {
+                        long totalMaxDuration = (process.getMaxRunTimeHours() * 3600000)
+                                + (process.getMaxRunTimeMinutes() * 60000);
+                        long submissionStartTime = submission.getStartTime().getTime();
+                        if (now.getTime() - submissionStartTime > totalMaxDuration) {
+                            System.out.println("==LONG RUN == for submission: " + submission.getId());
+                            submission.setStatus(
+                                    statusRepository.findById(Status.LONG_RUNNING).orElseThrow(NotFoundException::new));
+                            submissionRepository.save(submission);
+                            // Check if notification was already send
+                            boolean wasNotificationSend = notificationLogRepository
+                                    .existsBySubmissionIdAndNotificationTemplate(submission.getId(),
+                                            NotificationTemplate.LONG_RUN_SUBMISSION);
+                            if (!wasNotificationSend) {
+                                String toEmails = this.getToEmails(submission.getProcess());
+                                EmailModel emailModel = new EmailModel(NotificationTemplate.LONG_RUN_SUBMISSION,
+                                        toEmails, false);
+                                emailModel.submission = submission;
+                                emailModel.process = submission.getProcess();
+                                spotlightEmailService.genericSend(emailModel);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private String getToEmails(Process process) {
+        User appOwner = this.getAppOwner(process);
+        String toEmails = (appOwner != null) ? appOwner.getEmail() : "";
+        toEmails = toEmails + " " + process.getSupportTeamEmail() + " " + "jamie.myers@ge.com";
+        return toEmails;
     }
 
     @Scheduled(initialDelay = MINUTES_1_DAY, fixedRate = MINUTES_1_DAY) // 1 day
@@ -573,4 +763,14 @@ public class SubmissionCronJob {
         }
     }
 
+    private Optional<Notification> getToEmailsSubmissionTypeAlerts(Long processId, String submissionType) {
+        Optional<Notification> notification = notificationRepository
+                .findFirstByProcessIdAndSubmissionTypeAndProcessStepIdIsNullAndStatusIdIsNull(processId,
+                        submissionType);
+        if (notification.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return notification;
+        }
+    }
 }

@@ -1,0 +1,41 @@
+#network {
+	height: 600px;
+}
+
+.radio-btn {
+	margin-right: 10px;
+}
+
+.relationship-table {
+	width: 100%;
+	tr {
+		td {
+			border: 1px solid lightgray;
+			&:first-child {
+				font-weight: bold;
+				width: 200px;
+				text-align: right;
+				padding-right: 10px;
+			}
+		}
+	}
+}
+
+.network-legends {
+	margin-top: 150px;
+	text-align: center;
+	img {
+		width: 80px;
+	}
+	.item {
+		margin-top: 10px;
+	}
+}
+
+.table-1 {
+	background-color: #ffffff;		
+	border-collapse:collapse;
+	border: 1px darkgray solid;
+	display:block;	
+		
+}

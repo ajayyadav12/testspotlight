@@ -30,6 +30,10 @@ public class NotificationLog {
 	private Long processId;
 	@Column(name = "process_step_id")
 	private Long processStepId;
+	@Column(name = "body")
+	private String body;
+	@Column(name = "subject")
+	private String subject;
 
 	public Long getId() {
 		return id;
@@ -101,5 +105,21 @@ public class NotificationLog {
 
 	public void setProcessStepId(Long processStepId) {
 		this.processStepId = processStepId;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public void setBody(String body) {
+		this.body = body;
+	}
+
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
 	}
 }

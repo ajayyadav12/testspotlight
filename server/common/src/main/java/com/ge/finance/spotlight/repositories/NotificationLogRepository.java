@@ -13,11 +13,13 @@ public interface NotificationLogRepository extends JpaRepository<NotificationLog
     @Query
     List<NotificationLog> findAll();
 
-    List<NotificationLog> findBySubmissionIdAndProcessStepIdIsNull(Long submissionId);
+    List<NotificationLog> findByProcessId(Long processId);
 
-    List<NotificationLog> findBySubmissionIdAndProcessStepId(Long submissionId, Long processStepId);
+    boolean existsBySubmissionIdAndProcessStepIdIsNull(Long submissionId);
 
-    List<NotificationLog> findByScheduledSubmissionIdAndNotificationTemplateAndProcessIdIsNotNull(Long submissionId,
+    boolean existsBySubmissionIdAndProcessStepId(Long submissionId, Long processStepId);
+
+    boolean existsByScheduledSubmissionIdAndNotificationTemplateAndProcessIdIsNotNull(Long submissionId,
             Long templateId);
 
     boolean existsBySubmissionIdAndNotificationTemplate(Long submissionId, Long notificationTemplate);

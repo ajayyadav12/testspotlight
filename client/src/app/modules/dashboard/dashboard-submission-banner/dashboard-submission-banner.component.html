@@ -1,18 +1,38 @@
 <div class="p-grid">
   <div class="p-col">
-    <div id="{{ 'bonus_chart_failed' + uniqueId }}"></div>
+    <div class="p-grid">
+      <div class="p-col-12">
+        <canvas id="bonus_chart_failed" width="200" height="120"></canvas>
+      </div>
+    </div>
   </div>
   <div class="p-col">
-    <div id="{{ 'bonus_chart_inprogress' + uniqueId }}"></div>
+    <div class="p-grid">
+      <div class="p-col-12">
+        <canvas id="bonus_chart_inprogress" width="200" height="120"></canvas>
+      </div>
+    </div>
   </div>
 
   <div class="p-col">
-    <div id="{{ 'bonus_chart_delayed' + uniqueId }}"></div>
+    <div class="p-grid">
+      <div class="p-col-12">
+        <canvas id="bonus_chart_delayed" width="200" height="120"></canvas>
+      </div>
+    </div>
   </div>
   <div class="p-col">
-    <div id="{{ 'bonus_chart_warning' + uniqueId }}"></div>
+    <div class="value-only-wrapper" (click)="showDialog(4)">
+      <div class="value-only-icon"><span class="warning">!</span> </div>
+      <div class="value-only">{{warning}}</div>
+      <div class="value-only-title">Warning Feeds</div>
+    </div>
   </div>
   <div class="p-col">
-    <div id="{{ 'bonus_chart_success' + uniqueId }}"></div>
+    <div class="value-only-wrapper" (click)="showDialog(5)">
+      <div class="value-only-icon"><span class="pi pi-check success"></span></div>
+      <div class="value-only">{{success}}</div>
+      <div class="value-only-title">Success Feeds</div>
+    </div>
   </div>
 </div>

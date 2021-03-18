@@ -1,0 +1,8 @@
+@import "~src/styles-variables.scss";
+.filters {
+  box-shadow: 1px 1px 10px 2px $light-blue;
+  background-color: white;
+  .content {
+    margin-left: 4em;
+  }
+}

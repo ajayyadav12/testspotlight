@@ -6,28 +6,23 @@ import { ScheduleComponent } from './schedule.component';
 import { ScheduleService } from './schedule.service';
 import { ScheduleListComponent } from './schedule-list/schedule-list.component';
 import { ScheduleDtlComponent } from './schedule-dtl/schedule-dtl.component';
-import { PrimengModule } from 'src/app/shared/primeng.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { ScheduleDtlDailyComponent } from './schedule-dtl/schedule-dtl-daily/schedule-dtl-daily.component';
-import { ScheduleDtlWeeklyComponent } from './schedule-dtl/schedule-dtl-weekly/schedule-dtl-weekly.component';
-import { ScheduleDtlMonthlyComponent } from './schedule-dtl/schedule-dtl-monthly/schedule-dtl-monthly.component';
-import { ScheduleDtlCustomComponent } from './schedule-dtl/schedule-dtl-custom/schedule-dtl-custom.component';
 import { ScheduleDtlSubmissionsComponent } from './schedule-dtl/schedule-dtl-submissions/schedule-dtl-submissions.component';
+import { ScheduleDtlFormModule } from './schedule-dtl/schedule-dtl-form/schedule-dtl-form.module';
 
 @NgModule({
   declarations: [
     ScheduleComponent,
     ScheduleListComponent,
-    ScheduleDtlComponent,
-    ScheduleDtlDailyComponent,
-    ScheduleDtlWeeklyComponent,
-    ScheduleDtlMonthlyComponent,
-    ScheduleDtlCustomComponent,
+    ScheduleDtlComponent,    
     ScheduleDtlSubmissionsComponent
   ],
-  imports: [CommonModule, ScheduleRoutingModule, SharedModule, PrimengModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule,
+    ScheduleRoutingModule,
+    SharedModule,    
+    ScheduleDtlFormModule
+    ],
   providers: [ScheduleService],
-  exports: [ScheduleDtlMonthlyComponent]
+  exports: []
 })
-export class ScheduleModule {}
+export class ScheduleModule { }

@@ -1,186 +1,184 @@
 <p-table
-  #dt
-  [value]="parents"
-  dataKey="id"
-  autoLayout="true"
-  [paginator]="true"
-  [rows]="10"
-  [totalRecords]="totalRecords"
-  [loading]="loading"
-  (onLazyLoad)="getParentSubmissions()"
-  [lazy]="true"
-  [scrollable]="true"
-  scrollHeight="540px"
+	styleClass="p-datatable-striped p-datatable-sm"
+	#dt
+	[value]="parents"
+	dataKey="id"
+	autoLayout="true"
+	[paginator]="true"
+	[rows]="10"
+	[totalRecords]="totalRecords"
+	[loading]="loading"
+	(onLazyLoad)="getParentSubmissions()"
+	[lazy]="true"
+	[scrollable]="true"
+	scrollHeight="540px"
 >
-  <ng-template pTemplate="colgroup">
-    <colgroup>
-      <col [style.width]="'4%'" #status />
-      <col [style.width]="'3%'" #expand />
-      <col [style.width]="'3%'" #id />
-      <col [style.width]="'20%'" #process />
-      <col [style.width]="'20%'" #start />
-      <col [style.width]="'20%'" #end />
-      <col [style.width]="'7%'" #adHoc />
-    </colgroup>
-  </ng-template>
-  <ng-template pTemplate="header">
-    <tr>
-      <th [pSortableColumn]="'status'" style="width: 3em">
-        <p-sortIcon *ngIf="dt.sortField && dt.sortField === 'status'" [field]="'status'"></p-sortIcon>
-      </th>
-      <th style="width: 3em"></th>
-      <th [pSortableColumn]="'id'">
-        ID<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'id'" [field]="'id'"></p-sortIcon>
-      </th>
-      <th [pSortableColumn]="'title'">
-        Process<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'title'" [field]="'title'"></p-sortIcon>
-      </th>
-      <th [pSortableColumn]="'startTime'">
-        Start Time<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'startTime'" [field]="'startTime'"></p-sortIcon>
-      </th>
-      <th [pSortableColumn]="'endTime'">
-        End Time<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'endTime'" [field]="'endTime'"></p-sortIcon>
-      </th>
-      <th [pSortableColumn]="'adHoc'">
-        Ad Hoc<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'adHoc'" [field]="'adHoc'"></p-sortIcon>
-      </th>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="body" let-submission let-expanded="expanded" let-rowIndex="rowIndex">
-    <tr (mouseenter)="showIcons = rowIndex" (mouseleave)="showIcons = -1">
-      <td>
-        <div (mouseenter)="status.toggle($event)" (mouseleave)="status.hide()">
-          <div class="circle" *ngIf="!submission.status" [ngStyle]="{ border: '2px solid grey' }"></div>
-          <div
-            class="circle"
-            *ngIf="submission.status"
-            [ngStyle]="{ 'background-color': submissionStatusColor(submission.status) }"
-          ></div>
-          <p-overlayPanel #status appendTo="body" [style]="{ 'background-color': '#fffffff5' }">
-            <div style="color: #686868">
-              <p>
-                <span *ngIf="submission.endTime" class="pi pi-check-circle" style="font-size: 150%; color: #97e5b7">
-                  <br />
-                </span>
-              </p>
-              <p>
-                <b>Status: </b>
-                <span *ngIf="submission.status">{{ submission.status }}</span>
-                <span *ngIf="!submission.status">not started</span>
-              </p>
-              <p *ngIf="submission.status === 'in progress'">
-                <b>Current Process: </b>{{ submission.children[submission.children.length - 1].process.name }}
-              </p>
-              <p><b>Elapsed Time: </b> {{ submission.elapsedTime }}</p>
-            </div>
-          </p-overlayPanel>
-        </div>
-      </td>
-      <td>
-        <i
-          style="cursor:pointer"
-          [pRowToggler]="submission"
-          [ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
-        ></i>
-      </td>
-      <td>{{ submission.id }}</td>
-      <td>{{ submission.title }}</td>
-      <td>{{ submission.startTime | date: 'short' }}</td>
-      <td>{{ submission.endTime | date: 'short' }}</td>
-      <td>
-        <span
-          *ngIf="submission.adHoc"
-          class="pi pi-calendar-times"
-          style="font-size: 150%; color: grey; padding: none"
-          pTooltip="AdHoc: true"
-          showDelay="225"
-          tooltipPosition="bottom"
-        ></span>
-        <div
-          [ngClass]="{
-            'row-even': rowIndex % 2 > 0,
-            'row-odd': rowIndex % 2 === 0
-          }"
-          class="floating-icons"
-          *ngIf="showIcons === rowIndex"
-        >
-          <span>
-            <i
-              class="pi pi-window-maximize table-icon"
-              (click)="openIsolationMode(submission)"
-              pTooltip="Open Steps"
-              tooltipPosition="bottom"
-            ></i>
-          </span>
-        </div>
-      </td>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="rowexpansion" let-submission>
-    <tr style="background-color: white">
-      <td colspan="6">
-        <app-submissions-children
-          [parent]="submission"
-          (changeView)="exit($event)"
-          [showGrouped]="true"
-        ></app-submissions-children>
-      </td>
-    </tr>
-  </ng-template>
-  <ng-template pTemplate="paginatorleft">
-    <div class="footer" style="text-align: left">
-      <br />
-      <p style="margin-left: .2em">
-        <span class="status-circle" style="background-color:#00bf6fa8"></span> Success
-        <span class="status-circle" style="background-color:#0278d9c9"></span> Progress
-        <span class="status-circle" style="background-color:#ffa500a8"></span> Warning
-        <span class="status-circle" style="background-color:#f44336a8"></span> Failed
-      </p>
-    </div>
-  </ng-template>
-  <ng-template pTemplate="paginatorright">
-    <br />
-    <span class="footer">
-      <span *ngIf="dt.totalRecords">
-        Showing {{ dt.first + 1 }} to {{ totalRecords > dt.first + dt.rows ? dt.first + dt.rows : totalRecords }} of
-      </span>
-      {{ totalRecords }} records
-      <span *ngIf="!totalRecords"> to show</span>
-    </span>
-  </ng-template>
+	<ng-template pTemplate="colgroup">
+		<colgroup>
+			<col [style.width]="'4%'" #status />
+			<col [style.width]="'3%'" #expand />
+			<col [style.width]="'3%'" #id />
+			<col [style.width]="'20%'" #process />
+			<col [style.width]="'20%'" #start />
+			<col [style.width]="'20%'" #end />
+			<col [style.width]="'3%'" #r />
+			<col [style.width]="'3%'" #w />
+			<col [style.width]="'3%'" #e />
+			<col [style.width]="'7%'" #adHoc />
+		</colgroup>
+	</ng-template>
+	<ng-template pTemplate="header">
+		<tr>
+			<th [pSortableColumn]="'status'" style="width: 3em">
+				<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'status'" [field]="'status'"> </p-sortIcon>
+			</th>
+			<th style="width: 3em"></th>
+			<th [pSortableColumn]="'id'">
+				ID<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'id'" [field]="'id'"></p-sortIcon>
+			</th>
+			<th [pSortableColumn]="'title'">
+				Process<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'title'" [field]="'title'"> </p-sortIcon>
+			</th>
+			<th [pSortableColumn]="'startTime'">
+				Start Time (EST)<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'startTime'" [field]="'startTime'">
+				</p-sortIcon>
+			</th>
+			<th [pSortableColumn]="'endTime'">
+				End Time (EST)<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'endTime'" [field]="'endTime'">
+				</p-sortIcon>
+			</th>
+			<th [pSortableColumn]="'records'" pTooltip="Records" tooltipPosition="bottom">
+				R<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'records'" [field]="'records'"> </p-sortIcon>
+			</th>
+			<th [pSortableColumn]="'warnings'" pTooltip="Warnings" tooltipPosition="bottom">
+				W<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'warnings'" [field]="'warnings'"> </p-sortIcon>
+			</th>
+			<th [pSortableColumn]="'errors'" pTooltip="Errors" tooltipPosition="bottom">
+				E<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'errors'" [field]="'errors'"> </p-sortIcon>
+			</th>
+			<th [pSortableColumn]="'adHoc'">
+				Ad Hoc<p-sortIcon *ngIf="dt.sortField && dt.sortField === 'adHoc'" [field]="'adHoc'"> </p-sortIcon>
+			</th>
+		</tr>
+	</ng-template>
+	<ng-template pTemplate="body" let-submission let-expanded="expanded" let-rowIndex="rowIndex">
+		<tr (mouseenter)="showIcons = rowIndex" (mouseleave)="showIcons = -1">
+			<td>
+				<div (mouseenter)="status.toggle($event)" (mouseleave)="status.hide()">
+					<div class="circle" *ngIf="!submission.status" [ngStyle]="{ border: '2px solid grey' }"></div>
+					<div
+						class="circle"
+						*ngIf="submission.status"
+						[ngStyle]="{ 'background-color': submissionStatusColor(submission.status) }"
+					></div>
+					<p-overlayPanel #status appendTo="body" [style]="{ 'background-color': '#fffffff5' }">
+						<div style="color: #686868">
+							<p>
+								<span
+									*ngIf="submission.endTime"
+									class="pi pi-check-circle"
+									style="font-size: 150%; color: #97e5b7"
+								>
+									<br />
+								</span>
+							</p>
+							<p>
+								<b>Status: </b>
+								<span *ngIf="submission.status">{{ submission.status }}</span>
+								<span *ngIf="!submission.status">not started</span>
+							</p>
+							<p *ngIf="submission.status === 'in progress'">
+								<b>Current Process: </b
+								>{{ submission.children[submission.children.length - 1].process.name }}
+							</p>
+							<p><b>Elapsed Time: </b> {{ submission.elapsedTime }}</p>
+						</div>
+					</p-overlayPanel>
+				</div>
+			</td>
+			<td>
+				<i
+					style="cursor: pointer"
+					[pRowToggler]="submission"
+					[ngClass]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+				></i>
+			</td>
+			<td>{{ submission.id }}</td>
+			<td>{{ submission.title }}</td>
+			<td>{{ submission.startTime | date: 'short' }}</td>
+			<td>{{ submission.endTime | date: 'short' }}</td>
+			<td>{{ submission.records }}</td>
+			<td>{{ submission.warnings }}</td>
+			<td>{{ submission.errors }}</td>
+			<td>
+				<span
+					*ngIf="submission.adHoc"
+					class="pi pi-calendar-times"
+					style="font-size: 150%; color: grey; padding: none"
+					pTooltip="AdHoc: true"
+					showDelay="225"
+					tooltipPosition="bottom"
+				></span>
+				<div
+					[ngClass]="{
+						'row-even': rowIndex % 2 > 0,
+						'row-odd': rowIndex % 2 === 0
+					}"
+					class="floating-icons"
+					*ngIf="showIcons === rowIndex"
+				>
+					<span>
+						<i
+							class="pi pi-window-maximize table-icon"
+							(click)="openIsolationMode(submission)"
+							pTooltip="Open Steps"
+							tooltipPosition="bottom"
+						></i>
+					</span>
+				</div>
+			</td>
+		</tr>
+	</ng-template>
+	<ng-template pTemplate="rowexpansion" let-submission>
+		<tr style="background-color: white">
+			<td colspan="6">
+				<app-submissions-children [parent]="submission" (changeView)="exit($event)" [showGrouped]="true">
+				</app-submissions-children>
+			</td>
+		</tr>
+	</ng-template>
+	<ng-template pTemplate="paginatorleft">
+		<div class="footer" style="text-align: left">
+			<br />
+			<p style="margin-left: 0.2em">
+				<app-ge-status-legend></app-ge-status-legend>
+			</p>
+		</div>
+	</ng-template>
+	<ng-template pTemplate="paginatorright">
+		<br />
+		<span class="footer">
+			<span *ngIf="dt.totalRecords">
+				Showing {{ dt.first + 1 }} to
+				{{ totalRecords > dt.first + dt.rows ? dt.first + dt.rows : totalRecords }} of
+			</span>
+			{{ totalRecords }} records
+			<span *ngIf="!totalRecords"> to show</span>
+		</span>
+	</ng-template>
 </p-table>
 <p-sidebar
-  *ngIf="showIsolation"
-  [(visible)]="showIsolation"
-  [fullScreen]="true"
-  [style]="{ 'background-color': '#eeefef' }"
+	*ngIf="showIsolation"
+	[(visible)]="showIsolation"
+	[fullScreen]="true"
+	[style]="{ 'background-color': '#eeefef' }"
 >
-  <div style="padding: 1.5em">
-    <app-submissions-isolation
-      [autoRefreshOn]="false"
-      [incomingSubmission]="isolatedSubmission"
-      [previousUpdatedTime]="lastUpdatedTime"
-    >
-    </app-submissions-isolation>
-  </div>
-  <div style="width: 30px; display: inline-block">
-    <img
-      src="../../../../assets/ge-logo.svg"
-      alt=""
-      class="isolation-logo"
-      pTooltip="GE Corporate"
-      tooltipPosition="right"
-      showDelay="225"
-    />
-  </div>
-  <div style="width: 30px; display: inline-block">
-    <img
-      src="../../../../assets/spotlight-logo-gray.png"
-      alt=""
-      class="isolation-logo"
-      pTooltip="Spotlight"
-      tooltipPosition="right"
-      showDelay="225"
-    />
-  </div>
+	<div style="padding: 1.5em">
+		<app-submissions-isolation
+			[autoRefreshOn]="false"
+			[incomingSubmission]="isolatedSubmission"
+			[previousUpdatedTime]="lastUpdatedTime"
+		>
+		</app-submissions-isolation>
+	</div>
 </p-sidebar>

@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.5.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.2.6.RELEASE")
     }
 }
 
@@ -19,7 +19,7 @@ repositories {
 }
 
 group 'com.ge.finance.spotlight'
-version '2.2.0'
+version '3.5.0'
 
 sourceCompatibility = 1.8
 
@@ -29,16 +29,37 @@ bootWar {
     }
 }
 
-dependencies {
+dependencies {    
     compile project(':common')
-    compile('org.glassfish.jaxb:jaxb-runtime:2.3.0.1')
-    compile('org.javassist:javassist:3.23.1-GA')
-    compile('com.oracle:ojdbc6:11.2.0')
-    //providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
+    compile('com.microsoft.sqlserver:mssql-jdbc:8.2.2.jre11')
+    compile('org.glassfish.jaxb:jaxb-runtime:2.3.2')
+    compile('org.javassist:javassist:3.27.0-GA')
+    compile('com.box:box-java-sdk:2.32.0')
+     if (project.hasProperty('tomcat')) {
+        providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
+    }
     testCompile('org.springframework.boot:spring-boot-starter-test') {
         exclude group: "org.mockito", module: "mockito-core"
     }
-    testCompile("org.mockito:mockito-core:2.23.4")
-    testCompile('org.springframework.security:spring-security-test')
+    testCompile("org.mockito:mockito-core:3.1.0")
 }
+
+task testDev(type: Test) {
+    filter {
+        includeTestsMatching "*UnitTest"
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 

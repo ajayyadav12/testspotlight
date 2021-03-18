@@ -1,5 +1,5 @@
 // tslint:disable
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { Injectable, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { By } from '@angular/platform-browser';
@@ -10,8 +10,7 @@ import { By } from '@angular/platform-browser';
 import { Component, Directive } from '@angular/core';
 import { ProcessDtlSummaryComponent } from './process-dtl-summary.component';
 import { ProcessService } from '../../process.service';
-import { SenderService } from 'src/app/modules/admin/sender/sender.service';
-import { ReceiverService } from 'src/app/modules/admin/receiver/receiver.service';
+import { SystemService } from 'src/app/modules/admin/system/system.service';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -22,6 +21,13 @@ import { PrimengModule } from 'src/app/shared/primeng.module';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
+
+@Injectable()
+class MockSessionService {
+  get role() {
+    return 'admin';
+  }
+}
 
 @Injectable()
 class MockProcessService {
@@ -64,18 +70,12 @@ class MockProcessService {
 }
 
 @Injectable()
-class MockProcessTypeService {}
+class MockProcessTypeService { }
+
 
 @Injectable()
-class MockReceiverService {
-  getAllReceiver() {
-    return of([]);
-  }
-}
-
-@Injectable()
-class MockSenderService {
-  getAllSenders() {
+class MockSystemService {
+  getAllSystems() {
     return of([]);
   }
 }
@@ -97,15 +97,8 @@ describe('ProcessDtlSummaryComponent', () => {
   let component: ProcessDtlSummaryComponent;
 
   const fakeActivatedRoute = {
-    snapshot: {
-      queryParams: {
-        returnUrl: '/'
-      },
-      paramMap: {
-        get(param) {
-          return '1';
-        }
-      }
+    parent: {
+      params: of({ id: 1 })
     }
   };
 
@@ -119,13 +112,12 @@ describe('ProcessDtlSummaryComponent', () => {
       declarations: [ProcessDtlSummaryComponent],
       providers: [
         { provide: ProcessService, useClass: MockProcessService },
-        { provide: SenderService, useClass: MockSenderService },
-        { provide: ReceiverService, useClass: MockReceiverService },
+        { provide: SystemService, useClass: MockSystemService },
         FormBuilder,
         MessageService,
         { provide: ActivatedRoute, useFactory: () => fakeActivatedRoute },
         { provide: SidebarService, useFactory: () => fakeSidevarSvc },
-        SessionService,
+        { provide: SessionService, useClass: MockSessionService },
         { provide: UserService, useClass: MockUserService },
         { provide: Router, useClass: MockRouter }
       ],
@@ -142,17 +134,6 @@ describe('ProcessDtlSummaryComponent', () => {
   it('should run #setupForm()', async () => {
     component.setupForm();
     expect(component.processForm).toBeDefined();
-  });
-
-  it('should run #getProcess() with process parent', async () => {
-    component.onChangeProcessParent = jest.fn(x => {});
-    component.processApprovalStatusAction = jest.fn(x => {});
-
-    component.getProcess(2);
-
-    expect(component.onChangeProcessParent).toHaveBeenCalled();
-    expect(component.processApprovalStatusAction).toHaveBeenCalled();
-    expect(fakeSidevarSvc.title).toBe('Process: test');
   });
 
   it('should run #processApprovalStatusAction() when approved', async () => {

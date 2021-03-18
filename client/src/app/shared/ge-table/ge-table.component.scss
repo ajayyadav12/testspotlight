@@ -1,7 +1,6 @@
 @import '~src/styles-variables.scss';
 
-.table-icon {
-  font-size: 1.8em;
+.table-icon {  
   padding: 2px;
   cursor: pointer;
   &:hover {
@@ -13,8 +12,15 @@
 .floating-icons {
   float: right;
   position: absolute;
-  width: 70px;
   right: 0px;
+}
+
+.floating-icons-2 {
+  width: 70px;
+}
+
+.floating-icons-3 {
+  width: 105px;
 }
 
 .row-even {
@@ -23,4 +29,10 @@
 
 .row-odd {
   background-color: white;
+}
+
+pre {
+    margin: 0;    
+    font-family: Roboto;
+    font-size: small;
 }

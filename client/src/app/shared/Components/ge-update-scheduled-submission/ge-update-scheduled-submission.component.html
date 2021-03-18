@@ -1,0 +1,35 @@
+<p-dialog [modal]="true" [(visible)]="displayEditDialog">
+	<p-header>
+		Edit Schedule Submission <b>#{{ schedSubmissionID }}</b></p-header
+	>
+	<div class="warning">All times are in ET</div>
+	<form [formGroup]="_scheduledSubmissionForm">
+		<div class="p-grid" style="margin: 20px 50px 400px 50px">
+			<div class="p-md-6">
+				<span class="p-float-label">
+					<p-calendar formControlName="startTime" [showTime]="true"> </p-calendar>
+					<label for="startTime">Start Date</label>
+				</span>
+			</div>
+			<div class="p-md-6">
+				<span class="p-float-label">
+					<p-calendar formControlName="endTime" [showTime]="true"> </p-calendar>
+					<label for="endTime">End Date</label>
+				</span>
+			</div>
+			<br /><br /><br /><br /><br />
+			<p-header>Edit Note :</p-header>
+			<div class="p-md-12">
+				<textarea pInputTextarea formControlName="editNotes" style="border-style: groove !important"></textarea>
+			</div>
+			<div class="p-md-12">
+				<p-button
+					[disabled]="!_scheduledSubmissionForm.valid"
+					label="Update"
+					(onClick)="updateUpcomingSubmission()"
+				>
+				</p-button>
+			</div>
+		</div>
+	</form>
+</p-dialog>
